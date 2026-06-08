@@ -34,10 +34,10 @@ export const emailCheckLimiter = rateLimit({
     },
 });
 
-// Limits for forgot password (3 attempts per hour)
+// Limits for forgot password (10 attempts per 15 mins)
 export const forgotPasswordLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: 3,
+    windowMs: 15 * 60 * 1000,
+    max: 10,
     message: { success: false, message: "Too many password reset requests. Please try again later.", code: "RATE_LIMIT_EXCEEDED" },
     standardHeaders: true,
     legacyHeaders: false,
