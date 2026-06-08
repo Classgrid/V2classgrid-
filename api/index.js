@@ -94,6 +94,15 @@ app.use((req, res, next) => {
   next();
 });
 
+/* ---------- SUBDOMAIN ROUTING ---------- */
+app.use((req, res, next) => {
+  const host = req.hostname || req.get('host') || '';
+  if (host.includes('v2.superadmin.classgrid.in') && req.path === '/') {
+    return res.sendFile(path.join(__dirname, "../public/super-admin-dashboard.html"));
+  }
+  next();
+});
+
 /* ---------- STATIC FILES ---------- */
 app.use(express.static(path.join(__dirname, "../public")));
 
@@ -160,19 +169,6 @@ app.get("/api/auth/callback/github", (req, res) => {
 app.get("/api/auth/callback/facebook", (req, res) => {
   const qs = req.url.includes("?") ? req.url.substring(req.url.indexOf("?")) : "";
   res.redirect(307, `/api/auth/facebook/callback${qs}`);
-});
-
-app.get("/api/config", (req, res) => {
-  res.json({ recaptchaSiteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY });
-});
-
-/* ---------- SUBDOMAIN ROUTING ---------- */
-app.use((req, res, next) => {
-  const host = req.hostname || req.get('host') || '';
-  if (host.includes('v2.superadmin.classgrid.in') && req.path === '/') {
-    return res.sendFile(path.join(__dirname, "../public/super-admin-dashboard.html"));
-  }
-  next();
 });
 
 app.get("/", (req, res) => {
