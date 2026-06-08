@@ -161,7 +161,7 @@ async function init() {
 
         // Admins should never end up on the classroom hub
         if (freshUser.role === 'super_admin') {
-            window.location.href = '/super-admin-dashboard';
+            window.location.href = 'https://v2.superadmin.classgrid.in';
             return;
         }
         if (freshUser.role === 'org_admin') {

@@ -3716,7 +3716,7 @@
                 // ── Role-based routing ─────────────────────────────
                 // Admins should never end up on the classroom hub
                 if (currentUser.role === 'super_admin') {
-                    window.location.href = '/super-admin-dashboard';
+                    window.location.href = 'https://v2.superadmin.classgrid.in';
                     return;
                 }
                 if (currentUser.role === 'org_admin') {

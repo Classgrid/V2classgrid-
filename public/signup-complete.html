@@ -516,7 +516,7 @@
                             // Role-based routing (similar to login)
                             const role = data.user && data.user.role;
                             if (role === 'super_admin') {
-                                window.location.href = '/super-admin-dashboard';
+                                window.location.href = 'https://v2.superadmin.classgrid.in';
                             } else if (role === 'org_admin') {
                                 const orgName = data.user.organization && data.user.organization.name ? encodeURIComponent(data.user.organization.name.replace(/\s+/g, '-').toLowerCase()) : 'dashboard';
                                 window.location.href = `/org/${orgName}/admin`;

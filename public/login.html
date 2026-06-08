@@ -1203,7 +1203,7 @@
         <button class="close-modal" id="closeModal"><i class="fas fa-times"></i></button>
       </div>
       <div class="support-form-container">
-        <form action="https://formspree.io/f/mwvpkjzn" method="POST" id="supportForm">
+        <form action="https://formspree.io/f/xwvjoojo" method="POST" id="supportForm">
           <h3 style="color:#111111;margin-bottom:1.5rem;font-size:1.3rem;">Contact us</h3>
           <div class="support-form-group"><label class="support-form-label">Your name <span
                 class="required">*</span></label><input type="text" name="name" class="support-form-input" required>
@@ -1541,7 +1541,7 @@
 
     function redirectByRole(user) {
       const role = user && user.role;
-      if (role === 'super_admin') { window.location.href = '/super-admin-dashboard'; }
+      if (role === 'super_admin') { window.location.href = 'https://v2.superadmin.classgrid.in'; }
       else if (role === 'org_admin') {
         const n = user.organization && user.organization.name ? encodeURIComponent(user.organization.name.replace(/\s+/g, '-').toLowerCase()) : 'dashboard';
         window.location.href = `/org/${n}/admin`;
