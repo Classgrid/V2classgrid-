@@ -58,6 +58,7 @@ app.use(
       "http://127.0.0.1:3000",
       "https://www.classgrid.in",
       "https://classgrid.in",
+      "https://v2.classgrid.in",
       "https://classgridplatform.vercel.app"
     ],
     credentials: true
@@ -163,6 +164,15 @@ app.get("/api/auth/callback/facebook", (req, res) => {
 
 app.get("/api/config", (req, res) => {
   res.json({ recaptchaSiteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY });
+});
+
+/* ---------- SUBDOMAIN ROUTING ---------- */
+app.use((req, res, next) => {
+  const host = req.hostname || req.get('host') || '';
+  if (host.includes('v2.superadmin.classgrid.in') && req.path === '/') {
+    return res.sendFile(path.join(__dirname, "../public/super-admin-dashboard.html"));
+  }
+  next();
 });
 
 app.get("/", (req, res) => {
