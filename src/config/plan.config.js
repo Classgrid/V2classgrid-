@@ -135,5 +135,5 @@ export function getEffectivePlan(plan, planExpiresAt) {
  */
 export const PAYMENT_CONFIG = {
     upiId: process.env.PAYMENT_UPI_ID || "nikhilsubsun321@oksbi",
-    qrImageUrl: process.env.PAYMENT_QR_URL || "https://fiherpwzabiftbkwuqsb.supabase.co/storage/v1/object/public/notes-files/gpay-qr.png",
+    qrImageUrl: process.env.PAYMENT_QR_URL || "https://bumxgscngzjadyozdpce.supabase.co/storage/v1/object/public/notes-files/gpay-qr.png",
 };

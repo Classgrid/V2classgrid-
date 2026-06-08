@@ -8,7 +8,7 @@ const getFrontendUrl = () => {
   return process.env.FRONTEND_URL?.trim() || (process.env.NODE_ENV === "production" ? "https://classgrid.in" : "http://localhost:3000");
 };
 
-const PLATFORM_LOGO_URL = "https://fiherpwzabiftbkwuqsb.supabase.co/storage/v1/object/public/notes-files/android-chrome-512x512.png";
+const PLATFORM_LOGO_URL = "https://bumxgscngzjadyozdpce.supabase.co/storage/v1/object/public/notes-files/android-chrome-512x512.png";
 
 const formatDate = () => {
   return new Date().toLocaleString("en-IN", {
