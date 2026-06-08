@@ -171,6 +171,10 @@ app.get("/api/auth/callback/facebook", (req, res) => {
   res.redirect(307, `/api/auth/facebook/callback${qs}`);
 });
 
+app.get("/api/config", (req, res) => {
+  res.json({ recaptchaSiteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY });
+});
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));
 });
