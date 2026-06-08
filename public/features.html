@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- Primary SEO -->
+    <title>Features – Classgrid | AI-Powered Classroom Platform</title>
+    <meta name="description"
+        content="Explore everything Classgrid offers — AI academic assistant, smart attendance, real-time classroom chat, structured notes, organization management, and more." />
+    <meta name="keywords"
+        content="Classgrid features, AI classroom, smart attendance, notes sharing, classroom management, education platform India" />
+    <meta name="author" content="Nikhil Shinde" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://classgrid.in/features" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Features – Classgrid | AI-Powered Classroom Platform" />
+    <meta property="og:description"
+        content="Discover all features of Classgrid — the AI-native classroom platform for institutions." />
+    <meta property="og:url" content="https://classgrid.in/features" />
+    <meta property="og:image" content="https://classgrid.in/images/classgrid-preview.png" />
+    <meta property="og:site_name" content="Classgrid" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hi: rgba(255, 255, 255, 0.16);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --muted: #888888;
+            --dim: #444444;
+            --sidebar-w: 240px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: #000;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1.5rem 1.4rem 1.3rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 9.5px;
+            background: var(--grad-bp);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            border-radius: 7px;
+            z-index: 0;
+        }
+
+        .logo-box img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .brand-name em {
+            font-style: normal;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-section {
+            padding: 1.2rem 1rem 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dim);
+            padding: 0 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 1px;
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(74, 144, 245, 0.1);
+            color: #fff;
+        }
+
+        .nav-item.active i {
+            color: var(--blue-light);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.6rem 1rem;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-size: 0.73rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .sidebar-badge strong {
+            color: #aaa;
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.76rem;
+        }
+
+        /* Hamburger */
+        .ham {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 200;
+            flex-direction: column;
+            gap: 5px;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            cursor: pointer;
+        }
+
+        .ham span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.28s ease;
+        }
+
+        .ham.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .ham.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .ham.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* Reading progress */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 2px;
+            z-index: 200;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: var(--grad-bp);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+        }
+
+        .page-hero {
+            padding: 3.5rem 4rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            background: #000;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue);
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            color: #fff;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+        }
+
+        .page-title span {
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-sub {
+            font-size: 0.92rem;
+            color: var(--muted);
+            max-width: 540px;
+            line-height: 1.75;
+        }
+
+        /* Content */
+        .content-wrap {
+            padding: 3rem 4rem 5rem;
+            max-width: 820px;
+        }
+
+        .feature-section {
+            margin-bottom: 3.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .feature-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-num {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #4a90f5, #a855f7, #ec4899, #f5a623);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .feature-section p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.92);
+            line-height: 1.9;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .feature-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .sub-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 1.75rem 0 0.65rem;
+        }
+
+        /* Feature list */
+        .feat-list {
+            list-style: none;
+            margin: 1rem 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .feat-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.7;
+        }
+
+        .feat-list li i {
+            color: var(--blue-light);
+            font-size: 0.65rem;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .feat-list li strong {
+            color: #fff;
+        }
+
+        /* Highlight block */
+        .highlight-block {
+            border-left: 2px solid rgba(74, 144, 245, 0.4);
+            padding: 0.85rem 1.2rem;
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .highlight-block p {
+            font-size: 0.875rem !important;
+            color: rgba(255, 255, 255, 0.45) !important;
+            margin: 0 !important;
+            line-height: 1.8 !important;
+            font-weight: 400 !important;
+        }
+
+        /* Plan comparison table */
+        .plan-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .plan-table th,
+        .plan-table td {
+            padding: 0.65rem 0.9rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .plan-table th {
+            color: var(--blue-light);
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .plan-table td {
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .plan-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* CTA block */
+        .cta-block {
+            margin-top: 1.5rem;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .cta-block h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .cta-block p {
+            color: var(--muted) !important;
+            font-size: 0.875rem !important;
+            margin-bottom: 1rem !important;
+            font-weight: 400 !important;
+        }
+
+        .cta-link {
+            display: inline-block;
+            padding: 0.65rem 1.8rem;
+            background: var(--grad-bp);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: opacity 0.2s;
+        }
+
+        .cta-link:hover {
+            opacity: 0.85;
+        }
+
+        .back-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            background: #111;
+            border: 1px solid var(--border-hi);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 50;
+            font-size: 0.8rem;
+        }
+
+        .back-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-top:hover {
+            background: #1a1a1a;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .reading-progress {
+                left: 0;
+            }
+
+            .ham {
+                display: flex;
+            }
+
+            .content-wrap {
+                padding: 2rem 1.5rem 3rem;
+            }
+
+            .page-hero {
+                padding: 4rem 1.5rem 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-wrap {
+                padding: 1.5rem 1.2rem 3rem;
+            }
+
+            .page-hero {
+                padding: 3.5rem 1.2rem 1.5rem;
+            }
+
+            .plan-table {
+                font-size: 0.78rem;
+            }
+
+            .plan-table th,
+            .plan-table td {
+                padding: 0.5rem 0.6rem;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-hero-inner {
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="reading-progress">
+        <div class="reading-progress-bar" id="progressBar"></div>
+    </div>
+    <button class="ham" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <a href="index" class="sidebar-logo">
+            <div class="logo-box"><img src="/Classgrid.png" alt="Classgrid"></div>
+            <span class="brand-name">Class<em>grid</em></span>
+        </a>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Navigation</div>
+            <a href="index" class="nav-item"><i class="fas fa-house"></i> Home</a>
+            <a href="features" class="nav-item active"><i class="fas fa-bolt"></i> Features</a>
+            <a href="get-started" class="nav-item"><i class="fas fa-rocket"></i> Get Started</a>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Sections</div>
+            <a href="#s1" class="nav-item"><i class="fas fa-building"></i> Organization</a>
+            <a href="#s2" class="nav-item"><i class="fas fa-chalkboard-teacher"></i> Faculty</a>
+            <a href="#s3" class="nav-item"><i class="fas fa-th-large"></i> Classrooms</a>
+            <a href="#s4" class="nav-item"><i class="fas fa-robot"></i> AI Engine</a>
+            <a href="#s5" class="nav-item"><i class="fas fa-graduation-cap"></i> Students</a>
+            <a href="#s6" class="nav-item"><i class="fas fa-file-alt"></i> Notes</a>
+            <a href="#s7" class="nav-item"><i class="fas fa-clipboard-check"></i> Attendance</a>
+            <a href="#s8" class="nav-item"><i class="fas fa-comments"></i> Chat</a>
+            <a href="#s9" class="nav-item"><i class="fas fa-shield-halved"></i> Security</a>
+            <a href="#s10" class="nav-item"><i class="fas fa-bell"></i> Notifications</a>
+            <a href="#s11" class="nav-item"><i class="fas fa-tags"></i> Plans</a>
+            <a href="#s12" class="nav-item"><i class="fas fa-user-shield"></i> Admin</a>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Legal</div>
+            <a href="privacy" class="nav-item"><i class="fas fa-shield-halved"></i> Privacy Policy</a>
+            <a href="terms" class="nav-item"><i class="fas fa-file-contract"></i> Terms of Service</a>
+            <a href="contact" class="nav-item"><i class="fas fa-envelope"></i> Contact</a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-badge">
+                <strong>All-in-One Platform</strong>
+                Every feature listed here works together inside one unified system.
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="page-hero">
+            <div class="page-hero-inner">
+                <div class="page-badge"><span class="badge-dot"></span>Platform Features</div>
+                <h1 class="page-title">Everything in <span>Classgrid</span></h1>
+                <p class="page-sub">A comprehensive look at every feature available on the platform — from organization
+                    management and AI-powered learning to security and real-time collaboration.</p>
+            </div>
+        </div>
+
+        <div class="content-wrap">
+
+            <!-- 01 — ORGANIZATION MANAGEMENT -->
+            <div class="feature-section" id="s1">
+                <div class="section-header">
+                    <div class="section-num">01</div>
+                    <div class="section-title">Organization Setup</div>
+                </div>
+                <p>Every institution starts as an Organization — a unified workspace for faculty, classrooms, and
+                    students under one roof.</p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>One-click application:</strong> Admins apply with institute
+                        name, logo, and contact details</li>
+                    <li><i class="fas fa-check"></i> <strong>Dual secure codes:</strong> Each org gets a unique
+                        Organization Code (for faculty) and Honor Code (for students) — never shared publicly</li>
+                    <li><i class="fas fa-check"></i> <strong>Org Admin dashboard:</strong> Full visibility into faculty,
+                        students, classrooms, and settings</li>
+                    <li><i class="fas fa-check"></i> <strong>Faculty management:</strong> Add or remove faculty via
+                        email invite with auto password setup</li>
+                    <li><i class="fas fa-check"></i> <strong>Single-org enforcement:</strong> Users belong to exactly
+                        one organization — no cross-org data leaks</li>
+                    <li><i class="fas fa-check"></i> <strong>Organization deletion:</strong> Full hard-delete with email
+                        verification — removes all data permanently</li>
+                </ul>
+            </div>
+
+            <!-- 02 — FACULTY DASHBOARD -->
+            <div class="feature-section" id="s2">
+                <div class="section-header">
+                    <div class="section-num">02</div>
+                    <div class="section-title">Faculty Dashboard</div>
+                </div>
+                <p>Faculty get a centralized command center to manage classrooms, content, and students in one place.
+                </p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>Profile management:</strong> Update name, email, and
+                        password from the dashboard</li>
+                    <li><i class="fas fa-check"></i> <strong>Classroom overview:</strong> See all classrooms with
+                        student counts and join codes at a glance</li>
+                    <li><i class="fas fa-check"></i> <strong>Activity logs:</strong> Track events across classrooms —
+                        joins, announcements, uploads</li>
+                    <li><i class="fas fa-check"></i> <strong>Notification center:</strong> In-app alerts for join
+                        requests, system events, and student activity</li>
+                    <li><i class="fas fa-check"></i> <strong>Faculty invite flow:</strong> Email invite → set password →
+                        enter Org Code → start teaching</li>
+                    <li><i class="fas fa-check"></i> <strong>Admin password reset:</strong> Org Admins can trigger
+                        password reset emails for any faculty</li>
+                </ul>
+            </div>
+
+            <!-- 03 — CLASSROOM MANAGEMENT -->
+            <div class="feature-section" id="s3">
+                <div class="section-header">
+                    <div class="section-num">03</div>
+                    <div class="section-title">Classroom Controls</div>
+                </div>
+                <p>Classrooms are the core workspace — structured, secure, and fully controlled by faculty.</p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>Create classrooms:</strong> Set name, subject, description,
+                        and capacity — limited per plan</li>
+                    <li><i class="fas fa-check"></i> <strong>Join via code:</strong> Students join instantly using a
+                        6-character classroom code</li>
+                    <li><i class="fas fa-check"></i> <strong>Approval-based join:</strong> Faculty can require manual
+                        approval before students gain access</li>
+                    <li><i class="fas fa-check"></i> <strong>Bulk approve/reject:</strong> Process multiple join
+                        requests at once with enforced limits</li>
+                    <li><i class="fas fa-check"></i> <strong>Member management:</strong> View all students, remove
+                        members, and track join history</li>
+                    <li><i class="fas fa-check"></i> <strong>Archive classrooms:</strong> Archive old classrooms to keep
+                        the dashboard clean</li>
+                    <li><i class="fas fa-check"></i> <strong>Classroom settings:</strong> Toggle join requests, set
+                        capacity limits, manage visibility</li>
+                </ul>
+            </div>
+
+            <!-- 04 — AI ENGINE -->
+            <div class="feature-section" id="s4">
+                <div class="section-header">
+                    <div class="section-num">04</div>
+                    <div class="section-title">AI Academic Engine</div>
+                </div>
+                <p>Classgrid AI is embedded directly into the classroom workflow — serving students and faculty with
+                    contextual intelligence.</p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>Instant doubt solving:</strong> Students get AI-generated
+                        answers in real time without waiting</li>
+                    <li><i class="fas fa-check"></i> <strong>Smart Assistance:</strong> AI assists students with
+                        uploaded
+                        notes and classroom content</li>
+                    <li><i class="fas fa-check"></i> <strong>Lecture summaries:</strong> Condenses long materials into
+                        structured, digestible summaries</li>
+                    <li><i class="fas fa-check"></i> <strong>Academic assistance:</strong> Contextual help aligned with
+                        classroom curriculum</li>
+                    <li><i class="fas fa-check"></i> <strong>Content support:</strong> Helps faculty organize and manage
+                        academic content intelligently</li>
+                </ul>
+                <div class="highlight-block">
+                    <p><strong>AI Routing:</strong> Primary inference via Groq (LLaMA). On rate limits, the system
+                        auto-falls back to Gemini Flash — zero interruption.</p>
+                </div>
+            </div>
+
+            <!-- 05 — STUDENT EXPERIENCE -->
+            <div class="feature-section" id="s5">
+                <div class="section-header">
+                    <div class="section-num">05</div>
+                    <div class="section-title">Student Experience</div>
+                </div>
+                <p>Students get a clean, focused environment designed for learning — not distractions.</p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>Personal dashboard:</strong> See enrolled classrooms,
+                        pending requests, and notifications</li>
+                    <li><i class="fas fa-check"></i> <strong>Flexible entry:</strong> Join by code (instant) or via
+                        request (approval) — both supported</li>
+                    <li><i class="fas fa-check"></i> <strong>Notes & announcements:</strong> View all faculty-posted
+                        notes and classroom material in real time</li>
+                    <li><i class="fas fa-check"></i> <strong>Track progress:</strong> Monitor attendance and academic
+                        progress within the classroom</li>
+                    <li><i class="fas fa-check"></i> <strong>Peer contribution:</strong> Upload notes to a dedicated
+                        student section — kept distinct</li>
+                    <li><i class="fas fa-check"></i> <strong>Honor Code joining:</strong> Enter org Honor Code to link
+                        accounts — prevents cross-org issues</li>
+                </ul>
+            </div>
+
+            <!-- 06 — NOTES & CONTENT -->
+            <div class="feature-section" id="s6">
+                <div class="section-header">
+                    <div class="section-num">06</div>
+                    <div class="section-title">Notes & Content</div>
+                </div>
+                <p>Structured content delivery — faculty upload material, students access it instantly, and peer
+                    contributions stay separate.</p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>Faculty uploads:</strong> Upload PDFs, documents, and study
+                        material to specific classrooms</li>
+                    <li><i class="fas fa-check"></i> <strong>Student uploads:</strong> Students contribute notes to a
+                        dedicated peer resources section</li>
+                    <li><i class="fas fa-check"></i> <strong>Review system:</strong> Student-uploaded notes go through
+                        approval before becoming visible</li>
+                    <li><i class="fas fa-check"></i> <strong>Org-isolated notes:</strong> Notes visible only within the
+                        same organization — no cross-org access</li>
+                    <li><i class="fas fa-check"></i> <strong>Secure storage:</strong> Files stored on Supabase with
+                        signed URLs and access controls</li>
+                    <li><i class="fas fa-check"></i> <strong>Announcements:</strong> Faculty post class-wide updates
+                        visible to all enrolled students</li>
+                </ul>
+            </div>
+
+            <!-- 07 — ATTENDANCE -->
+            <div class="feature-section" id="s7">
+                <div class="section-header">
+                    <div class="section-num">07</div>
+                    <div class="section-title">Smart Attendance</div>
+                </div>
+                <p>Attendance tracking built natively into the classroom — no external tools or manual spreadsheets.</p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>Faculty-initiated:</strong> Start and stop attendance
+                        sessions from within the classroom</li>
+                    <li><i class="fas fa-check"></i> <strong>Daily reports:</strong> View who was present, absent, or
+                        late for each session</li>
+                    <li><i class="fas fa-check"></i> <strong>Weekly reports:</strong> Aggregate view showing attendance
+                        trends across the week</li>
+                    <li><i class="fas fa-check"></i> <strong>Monthly summaries:</strong> Full monthly breakdown for
+                        academic record-keeping</li>
+                    <li><i class="fas fa-check"></i> <strong>Student view:</strong> Students see their own attendance
+                        history and participation record</li>
+                </ul>
+                <div class="highlight-block">
+                    <p><strong>Pro Plan Only:</strong> Smart Attendance, reports, and advanced analytics are exclusive
+                        to the Pro plan.</p>
+                </div>
+            </div>
+
+            <!-- 08 — REAL-TIME CHAT -->
+            <div class="feature-section" id="s8">
+                <div class="section-header">
+                    <div class="section-num">08</div>
+                    <div class="section-title">Real-Time Chat</div>
+                </div>
+                <p>Live collaboration for doubts, peer discussion, and academic exchange — mirroring in-person
+                    interaction.</p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>Live messaging:</strong> Students and faculty communicate
+                        in real time within each classroom</li>
+                    <li><i class="fas fa-check"></i> <strong>Faculty monitoring:</strong> Teachers can observe and
+                        moderate all chat activity</li>
+                    <li><i class="fas fa-check"></i> <strong>Scoped context:</strong> Chat is scoped to individual
+                        classrooms — no cross-classroom noise</li>
+                    <li><i class="fas fa-check"></i> <strong>Active tracking:</strong> Faculty see who's online and
+                        engaging in the classroom right now</li>
+                </ul>
+            </div>
+
+            <!-- 09 — SECURITY -->
+            <div class="feature-section" id="s9">
+                <div class="section-header">
+                    <div class="section-num">09</div>
+                    <div class="section-title">Security & Auth</div>
+                </div>
+                <p>Enterprise-grade security built into every layer — authentication, authorization, and data
+                    protection.</p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>4 login providers:</strong> Google OAuth, GitHub, LinkedIn,
+                        and Email/Password — all verified</li>
+                    <li><i class="fas fa-check"></i> <strong>JWT encryption:</strong> Every session is encrypted with
+                        JSON Web Tokens — no plain-text auth</li>
+                    <li><i class="fas fa-check"></i> <strong>bcrypt hashing:</strong> All passwords are salted and
+                        hashed using bcrypt — never stored in plaintext</li>
+                    <li><i class="fas fa-check"></i> <strong>Email verification:</strong> New accounts must verify email
+                        before gaining full access</li>
+                    <li><i class="fas fa-check"></i> <strong>Login alerts:</strong> Automatic email notification sent on
+                        every login — full account awareness</li>
+                    <li><i class="fas fa-check"></i> <strong>Role-based access:</strong> Strict separation — Super
+                        Admin, Org Admin, Faculty, Student scoped</li>
+                    <li><i class="fas fa-check"></i> <strong>Code isolation:</strong> Org Codes and Honor Codes prevent
+                        unauthorized cross-org access</li>
+                </ul>
+            </div>
+
+            <!-- 10 — NOTIFICATIONS -->
+            <div class="feature-section" id="s10">
+                <div class="section-header">
+                    <div class="section-num">10</div>
+                    <div class="section-title">Notifications</div>
+                </div>
+                <p>Stay informed without noise. Notifications are contextual and actionable — in-app and via email.</p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>In-app alerts:</strong> Join approvals, classroom updates,
+                        and system alerts — all in the dashboard</li>
+                    <li><i class="fas fa-check"></i> <strong>Email alerts:</strong> Invites, resets, org approvals, join
+                        approvals, and login alerts via SMTP</li>
+                    <li><i class="fas fa-check"></i> <strong>Pro activation email:</strong> Admins receive confirmation
+                        with plan details and expiry date</li>
+                    <li><i class="fas fa-check"></i> <strong>Org approval email:</strong> Admins receive org codes,
+                        honor codes, and onboarding details</li>
+                </ul>
+            </div>
+
+            <!-- 11 — PLANS & LIMITS -->
+            <div class="feature-section" id="s11">
+                <div class="section-header">
+                    <div class="section-num">11</div>
+                    <div class="section-title">Plans & Limits</div>
+                </div>
+                <p>Simple, transparent pricing. All limits enforced at the API level — no soft limits, no overages.</p>
+
+                <table class="plan-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Starter (Free)</th>
+                            <th>Pro (₹100/mo)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Faculty Accounts</td>
+                            <td>5</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>Classrooms per Faculty</td>
+                            <td>2</td>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>Students per Classroom</td>
+                            <td>60</td>
+                            <td>150</td>
+                        </tr>
+                        <tr>
+                            <td>Org-Wide Student Cap</td>
+                            <td>600</td>
+                            <td>7,500</td>
+                        </tr>
+                        <tr>
+                            <td>Smart Attendance</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Attendance Reports</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Advanced Analytics</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
+                            <td>Priority Feature Access</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-block">
+                    <p><strong>Plan Expiry:</strong> When Pro expires, the system falls back to Free limits. Data is
+                        preserved but new additions are blocked until renewed.</p>
+                </div>
+
+                <div class="cta-block">
+                    <h3>Ready to Start?</h3>
+                    <p>Create your organization for free, or upgrade to Pro for full capacity.</p>
+                    <a href="get-started" class="cta-link">View Plans →</a>
+                </div>
+            </div>
+
+            <!-- 12 — SUPER ADMIN -->
+            <div class="feature-section" id="s12">
+                <div class="section-header">
+                    <div class="section-num">12</div>
+                    <div class="section-title">Super Admin Control</div>
+                </div>
+                <p>Platform-level administration — full control over organizations, users, plans, and content
+                    moderation.</p>
+                <ul class="feat-list">
+                    <li><i class="fas fa-check"></i> <strong>Org approvals:</strong> Review pending applications and
+                        activate or decline organizations</li>
+                    <li><i class="fas fa-check"></i> <strong>Pro plan activation:</strong> Instant Pro plan activation
+                        upon successful payment</li>
+                    <li><i class="fas fa-check"></i> <strong>Plan management:</strong> Upgrade, downgrade, or extend
+                        plans for any organization</li>
+                    <li><i class="fas fa-check"></i> <strong>User management:</strong> Suspend, block, or reactivate any
+                        user account platform-wide</li>
+                    <li><i class="fas fa-check"></i> <strong>Org control:</strong> Suspend, block, reactivate, or
+                        permanently delete organizations</li>
+                    <li><i class="fas fa-check"></i> <strong>Notes moderation:</strong> Review, approve, or reject
+                        student-uploaded notes platform-wide</li>
+                    <li><i class="fas fa-check"></i> <strong>Co-Admin creation:</strong> Create additional Super Admin
+                        accounts with full platform access</li>
+                </ul>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        const ham = document.getElementById('hamBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        ham.addEventListener('click', () => { ham.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+        overlay.addEventListener('click', () => { ham.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+        const progressBar = document.getElementById('progressBar');
+        const backTop = document.getElementById('backTop');
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docH = document.documentElement.scrollHeight - window.innerHeight;
+            progressBar.style.width = (scrollTop / docH * 100) + '%';
+            backTop.classList.toggle('show', scrollTop > 300);
+        }, { passive: true });
+
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.feature-section').forEach(el => io.observe(el));
+
+        // Sidebar active link on scroll
+        const sections = document.querySelectorAll('.feature-section[id]');
+        const navItems = document.querySelectorAll('.sidebar .nav-item[href^="#"]');
+        const sectionIO = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    navItems.forEach(n => n.classList.remove('active'));
+                    const active = document.querySelector(`.sidebar .nav-item[href="#${e.target.id}"]`);
+                    if (active) active.classList.add('active');
+                }
+            });
+        }, { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' });
+        sections.forEach(s => sectionIO.observe(s));
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- Primary SEO -->
+    <title>Terms of Service | Classgrid – AI Classroom Platform</title>
+    <meta name="description"
+        content="Classgrid Terms of Service — Read the terms and conditions governing the use of our AI-powered intelligent classroom platform." />
+    <meta name="keywords" content="Classgrid terms, terms of service, education platform terms, AI classroom rules" />
+    <meta name="author" content="Nikhil Shinde" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://classgrid.in/terms" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Terms of Service – Classgrid" />
+    <meta property="og:description" content="Terms and conditions for using the Classgrid AI classroom platform." />
+    <meta property="og:url" content="https://classgrid.in/terms" />
+    <meta property="og:image" content="https://classgrid.in/images/classgrid-preview.png" />
+    <meta property="og:site_name" content="Classgrid" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hi: rgba(255, 255, 255, 0.16);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --muted: #888888;
+            --dim: #444444;
+            --sidebar-w: 240px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: #000;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1.5rem 1.4rem 1.3rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 9.5px;
+            background: var(--grad-bp);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            border-radius: 7px;
+            z-index: 0;
+        }
+
+        .logo-box img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .brand-name em {
+            font-style: normal;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-section {
+            padding: 1.2rem 1rem 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dim);
+            padding: 0 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 1px;
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(74, 144, 245, 0.1);
+            color: #fff;
+        }
+
+        .nav-item.active i {
+            color: var(--blue-light);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.6rem 1rem;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-size: 0.73rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .sidebar-badge strong {
+            color: #aaa;
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.76rem;
+        }
+
+        /* Hamburger */
+        .ham {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 200;
+            flex-direction: column;
+            gap: 5px;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            cursor: pointer;
+        }
+
+        .ham span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.28s ease;
+        }
+
+        .ham.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .ham.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .ham.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* Reading progress */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 2px;
+            z-index: 200;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: var(--grad-bp);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+        }
+
+        .page-hero {
+            padding: 3.5rem 4rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            background: #000;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue);
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            color: #fff;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+        }
+
+        .page-title span {
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Content */
+        .content-wrap {
+            padding: 3rem 4rem 5rem;
+            max-width: 780px;
+        }
+
+        .policy-section {
+            margin-bottom: 3.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .policy-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-num {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #4a90f5, #a855f7, #ec4899, #f5a623);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .policy-section p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.92);
+            line-height: 1.9;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .policy-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .sub-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 1.75rem 0 0.65rem;
+        }
+
+        .note-block {
+            border-left: 2px solid rgba(74, 144, 245, 0.4);
+            padding: 0.85rem 1.2rem;
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .note-block p {
+            font-size: 0.875rem !important;
+            color: rgba(255, 255, 255, 0.45) !important;
+            margin: 0 !important;
+            line-height: 1.8 !important;
+            font-weight: 400 !important;
+        }
+
+        .warn-block {
+            border-left: 2px solid rgba(255, 200, 0, 0.3);
+            padding: 0.85rem 1.2rem;
+            margin-top: 1rem;
+            background: rgba(255, 200, 0, 0.02);
+        }
+
+        .warn-block p {
+            font-size: 0.875rem !important;
+            color: rgba(255, 200, 0, 0.5) !important;
+            margin: 0 !important;
+            line-height: 1.8 !important;
+            font-weight: 400 !important;
+        }
+
+        .contact-block {
+            margin-top: 1.5rem;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .contact-block h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-block p {
+            color: var(--muted) !important;
+            font-size: 0.875rem !important;
+            margin-bottom: 1rem !important;
+            font-weight: 400 !important;
+        }
+
+        .contact-email {
+            display: inline-block;
+            color: var(--blue-light);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(74, 144, 245, 0.3);
+            padding-bottom: 1px;
+            transition: border-color 0.2s;
+        }
+
+        .contact-email:hover {
+            border-color: var(--blue-light);
+        }
+
+        .back-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            background: #111;
+            border: 1px solid var(--border-hi);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 50;
+            font-size: 0.8rem;
+        }
+
+        .back-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-top:hover {
+            background: #1a1a1a;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .reading-progress {
+                left: 0;
+            }
+
+            .ham {
+                display: flex;
+            }
+
+            .content-wrap {
+                padding: 2rem 1.5rem 3rem;
+            }
+
+            .page-hero {
+                padding: 4rem 1.5rem 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-wrap {
+                padding: 1.5rem 1.2rem 3rem;
+            }
+
+            .page-hero {
+                padding: 3.5rem 1.2rem 1.5rem;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-hero-inner {
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="reading-progress">
+        <div class="reading-progress-bar" id="progressBar"></div>
+    </div>
+    <button class="ham" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <a href="index" class="sidebar-logo">
+            <div class="logo-box"><img src="/Classgrid.png" alt="Classgrid"></div>
+            <span class="brand-name">Class<em>grid</em></span>
+        </a>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Navigation</div>
+            <a href="index" class="nav-item"><i class="fas fa-house"></i> Home</a>
+            <a href="features" class="nav-item"><i class="fas fa-bolt"></i> Features</a>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Legal</div>
+            <a href="privacy" class="nav-item"><i class="fas fa-shield-halved"></i> Privacy Policy</a>
+            <a href="terms" class="nav-item active"><i class="fas fa-file-contract"></i> Terms of Service</a>
+            <a href="contact" class="nav-item"><i class="fas fa-envelope"></i> Contact</a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-badge">
+                <strong>Simple & Clear</strong>
+                Our terms are written so everyone can understand them.
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="page-hero">
+            <div class="page-hero-inner">
+                <div class="page-badge"><span class="badge-dot"></span>Legal Document</div>
+                <h1 class="page-title">Terms of <span>Service</span></h1>
+                <div class="page-meta">
+                    <span>Last Updated: February 2026</span>
+                    <span>Classgrid Platform</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-wrap">
+
+            <div class="policy-section" id="s1">
+                <div class="section-header">
+                    <div class="section-num">01</div>
+                    <div class="section-title">Welcome to ClassGrid</div>
+                </div>
+                <p>Hey! Thanks for using ClassGrid. These Terms of Service are basically the rules you agree to follow
+                    when you use our platform. Think of them like the rules of a game — everyone needs to know them so
+                    things stay fair and fun for everyone.</p>
+                <p>By signing up or logging into ClassGrid, you're saying "I agree" to these rules. If you don't agree,
+                    please don't use the platform.</p>
+            </div>
+
+            <div class="policy-section" id="s2">
+                <div class="section-header">
+                    <div class="section-num">02</div>
+                    <div class="section-title">What Do These Words Mean?</div>
+                </div>
+                <p>We use a few specific words throughout this document, so here's what they mean in simple terms. The
+                    "Platform" means ClassGrid and everything that comes with it. An "Organization" is a school,
+                    college, or coaching center that uses ClassGrid. An "Organization Admin" is the person at that
+                    school who manages everything on ClassGrid. "Faculty" means teachers and instructors. A "Student" is
+                    someone who joins a classroom to learn.</p>
+            </div>
+
+            <div class="policy-section" id="s3">
+                <div class="section-header">
+                    <div class="section-num">03</div>
+                    <div class="section-title">Who Can Use ClassGrid?</div>
+                </div>
+                <p>ClassGrid is meant for students, teachers, and educational institutions. To use it, you need to be
+                    part of an organization that has signed up — like your school or coaching center. You must give us
+                    correct information when you sign up, and you should never pretend to be someone else. Your school
+                    is responsible for making sure only the right people get access to their classrooms.</p>
+            </div>
+
+            <div class="policy-section" id="s4">
+                <div class="section-header">
+                    <div class="section-num">04</div>
+                    <div class="section-title">Creating Your Account</div>
+                </div>
+                <p>You can create an account using your email and a password, or by signing in with Google, GitHub, or
+                    LinkedIn. Once you have an account, it's yours to take care of. Keep your password private and don't
+                    share it with anyone. If something weird happens on your account — like someone else logging in —
+                    that's on you if it happened because you shared your password or weren't careful with it. ClassGrid
+                    can't be blamed for things that happen because of your own actions with your account.</p>
+            </div>
+
+            <div class="policy-section" id="s5">
+                <div class="section-header">
+                    <div class="section-num">05</div>
+                    <div class="section-title">Rules for Schools & Institutions</div>
+                </div>
+                <p>If your school or institution is using ClassGrid, they have agreed to use it only for proper
+                    educational purposes. They are responsible for managing which teachers and students have access,
+                    keeping an eye on what gets posted in classrooms, making sure all uploaded materials are legal and
+                    appropriate, and maintaining honest academic standards. Basically, everything that happens inside an
+                    organization's ClassGrid space is that organization's responsibility — not ClassGrid's.</p>
+            </div>
+
+            <div class="policy-section" id="s6">
+                <div class="section-header">
+                    <div class="section-num">06</div>
+                    <div class="section-title">Rules for Teachers</div>
+                </div>
+                <p>Teachers using ClassGrid agree to use it for teaching and nothing else. They should behave
+                    professionally, not misuse the AI tools available on the platform, and only upload content that is
+                    legal and that they have the right to share. Teachers must also respect student privacy — they
+                    cannot snoop around other schools' classrooms or data. ClassGrid gives teachers powerful tools, and
+                    with that comes responsibility to use them the right way.</p>
+            </div>
+
+            <div class="policy-section" id="s7">
+                <div class="section-header">
+                    <div class="section-num">07</div>
+                    <div class="section-title">Rules for Students</div>
+                </div>
+                <p>Students agree to use ClassGrid only for learning. This means no bullying, no harassment, no
+                    uploading anything illegal or harmful, and no trying to sneak into classrooms you haven't been
+                    invited to. The AI tools are there to help you study — not to be misused. You can only be part of
+                    one organization at a time unless your school has set things up differently. Basically, just be a
+                    good person and use the platform the way it was meant to be used.</p>
+            </div>
+
+            <div class="policy-section" id="s8">
+                <div class="section-header">
+                    <div class="section-num">08</div>
+                    <div class="section-title">Things Nobody Should Do</div>
+                </div>
+                <p>There are some things that are off limits for everyone on ClassGrid, no matter who you are. You must
+                    not break any laws while using the platform, upload viruses or harmful software, try to hack or
+                    break into parts of the system you're not supposed to access, copy or steal data from the platform,
+                    share classroom access codes with people who don't belong, or pretend to be a different school or
+                    institution. Breaking these rules can get your account suspended or permanently banned.</p>
+            </div>
+
+            <div class="policy-section" id="s9">
+                <div class="section-header">
+                    <div class="section-num">09</div>
+                    <div class="section-title">About the AI Features</div>
+                </div>
+                <p>ClassGrid has some really cool AI tools built in to help you study and learn. But it's important to
+                    understand what AI actually is — it's a computer program that generates answers based on patterns,
+                    and it can sometimes get things wrong. The AI on ClassGrid is a helper, not a replacement for your
+                    teacher or your own thinking. ClassGrid cannot be held responsible if you make a decision based on
+                    something the AI told you that turned out to be incorrect. Always double-check important information
+                    with your teacher or a trusted source.</p>
+                <div class="warn-block">
+                    <p>AI can make mistakes. Never use AI-generated answers for important academic decisions without
+                        verifying them first.</p>
+                </div>
+            </div>
+
+            <div class="policy-section" id="s10">
+                <div class="section-header">
+                    <div class="section-num">10</div>
+                    <div class="section-title">Who Owns the Content You Upload?</div>
+                </div>
+                <p>If you upload notes, assignments, or any other content to ClassGrid, you still own it — it's yours.
+                    By uploading it, you're giving ClassGrid permission to store it, process it, and show it within the
+                    platform so everything works properly. That's it. ClassGrid does not claim ownership of your work
+                    and will never use your educational materials for anything outside of running the platform.</p>
+            </div>
+
+            <div class="policy-section" id="s11">
+                <div class="section-header">
+                    <div class="section-num">11</div>
+                    <div class="section-title">ClassGrid's Own Stuff</div>
+                </div>
+                <p>The ClassGrid platform itself — the code, the design, the logo, the branding — all of that belongs to
+                    ClassGrid. You're welcome to use the platform, but you cannot copy the code, steal the design,
+                    reproduce the logo, or try to build your own version of ClassGrid based on what we've built. That
+                    would be like copying someone's homework and calling it your own — not cool.</p>
+            </div>
+
+            <div class="policy-section" id="s12">
+                <div class="section-header">
+                    <div class="section-num">12</div>
+                    <div class="section-title">Your Data & Privacy</div>
+                </div>
+                <p>Using ClassGrid means your data is handled according to our Privacy Policy. We take privacy
+                    seriously, especially for younger students. Schools are responsible for making sure they have the
+                    right permissions from students and parents where required by law. We encourage you to read our
+                    Privacy Policy to understand exactly what data we collect and how we use it.</p>
+            </div>
+
+            <div class="policy-section" id="s13">
+                <div class="section-header">
+                    <div class="section-num">13</div>
+                    <div class="section-title">When Accounts Get Suspended</div>
+                </div>
+                <p>ClassGrid has the right to suspend or permanently ban accounts that break these rules. This can
+                    happen to individual users or even entire organizations. Reasons for suspension include breaking
+                    these Terms, doing something that puts the platform's security at risk, misusing the platform in any
+                    way, or legal requirements that force us to act. We don't take this lightly, but keeping the
+                    platform safe and fair for everyone is our priority.</p>
+            </div>
+
+            <div class="policy-section" id="s14">
+                <div class="section-header">
+                    <div class="section-num">14</div>
+                    <div class="section-title">What ClassGrid Is Not Responsible For</div>
+                </div>
+                <p>ClassGrid provides the tools — what you do with them is up to you. We are not responsible for your
+                    exam results or academic performance, anything wrong that an AI response tells you, content that
+                    other users upload, data you lose because of something you did, the platform going down temporarily
+                    for maintenance, or arguments or disputes between users. The platform is provided as-is, meaning we
+                    do our best but cannot guarantee it will always be perfect.</p>
+            </div>
+
+            <div class="policy-section" id="s15">
+                <div class="section-header">
+                    <div class="section-num">15</div>
+                    <div class="section-title">Platform Availability</div>
+                </div>
+                <p>We work hard to keep ClassGrid running smoothly, but we cannot promise it will be available 100% of
+                    the time. Sometimes we need to do maintenance, fix bugs, or add new features — and during those
+                    times the platform might be temporarily unavailable. We'll try to do this at times that cause the
+                    least disruption, but we appreciate your patience when it happens.</p>
+            </div>
+
+            <div class="policy-section" id="s16">
+                <div class="section-header">
+                    <div class="section-num">16</div>
+                    <div class="section-title">Your Responsibility if Things Go Wrong</div>
+                </div>
+                <p>If you misuse ClassGrid and it causes problems — for ClassGrid, for other users, or for anyone else —
+                    you are responsible for that. This includes things like breaking these rules, uploading harmful
+                    content, or violating any laws. ClassGrid should not have to pay for problems that were caused by
+                    your own actions on the platform.</p>
+            </div>
+
+            <div class="policy-section" id="s17">
+                <div class="section-header">
+                    <div class="section-num">17</div>
+                    <div class="section-title">Which Country's Laws Apply?</div>
+                </div>
+                <p>ClassGrid is based in India, so Indian law applies to these Terms. If there is ever a serious legal
+                    dispute that needs to go to court, it will be handled in India. We hope it never comes to that — but
+                    it's good to know just in case.</p>
+            </div>
+
+            <div class="policy-section" id="s18">
+                <div class="section-header">
+                    <div class="section-num">18</div>
+                    <div class="section-title">When We Update These Rules</div>
+                </div>
+                <p>As ClassGrid grows, these rules might need to be updated. When that happens, we'll post the new
+                    version on this page with an updated date. If you keep using ClassGrid after we make changes, that
+                    means you're okay with the new rules. We recommend checking this page every now and then so you're
+                    always in the loop.</p>
+            </div>
+
+            <div class="policy-section" id="s19">
+                <div class="section-header">
+                    <div class="section-num">19</div>
+                    <div class="section-title">Payments, Subscriptions & Billing</div>
+                </div>
+
+                <div class="sub-title">Pro Plan Access & Features</div>
+                <p>Access to advanced platform features—such as increased classroom and storage limits, advanced
+                    analytics, and the <strong>Smart Attendance system</strong>—is available exclusively through our Pro
+                    Plan. Specific features, usage limits, and capabilities included in the Pro Plan are detailed on our
+                    pricing and features pages and may be updated from time to time.</p>
+
+                <div class="sub-title">Payment Processor (Razorpay)</div>
+                <p>Payments are processed securely through Razorpay. Classgrid does not store full card or UPI
+                    credentials. By making a payment, users agree to Razorpay's payment processing policies. Plan
+                    activation occurs automatically after successful payment confirmation.</p>
+
+                <div class="sub-title">Billing & Activation</div>
+                <p>ClassGrid offers the Pro Plan on a fixed-duration basis (e.g., monthly). To upgrade your organization
+                    to the Pro Plan, you must complete the payment process via our integrated Razorpay gateway.
+                    Upgrades are processed and activated instantly upon successful payment. If
+                    your payment fails or is interrupted, the Pro Plan will not be activated, and any deducted amounts
+                    will
+                    be refunded to your original payment method in accordance with standard Razorpay and banking
+                    timelines.</p>
+
+                <div class="sub-title">No Auto-Renewal</div>
+                <p><strong>Subscriptions do not auto-renew.</strong> Your Pro Plan will remain active for the specific
+                    duration purchased (e.g., 30 days from the activation date). You are responsible for renewing your
+                    plan before the expiration date to maintain uninterrupted access to Pro features. If your plan
+                    expires, your organization's account will automatically be reverted to the Free Plan, which may
+                    result in restricted access to features and data that exceed Free Plan limits.</p>
+
+                <div class="sub-title">Cancellation & Refund Policy</div>
+                <p>Because the Pro Plan is activated upon manual payment verification and does not auto-renew, all
+                    subscription payments are generally non-refundable once activated. We do not provide partial refunds
+                    or credits for partially used billing periods or if you choose to stop using the platform mid-cycle.
+                    If you believe your payment was collected in error or if your plan was not successfully activated
+                    despite a successful payment, please contact us within 7 days of the transaction for assistance.</p>
+
+                <div class="sub-title">Pricing Changes & Taxes</div>
+                <p>ClassGrid reserves the right to modify pricing for our plans. We will announce any price changes on
+                    the platform before they take effect. Current pricing will apply to your plan until it expires, but
+                    any subsequent renewals may be subject to the updated pricing. Unless otherwise stated, our prices
+                    are exclusive of applicable taxes (such as GST). If GST applies, it will be communicated during the
+                    checkout phase.</p>
+
+                <div class="sub-title">Disputes & Support</div>
+                <p>For any billing, payment, or renewal inquiries, or to report a disputed transaction, please contact
+                    our support team at <a href="mailto:support@classgrid.in"
+                        style="color:var(--blue-light);">support@classgrid.in</a>. Any formal payment disputes are
+                    subject to the jurisdiction and governing laws defined in these Terms.</p>
+            </div>
+
+            <div class="policy-section" id="s20">
+                <div class="section-header">
+                    <div class="section-num">20</div>
+                    <div class="section-title">Content Ownership & Intellectual Property</div>
+                </div>
+
+                <div class="sub-title">User-Owned Content</div>
+                <p>All notes, PDFs, documents, classroom materials, announcements, and other academic content uploaded
+                    to ClassGrid remain the sole intellectual property of the original creator or their respective
+                    organization.</p>
+
+                <div class="sub-title">No Ownership Claim</div>
+                <p>ClassGrid does NOT claim any ownership rights over user-uploaded content. We do not sell, rent, or
+                    commercially exploit any academic materials hosted on our platform.</p>
+
+                <div class="sub-title">Limited License to Platform</div>
+                <p>By uploading content to ClassGrid, you grant us a limited, non-exclusive, royalty-free license to
+                    store, process, format, and display that content solely for the operational purposes of the
+                    platform—such as making it available to your authorized students and faculty within your
+                    organization's classrooms.</p>
+
+                <div class="sub-title">Responsibility of Uploading User</div>
+                <p>When you upload any material to ClassGrid, you legally confirm that you either own the intellectual
+                    property rights to that content, or you have obtained explicit, legal permission from the rightful
+                    owner to upload, share, and distribute it on our platform.</p>
+
+                <div class="sub-title">Copyright Infringement & Platform Liability</div>
+                <p>ClassGrid operates purely as a hosting infrastructure provider and is not liable for unauthorized
+                    uploads or plagiarism committed by users. We stringently respect intellectual property rights. If we
+                    receive a valid notice of copyright infringement, ClassGrid reserves the right to immediately remove
+                    the violating content without prior notice and may suspend or permanently terminate the accounts of
+                    users who repeatedly infringe upon intellectual property rights.</p>
+            </div>
+
+            <div class="policy-section" id="s21">
+                <div class="section-header">
+                    <div class="section-num">21</div>
+                    <div class="section-title">Got Questions?</div>
+                </div>
+                <p>If anything in these Terms confused you, or if you have a question about how ClassGrid works, feel
+                    free to reach out to us. We're happy to help explain things in a way that makes sense to you.</p>
+                <div class="contact-block">
+                    <h3>Get In Touch</h3>
+                    <p>Our team is happy to answer any questions about these Terms.</p>
+                    <a href="mailto:support@classgrid.in" class="contact-email">support@classgrid.in</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        const ham = document.getElementById('hamBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        ham.addEventListener('click', () => { ham.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+        overlay.addEventListener('click', () => { ham.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+        const progressBar = document.getElementById('progressBar');
+        const backTop = document.getElementById('backTop');
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docH = document.documentElement.scrollHeight - window.innerHeight;
+            progressBar.style.width = (scrollTop / docH * 100) + '%';
+            backTop.classList.toggle('show', scrollTop > 300);
+        }, { passive: true });
+
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.policy-section').forEach(el => io.observe(el));
+    </script>
+</body>
+
+</html>

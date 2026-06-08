@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- Primary SEO -->
+    <title>Security | Classgrid – How We Protect Your Data</title>
+    <meta name="description"
+        content="Learn about Classgrid's comprehensive security measures — encryption, role-based access, JWT authentication, and data isolation for institutional safety." />
+    <meta name="keywords"
+        content="Classgrid security, data encryption, education platform security, institutional data protection, RBAC" />
+    <meta name="author" content="Nikhil Shinde" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://classgrid.in/security" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Security – Classgrid" />
+    <meta property="og:description"
+        content="Enterprise-grade security for your classroom data: encryption, RBAC, and data isolation." />
+    <meta property="og:url" content="https://classgrid.in/security" />
+    <meta property="og:image" content="https://classgrid.in/images/classgrid-preview.png" />
+    <meta property="og:site_name" content="Classgrid" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hi: rgba(255, 255, 255, 0.16);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --muted: #888888;
+            --dim: #444444;
+            --sidebar-w: 240px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: #000;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1.5rem 1.4rem 1.3rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 9.5px;
+            background: var(--grad-bp);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            border-radius: 7px;
+            z-index: 0;
+        }
+
+        .logo-box img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .brand-name em {
+            font-style: normal;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-section {
+            padding: 1.2rem 1rem 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dim);
+            padding: 0 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 1px;
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(74, 144, 245, 0.1);
+            color: #fff;
+        }
+
+        .nav-item.active i {
+            color: var(--blue-light);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.6rem 1rem;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-size: 0.73rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .sidebar-badge strong {
+            color: #aaa;
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.76rem;
+        }
+
+        .ham {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 200;
+            flex-direction: column;
+            gap: 5px;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            cursor: pointer;
+        }
+
+        .ham span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.28s ease;
+        }
+
+        .ham.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .ham.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .ham.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 2px;
+            z-index: 200;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: var(--grad-bp);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+        }
+
+        .page-hero {
+            padding: 3.5rem 4rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            background: #000;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue);
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            color: #fff;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+        }
+
+        .page-title span {
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .content-wrap {
+            padding: 3rem 4rem 5rem;
+            max-width: 780px;
+        }
+
+        .policy-section {
+            margin-bottom: 3.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .policy-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-num {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #4a90f5, #a855f7, #ec4899, #f5a623);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .policy-section p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.92);
+            line-height: 1.9;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .policy-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .sub-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 1.75rem 0 0.65rem;
+        }
+
+        .note-block {
+            border-left: 2px solid rgba(74, 144, 245, 0.4);
+            padding: 0.85rem 1.2rem;
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .note-block p {
+            font-size: 0.875rem !important;
+            color: rgba(255, 255, 255, 0.45) !important;
+            margin: 0 !important;
+            line-height: 1.8 !important;
+            font-weight: 400 !important;
+        }
+
+        .warn-block {
+            border-left: 2px solid rgba(255, 200, 0, 0.3);
+            padding: 0.85rem 1.2rem;
+            margin-top: 1rem;
+            background: rgba(255, 200, 0, 0.02);
+        }
+
+        .warn-block p {
+            font-size: 0.875rem !important;
+            color: rgba(255, 200, 0, 0.5) !important;
+            margin: 0 !important;
+            line-height: 1.8 !important;
+            font-weight: 400 !important;
+        }
+
+        .contact-block {
+            margin-top: 1.5rem;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .contact-block h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-block p {
+            color: var(--muted) !important;
+            font-size: 0.875rem !important;
+            margin-bottom: 1rem !important;
+            font-weight: 400 !important;
+        }
+
+        .contact-email {
+            display: inline-block;
+            color: var(--blue-light);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(74, 144, 245, 0.3);
+            padding-bottom: 1px;
+            transition: border-color 0.2s;
+        }
+
+        .contact-email:hover {
+            border-color: var(--blue-light);
+        }
+
+        .back-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            background: #111;
+            border: 1px solid var(--border-hi);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 50;
+            font-size: 0.8rem;
+        }
+
+        .back-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-top:hover {
+            background: #1a1a1a;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .reading-progress {
+                left: 0;
+            }
+
+            .ham {
+                display: flex;
+            }
+
+            .content-wrap {
+                padding: 2rem 1.5rem 3rem;
+            }
+
+            .page-hero {
+                padding: 4rem 1.5rem 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-wrap {
+                padding: 1.5rem 1.2rem 3rem;
+            }
+
+            .page-hero {
+                padding: 3.5rem 1.2rem 1.5rem;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-hero-inner {
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="reading-progress">
+        <div class="reading-progress-bar" id="progressBar"></div>
+    </div>
+    <button class="ham" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <a href="index" class="sidebar-logo">
+            <div class="logo-box"><img src="/Classgrid.png" alt="Classgrid"></div>
+            <span class="brand-name">Class<em>grid</em></span>
+        </a>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Navigation</div>
+            <a href="index" class="nav-item"><i class="fas fa-house"></i> Home</a>
+            <a href="features" class="nav-item"><i class="fas fa-bolt"></i> Features</a>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Legal</div>
+            <a href="privacy" class="nav-item"><i class="fas fa-shield-halved"></i> Privacy Policy</a>
+            <a href="terms" class="nav-item"><i class="fas fa-file-contract"></i> Terms of Service</a>
+            <a href="contact" class="nav-item"><i class="fas fa-envelope"></i> Contact</a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-badge">
+                <strong>Security First</strong>
+                Your data and account are protected at every layer.
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="page-hero">
+            <div class="page-hero-inner">
+                <div class="page-badge"><span class="badge-dot"></span>Platform Safety</div>
+                <h1 class="page-title">Security & <span>Guidelines</span></h1>
+                <div class="page-meta">
+                    <span>Last Updated: February 2026</span>
+                    <span>Classgrid Platform</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-wrap">
+
+            <div class="policy-section" id="s1">
+                <div class="section-header">
+                    <div class="section-num">01</div>
+                    <div class="section-title">Platform Security Overview</div>
+                </div>
+                <p>ClassGrid takes security seriously at every level. We have built multiple layers of protection to
+                    keep your account, your data, and your classroom safe. This page explains how we protect you and
+                    what rules everyone must follow to keep the platform safe for all users.</p>
+
+                <div class="sub-title">Authentication & Access Control</div>
+                <p>Every user on ClassGrid goes through a secure login system. We use token-based session management,
+                    which means once you log in, your session is tracked securely and expires automatically when not in
+                    use. Access on the platform is role-based — meaning students can only see student things, faculty
+                    can only manage their own classrooms, and admins have access only within their organization. If an
+                    account gets suspended, access is cut off immediately and automatically.</p>
+
+                <div class="sub-title">Data Protection</div>
+                <p>All communication between your device and ClassGrid happens over HTTPS, which means your data is
+                    encrypted while it travels. Passwords are never stored in plain text — they are hashed using secure
+                    practices so even we cannot read them. Internal access to data is tightly controlled, and no one
+                    from one organization can access data from another organization.</p>
+
+                <div class="sub-title">Abuse Prevention</div>
+                <p>We monitor for suspicious login activity and apply rate limiting to prevent automated attacks. This
+                    means if someone is trying to guess your password repeatedly, the system will automatically block
+                    those attempts. Organizations that are found to be misusing the platform can be suspended to protect
+                    other users.</p>
+
+                <div class="sub-title">Payment Security</div>
+                <p>Payments are processed through Razorpay using secure encrypted infrastructure. Razorpay uses PCI-DSS
+                    compliant systems for payment security. Payment confirmation is verified using secure webhook
+                    signatures before activating services.</p>
+            </div>
+
+            <div class="policy-section" id="s2">
+                <div class="section-header">
+                    <div class="section-num">02</div>
+                    <div class="section-title">Guidelines for Organizations</div>
+                </div>
+                <p>Schools and institutions using ClassGrid agree to use the platform only for genuine educational
+                    purposes. This means making sure that every faculty member added to the platform is a real,
+                    authorized person from your institution. Organizations are expected to keep an eye on what gets
+                    posted in classrooms, maintain academic honesty, and never try to impersonate other institutions or
+                    misuse the AI tools for non-academic purposes.</p>
+                <p>Everything that happens inside an organization's ClassGrid space — content uploaded by teachers,
+                    classroom activity, student data usage — is that organization's responsibility. ClassGrid provides
+                    the infrastructure and tools, but the educational oversight stays with the school or institution
+                    running the classrooms.</p>
+            </div>
+
+            <div class="policy-section" id="s3">
+                <div class="section-header">
+                    <div class="section-num">03</div>
+                    <div class="section-title">Student Code of Conduct</div>
+                </div>
+                <p>Students using ClassGrid are expected to use the platform only for learning. This means respecting
+                    your teachers and classmates, not uploading anything harmful, illegal, or inappropriate, and never
+                    trying to access classrooms or organizations you haven't been invited into. Sharing your classroom
+                    access information publicly is not allowed.</p>
+                <p>The AI tools on ClassGrid are there to help you study — using them to cheat or be academically
+                    dishonest is a violation of these guidelines. Breaking these rules can result in your account being
+                    suspended, being removed from your classroom, or disciplinary action taken by your organization.</p>
+            </div>
+
+            <div class="policy-section" id="s4">
+                <div class="section-header">
+                    <div class="section-num">04</div>
+                    <div class="section-title">AI Usage Policy</div>
+                </div>
+                <p>ClassGrid includes AI-powered assistance to help students and teachers. It's important to understand
+                    that AI responses are generated automatically by a computer and can sometimes be wrong. AI is meant
+                    to be a helpful study companion — not a replacement for your teacher or your own thinking. Teachers
+                    should review AI outputs before using them in academic settings, and students should never rely
+                    entirely on AI for important academic decisions.</p>
+                <div class="warn-block">
+                    <p>Using AI to generate harmful or illegal content, attempting to exploit the AI system, or
+                        submitting abusive prompts is strictly prohibited and can result in your AI access being
+                        restricted or your account being suspended.</p>
+                </div>
+            </div>
+
+            <div class="policy-section" id="s5">
+                <div class="section-header">
+                    <div class="section-num">05</div>
+                    <div class="section-title">Cookie Policy</div>
+                </div>
+                <p>ClassGrid uses cookies — small pieces of data stored on your device — to keep you securely logged in,
+                    remember your authentication state between visits, improve your overall experience on the platform,
+                    and monitor how the platform is performing. We do not use cookies for advertising in any way. If you
+                    want to, you can disable cookies in your browser settings, but doing so may cause some parts of
+                    ClassGrid to stop working correctly since cookies are used for keeping you logged in.</p>
+            </div>
+
+            <div class="policy-section" id="s6">
+                <div class="section-header">
+                    <div class="section-num">06</div>
+                    <div class="section-title">Disclaimer</div>
+                </div>
+                <p>ClassGrid is provided as-is and as-available. We work hard to keep things running smoothly, but we
+                    cannot guarantee the platform will be available 100% of the time, that it will always be completely
+                    free of errors, that AI responses will always be accurate, or that using the platform will lead to
+                    specific academic outcomes.</p>
+                <p>ClassGrid is not responsible for educational content uploaded by organizations, disagreements between
+                    students and teachers, decisions made based on AI responses, or problems caused by users mishandling
+                    their own account credentials. The platform is a tool — how it gets used is ultimately in the hands
+                    of the organizations and users on it.</p>
+            </div>
+
+            <div class="policy-section" id="s7">
+                <div class="section-header">
+                    <div class="section-num">07</div>
+                    <div class="section-title">Suspension & Enforcement</div>
+                </div>
+                <p>ClassGrid reserves the right to suspend individual user accounts, restrict an organization's access,
+                    remove content that violates our policies, or terminate accounts entirely when misuse is confirmed.
+                    These decisions are never made lightly — they exist to protect the integrity of the platform and the
+                    safety of all users. Enforcement actions are taken when necessary to maintain a fair and secure
+                    environment for everyone.</p>
+            </div>
+
+            <div class="policy-section" id="s8">
+                <div class="section-header">
+                    <div class="section-num">08</div>
+                    <div class="section-title">Platform Roles & Governance</div>
+                </div>
+                <p>ClassGrid maintains a clear structure of roles to keep things organized and secure. Organization
+                    Admins manage everything at the institution level — they control which faculty are added and oversee
+                    the overall setup of their school on ClassGrid. Faculty have control within their own classrooms —
+                    they manage content, students, and classroom activity. Students participate academically within the
+                    classrooms they are enrolled in. Cross-organization access is always restricted — no one can access
+                    data or classrooms outside their own organization.</p>
+            </div>
+
+            <div class="policy-section" id="s9">
+                <div class="section-header">
+                    <div class="section-num">09</div>
+                    <div class="section-title">Reporting a Security Issue</div>
+                </div>
+                <p>If you ever discover a security vulnerability or something on the platform that doesn't look right,
+                    please let us know right away. We take all security reports seriously and investigate every one of
+                    them. Responsible disclosure helps us keep ClassGrid safe for everyone. When reporting, try to
+                    include a clear description of the issue and steps to reproduce it if possible.</p>
+                <div class="contact-block">
+                    <h3>Report a Security Concern</h3>
+                    <p>Reach out to our team directly and we'll look into it promptly.</p>
+                    <a href="mailto:support@classgrid.in" class="contact-email">support@classgrid.in</a>
+                </div>
+            </div>
+
+            <div class="policy-section" id="s10">
+                <div class="section-header">
+                    <div class="section-num">10</div>
+                    <div class="section-title">Updates to These Guidelines</div>
+                </div>
+                <p>As ClassGrid grows and evolves, these guidelines may be updated to reflect new features, policies, or
+                    legal requirements. Continuing to use ClassGrid after any updates are posted means you accept the
+                    current version of these guidelines. We recommend checking this page occasionally to stay up to
+                    date.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        const ham = document.getElementById('hamBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        ham.addEventListener('click', () => { ham.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+        overlay.addEventListener('click', () => { ham.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+        const progressBar = document.getElementById('progressBar');
+        const backTop = document.getElementById('backTop');
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docH = document.documentElement.scrollHeight - window.innerHeight;
+            progressBar.style.width = (scrollTop / docH * 100) + '%';
+            backTop.classList.toggle('show', scrollTop > 300);
+        }, { passive: true });
+
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.policy-section').forEach(el => io.observe(el));
+    </script>
+</body>
+
+</html>

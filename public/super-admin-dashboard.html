@@ -1,0 +1,1640 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        /* Auth Guard + Theme Init � runs BEFORE CSS to prevent flash */
+        (function () {
+            // Extract and store JWT token from OAuth redirect URL params (?token=...)
+            var _params = new URLSearchParams(window.location.search);
+            var _urlToken = _params.get('token');
+            if (_urlToken) {
+                localStorage.setItem('jwt_token', _urlToken);
+                // Clean the token from the URL without reload
+                _params.delete('token');
+                var _newSearch = _params.toString();
+                var _newUrl = window.location.pathname + (_newSearch ? '?' + _newSearch : '');
+                window.history.replaceState({}, document.title, _newUrl);
+            }
+            var _cs = document.createElement('style'); _cs.id = '_ag'; _cs.textContent = 'body>*:not(script):not(style){visibility:hidden!important}'; document.head.appendChild(_cs);
+            var _cb = location.origin.includes('localhost') ? 'http://localhost:3000' : '';
+            var _saToken = localStorage.getItem('jwt_token'); var _saHeaders = { 'Cache-Control': 'no-store' }; if (_saToken && _saToken !== 'null' && _saToken !== 'undefined') { _saHeaders['Authorization'] = 'Bearer ' + _saToken; } fetch(_cb + '/api/auth/me', { credentials: 'include', cache: 'no-store', headers: _saHeaders })
+                .then(function (r) { if (r.ok) return r.json().then(function (u) { window._cookieAuthUser = u; var e = document.getElementById('_ag'); if (e) e.remove(); }); throw 0; })
+                .catch(function () { window.location.replace('/superadmin/login'); });
+            /* Restore saved theme before CSS paints � prevents flash */
+            var savedTheme = localStorage.getItem('sa_theme') || 'dark';
+            if (savedTheme === 'light') { document.documentElement.setAttribute('data-theme', 'light'); }
+        })();
+    </script>
+    <script src="/app-state.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Command Center | Classgrid Super Admin</title>
+    <meta name="description"
+        content="Classgrid Super Admin Platform Command Center � Manage organizations, users, analytics, and platform settings.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/super-admin.css">
+    <link rel="stylesheet" href="/css/ui-animations.css">
+</head>
+
+<body>
+    <div class="reading-progress">
+        <div class="reading-progress-bar" id="progressBar"></div>
+    </div>
+    <button class="ham" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- --- SIDEBAR --- -->
+    <aside class="sidebar" id="sidebar">
+        <a href="index" class="sidebar-logo">
+            <div class="logo-box"><img src="/Classgrid.png" alt="Classgrid"></div>
+            <span class="brand-name">Class<em>grid</em></span>
+            <span class="admin-badge">Super Admin</span>
+        </a>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Command</div>
+            <button class="nav-item active" onclick="showSection('overview',this)" id="nav-overview">
+                <i class="fas fa-terminal"></i> Overview
+            </button>
+            <button class="nav-item" onclick="showSection('organizations',this)" id="nav-organizations">
+                <i class="fas fa-building"></i> Organizations
+            </button>
+            <button class="nav-item" onclick="showSection('users',this)" id="nav-users">
+                <i class="fas fa-users"></i> Users
+            </button>
+            <button class="nav-item" onclick="showSection('analytics',this)" id="nav-analytics">
+                <i class="fas fa-chart-line"></i> Analytics
+            </button>
+            <button class="nav-item" onclick="showSection('superadmins',this)" id="nav-superadmins">
+                <i class="fas fa-shield-alt"></i> Super Admins
+            </button>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Operations</div>
+            <button class="nav-item" onclick="showSection('revenue',this)" id="nav-revenue">
+                <i class="fas fa-indian-rupee-sign"></i> Revenue
+            </button>
+            <button class="nav-item" onclick="showSection('moderation',this)" id="nav-moderation">
+                <i class="fas fa-shield-halved"></i> Moderation
+                <span class="badge" id="moderationBadge" style="display:none">0</span>
+            </button>
+            <button class="nav-item" onclick="showSection('security',this)" id="nav-security">
+                <i class="fas fa-lock"></i> Security
+            </button>
+            <button class="nav-item" onclick="showSection('audit-log',this);loadGlobalAuditLog();" id="nav-audit-log">
+                <i class="fas fa-history"></i> Audit Log
+            </button>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Infrastructure</div>
+            <button class="nav-item" onclick="showSection('system',this)" id="nav-system">
+                <i class="fas fa-server"></i> System
+            </button>
+            <button class="nav-item" onclick="showSection('api-monitor',this);loadApiMetrics()" id="nav-api-monitor">
+                <i class="fas fa-wave-square"></i> API Monitor
+            </button>
+            <button class="nav-item" onclick="showSection('settings',this)" id="nav-settings">
+                <i class="fas fa-gear"></i> Settings
+            </button>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <a href="/classroom" class="nav-item"><i class="fas fa-arrow-left"></i> Back to Hub</a>
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">
+                <i class="fas fa-sun" id="themeIcon"></i>
+                <span id="themeLabel">Light Mode</span>
+            </button>
+            <button class="nav-item" onclick="doLogout()" style="color:var(--red);">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-badge">
+                <strong><i class="fas fa-shield-alt"></i> Platform Command Center</strong>
+                Logged in as <span id="sidebarAdminName">Super Admin</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- --- MAIN --- -->
+    <main class="main">
+
+        <!-- +------------------------------------------�
+             �  SECTION 01 � OVERVIEW (Command Center)  �
+             +------------------------------------------�� -->
+        <div class="page-section active" id="section-overview">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot live"></span>Platform Command Center</div>
+                    <h1 class="page-title">Platform <span>Overview</span></h1>
+                    <div class="page-meta">
+                        <span id="navAdminName"><i class="fas fa-shield-alt"></i> Loading...</span>
+                        <span id="overviewDate"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="content-wrap">
+                <div class="cmd-section visible" id="s-overview-stats">
+                    <div class="section-header">
+                        <div class="section-num">01 Global Stats</div>
+                        <div class="section-title">Platform at a Glance</div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card anim-card reveal stagger-1" style="--stat-accent:var(--blue)">
+                            <div class="stat-label">Organizations</div>
+                            <div class="stat-num" id="statOrgs"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="stat-sub"><span class="stat-trend-up"><i class="fas fa-spinner fa-spin"
+                                        style="opacity:0.3;font-size:0.6em;"></i></span> Active institutions</div>
+                            <i class="fas fa-building stat-icon"></i>
+                        </div>
+                        <div class="stat-card anim-card reveal stagger-2" style="--stat-accent:var(--purple)">
+                            <div class="stat-label">Total Users</div>
+                            <div class="stat-num" id="statUsers"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="stat-sub">All roles combined</div>
+                            <i class="fas fa-users stat-icon"></i>
+                        </div>
+                        <div class="stat-card anim-card reveal stagger-3" style="--stat-accent:var(--green)">
+                            <div class="stat-label">Faculty</div>
+                            <div class="stat-num" id="statFaculty"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="stat-sub">Across all orgs</div>
+                            <i class="fas fa-chalkboard-teacher stat-icon"></i>
+                        </div>
+                        <div class="stat-card anim-card reveal stagger-3" style="--stat-accent:var(--cyan)">
+                            <div class="stat-label">Students</div>
+                            <div class="stat-num" id="statStudents"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="stat-sub">Platform-wide</div>
+                            <i class="fas fa-user-graduate stat-icon"></i>
+                        </div>
+                        <div class="stat-card anim-card reveal stagger-3" style="--stat-accent:var(--yellow)">
+                            <div class="stat-label">Pending</div>
+                            <div class="stat-num" id="statPending"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="stat-sub">Awaiting review</div>
+                            <i class="fas fa-hourglass-half stat-icon"></i>
+                        </div>
+                        <div class="stat-card anim-card reveal stagger-3" style="--stat-accent:var(--purple)">
+                            <div class="stat-label">Org Admins</div>
+                            <div class="stat-num" id="statOrgAdmins"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="stat-sub">Organization owners</div>
+                            <i class="fas fa-user-tie stat-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card anim-card reveal">
+                        <h4><i class="fas fa-user-shield"></i> Your Account</h4>
+                        <div class="info-row"><span>Name</span><span id="adminName"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.7em;"></i></span></div>
+                        <div class="info-row"><span>Email</span><span id="adminEmail"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.7em;"></i></span></div>
+                        <div class="info-row"><span>Role</span><span class="pill pill-admin">Super Admin</span></div>
+                        <div class="info-row"><span>Last Login</span><span id="adminLastLogin"><i
+                                    class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                        </div>
+                    </div>
+                    <div class="info-card anim-card reveal">
+                        <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
+                        <div style="display:flex;flex-direction:column;gap:0.6rem;margin-top:0.25rem;">
+                            <button class="btn btn-primary"
+                                onclick="showSection('moderation',document.getElementById('nav-moderation'))">
+                                <i class="fas fa-shield-halved"></i> Moderation Center
+                            </button>
+                            <button class="btn btn-ghost"
+                                onclick="showSection('organizations',document.getElementById('nav-organizations'))">
+                                <i class="fas fa-building"></i> All Organizations
+                            </button>
+                            <button class="btn btn-ghost"
+                                onclick="showSection('users',document.getElementById('nav-users'))">
+                                <i class="fas fa-users"></i> User Intelligence
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Activity Feed -->
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">Activity Feed</div>
+                        <div class="section-title">Recent Platform Events</div>
+                    </div>
+                    <div class="data-block">
+                        <div id="activityFeed" style="padding:1rem 1.25rem;">
+                            <div class="feed-item">
+                                <div class="feed-dot" style="background:var(--green)"></div> Platform operational <span
+                                    class="feed-time">now</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- +------------------------------------------�
+             �  SECTION 02 � ORGANIZATIONS               �
+             +------------------------------------------�� -->
+        <div class="page-section" id="section-organizations">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>Organizations</div>
+                    <h1 class="page-title">All <span>Organizations</span></h1>
+                    <div class="page-meta"><span>Approved institutions on the platform</span></div>
+                </div>
+            </div>
+            <div class="content-wrap" style="max-width:1100px;">
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">02 Organizations</div>
+                        <div class="section-title">Institutional Registry</div>
+                    </div>
+                    <div class="filter-bar">
+                        <div class="search-wrap">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="search-input" id="orgSearch" placeholder="Search organizations..."
+                                oninput="filterOrgs()">
+                        </div>
+                        <select class="filter-select" id="orgPlanFilter" onchange="filterOrgs()">
+                            <option value="">All Plans</option>
+                            <option value="FREE">Free</option>
+                            <option value="PRO">Pro</option>
+                        </select>
+                        <select class="filter-select" id="orgStatusFilter" onchange="filterOrgs()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="blocked">Blocked</option>
+                        </select>
+                        <button class="btn btn-ghost btn-sm" onclick="exportOrgsCSV()"><i class="fas fa-download"></i>
+                            Export CSV</button>
+                    </div>
+                    <div id="orgList">
+                        <div style="padding:1rem;">
+                            <div class="skeleton" style="height:80px;width:100%;margin-bottom:1rem;"></div>
+                            <div class="skeleton" style="height:80px;width:100%;margin-bottom:1rem;"></div>
+                            <div class="skeleton" style="height:80px;width:100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- +------------------------------------------�
+             �  SECTION 03 � USERS                        �
+             +------------------------------------------�� -->
+        <div class="page-section" id="section-users">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>User Intelligence</div>
+                    <h1 class="page-title">Global <span>Users</span></h1>
+                    <div class="page-meta"><span>All registered users across the platform</span></div>
+                </div>
+            </div>
+            <div class="content-wrap" style="max-width:1100px;">
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">03 Users</div>
+                        <div class="section-title">User Intelligence</div>
+                    </div>
+                    <div class="filter-bar">
+                        <div class="search-wrap">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="search-input" id="userSearch"
+                                placeholder="Search by name or email..." oninput="filterUsers()">
+                        </div>
+                        <select class="filter-select" id="roleFilter" onchange="filterUsers()">
+                            <option value="">All Roles</option>
+                            <option value="student">Student</option>
+                            <option value="faculty">Faculty</option>
+                            <option value="org_admin">Org Admin</option>
+
+                        </select>
+                        <select class="filter-select" id="userStatusFilter" onchange="filterUsers()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="blocked">Blocked</option>
+                        </select>
+
+                    </div>
+                    <div class="data-block">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width:40px">#</th>
+                                        <th>User</th>
+                                        <th>Role</th>
+                                        <th>Organization</th>
+                                        <th>Joined</th>
+                                        <th>Last Login</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody" class="anim-td-rows">
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                            <div class="skeleton" style="height:35px;width:100%;"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- +------------------------------------------�
+             �  SECTION 04 � ANALYTICS                    �
+             +------------------------------------------�� -->
+        <div class="page-section" id="section-analytics">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>Analytics</div>
+                    <h1 class="page-title"
+                        style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                        <span>Platform <span>Analytics</span></span>
+                        <div style="display:flex;gap:10px;align-items:center;">
+                            <!-- Auto-refresh widget for Analytics section -->
+                            <div id="liveRefreshBarAnalytics"
+                                style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 14px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:8px;width:fit-content;max-width:100%;">
+                                <span id="liveRefreshDotAnalytics" class="badge-dot live"
+                                    style="flex-shrink:0;transition:opacity 0.3s;"></span>
+                                <i id="liveRefreshIconAnalytics" class="fas fa-sync-alt"
+                                    style="color:rgba(0,212,255,0.45);font-size:0.72rem;"></i>
+                                <span id="liveRefreshLabelAnalytics"
+                                    style="font-size:0.77rem;color:rgba(255,255,255,0.5);white-space:nowrap;">Updated
+                                    just now</span>
+                                <button id="refreshNowBtnAnalytics" onclick="manualRefresh()"
+                                    title="Refresh all data now"
+                                    style="padding:4px 11px;border-radius:6px;border:1px solid rgba(0,212,255,0.25);background:rgba(0,212,255,0.08);color:#00d4ff;font-size:0.74rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;display:flex;align-items:center;gap:5px;"
+                                    onmouseover="this.style.background='rgba(0,212,255,0.18)'"
+                                    onmouseout="this.style.background='rgba(0,212,255,0.08)'"><i
+                                        class="fas fa-bolt"></i> Refresh Now</button>
+                            </div>
+                        </div>
+                    </h1>
+                    <div class="page-meta"><span>Growth, usage, and engagement metrics</span></div>
+                </div>
+            </div>
+            <div class="content-wrap">
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">04 Analytics</div>
+                        <div class="section-title">Growth & Engagement</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-chart-line" style="color:var(--cyan)"></i> Student Growth</h4>
+                            <div class="info-row"><span>Total Students</span><span id="analyticsGrowthTotal"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Joined Today</span><span id="analyticsGrowthToday"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Last 7 Days</span><span id="analyticsGrowth7Days"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>This Month</span><span id="analyticsGrowthMonth"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                        </div>
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-file-alt" style="color:var(--green)"></i> Notes & Approvals</h4>
+                            <div class="info-row"><span>Total Uploaded</span><span id="analyticsNotesTotal"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Approved</span><span id="analyticsNotesApproved"
+                                    style="color:var(--green)">�</span></div>
+                            <div class="info-row"><span>Pending Review</span><span id="analyticsNotesPending"
+                                    style="color:var(--yellow)">�</span></div>
+                            <div class="info-row"><span>Rejected</span><span id="analyticsNotesRejected"
+                                    style="color:var(--red)">�</span></div>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-fire"></i> Most Active Organizations</h4>
+                            <div id="analyticsTopOrgs">
+                                <div class="info-row"><span>Loading...</span><span>�</span></div>
+                            </div>
+                        </div>
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-clock"></i> Platform Breakdown</h4>
+                            <div class="info-row"><span>Total Admins</span><span id="analyticsTotalAdmins"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Total Faculty</span><span id="analyticsTotalFaculty"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Total Students</span><span id="analyticsTotalStudents"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Org Admins</span><span id="analyticsTotalOrgAdmins"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TOP PERFORMING STUDENTS PLATFORM-WIDE -->
+                    <div class="cmd-section visible" style="margin-top:1.5rem;">
+                        <div class="section-header">
+                            <div class="section-num">Analytics Performance</div>
+                            <div class="section-title">Platform Top Students</div>
+                        </div>
+                        <!-- Top Students Card -->
+                        <div style="margin-bottom:2rem;">
+                            <div
+                                style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+                                <h3 style="margin:0;color:var(--text);font-size:1rem;"><i class="fas fa-trophy"
+                                        style="color:#FFD700;margin-right:8px;"></i>Top Performing Students All Orgs
+                                    (Top 20)</h3>
+                                <button class="btn btn-ghost btn-sm" onclick="loadGlobalStudentPerformance()"><i
+                                        class="fas fa-sync"></i> Refresh</button>
+                            </div>
+                            <div style="font-size:0.8rem;color:var(--dim);margin-bottom:12px;"><i class="fas fa-clock"
+                                    style="margin-right:5px;"></i>Score = Quiz40% + Attendance30% + Notes20% +
+                                Activity10%. Cached 10 min.</div>
+                            <div id="globalTopStudentsContainer">
+                                <div style="text-align:center;padding:1.5rem;color:var(--dim);">
+                                    <div class="spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- STORAGE TRACKING -->
+                    <div class="cmd-section visible" style="margin-top:1.5rem;">
+                        <div class="section-header">
+                            <div class="section-num">Analytics Storage</div>
+                            <div class="section-title">Platform Storage Consumption</div>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-card anim-card reveal">
+                                <h4><i class="fas fa-database" style="color:var(--purple)"></i> Storage Overview</h4>
+                                <div class="info-row"><span>Total Storage Used</span><span id="storageTotalMb"
+                                        style="font-weight:700;">�</span></div>
+                                <div class="info-row"><span>Note Files Count</span><span id="storageFileCount"><i
+                                            class="fas fa-spinner fa-spin"
+                                            style="opacity:0.3;font-size:0.7em;"></i></span>
+                                </div>
+                                <div class="info-row"><span>Avg per Org</span><span id="storageAvgMb"><i
+                                            class="fas fa-spinner fa-spin"
+                                            style="opacity:0.3;font-size:0.7em;"></i></span></div>
+                            </div>
+                            <div class="info-card anim-card reveal">
+                                <h4><i class="fas fa-envelope" style="color:var(--blue)"></i> Email Analytics</h4>
+                                <div class="info-row"><span>Total Emails Sent</span><span id="emailTotal"
+                                        style="font-weight:700;">�</span></div>
+                                <div class="info-row"><span>Today</span><span id="emailToday"><i
+                                            class="fas fa-spinner fa-spin"
+                                            style="opacity:0.3;font-size:0.7em;"></i></span></div>
+                                <div class="info-row"><span>This Month</span><span id="emailMonth"><i
+                                            class="fas fa-spinner fa-spin"
+                                            style="opacity:0.3;font-size:0.7em;"></i></span></div>
+                                <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:6px;"
+                                    id="emailTypeBreakdown"></div>
+                            </div>
+
+                            <!-- Daily Email Chart Card -->
+                            <div class="info-card anim-card reveal" style="grid-column:1/-1;">
+                                <div
+                                    style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                                    <h4 style="margin:0;"><i class="fas fa-chart-bar" style="color:var(--blue)"></i>
+                                        Emails Sent — This Month (Day by Day)</h4>
+                                    <span id="emailChartMonth" style="font-size:0.75rem;color:var(--dim);"></span>
+                                </div>
+                                <div id="emailDailyChart"
+                                    style="display:flex;align-items:flex-end;gap:3px;height:110px;padding-bottom:4px;overflow-x:auto;">
+                                    <div style="color:var(--dim);font-size:0.8rem;padding:2rem 0;">Loading chart...
+                                    </div>
+                                </div>
+                                <div style="display:flex;gap:3px;margin-top:6px;font-size:0.66rem;color:var(--dim);overflow-x:auto;"
+                                    id="emailChartXLabels"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top:1rem;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                            <select id="analyticsOrgSelect"
+                                style="padding:7px 12px;border-radius: 4px;border:1px solid var(--border);background:var(--elevated);color:var(--text);font-size:0.82rem;outline:none;min-width:200px;">
+                                <option value="">All Organizations</option>
+                            </select>
+                            <button class="btn btn-ghost btn-sm" onclick="loadOrgLevelAnalytics()"><i
+                                    class="fas fa-sync"></i> Load Org Data</button>
+                            <span style="color:var(--dim);font-size:0.78rem;">Select org to see per-org storage + email
+                                breakdown</span>
+                        </div>
+                        <div id="orgAnalyticsDetail" style="display:none;margin-top:1rem;">
+                            <div class="info-grid">
+                                <div class="info-card anim-card reveal">
+                                    <h4><i class="fas fa-hdd" style="color:var(--cyan)"></i> <span
+                                            id="orgAnalyticsName">Org</span> Storage</h4>
+                                    <div class="info-row"><span>Storage Used</span><span id="orgStorageMb"><i
+                                                class="fas fa-spinner fa-spin"
+                                                style="opacity:0.3;font-size:0.7em;"></i></span>
+                                    </div>
+                                    <div class="info-row"><span>Files Uploaded</span><span id="orgFileCount"><i
+                                                class="fas fa-spinner fa-spin"
+                                                style="opacity:0.3;font-size:0.7em;"></i></span>
+                                    </div>
+                                    <div class="info-row"><span>Notes Submitted</span><span id="orgNotesCount"><i
+                                                class="fas fa-spinner fa-spin"
+                                                style="opacity:0.3;font-size:0.7em;"></i></span>
+                                    </div>
+                                    <div class="info-row"><span>Emails Sent</span><span id="orgEmailCount"><i
+                                                class="fas fa-spinner fa-spin"
+                                                style="opacity:0.3;font-size:0.7em;"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STUDENT GROWTH TREND -->
+                    <div class="cmd-section visible" style="margin-top:1.5rem;">
+                        <div class="section-header">
+                            <div class="section-num">Analytics Growth</div>
+                            <div class="section-title">Student Growth Tracking</div>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card anim-card reveal stagger-1" style="--stat-accent:var(--blue)">
+                                <div class="stat-label">Total Students</div>
+                                <div class="stat-num" id="growthTotal"><i class="fas fa-spinner fa-spin"
+                                        style="opacity:0.3;font-size:0.8em;"></i></div>
+                                <i class="fas fa-users stat-icon"></i>
+                            </div>
+                            <div class="stat-card anim-card reveal stagger-2" style="--stat-accent:var(--green)">
+                                <div class="stat-label">Joined Today</div>
+                                <div class="stat-num" id="growthToday"><i class="fas fa-spinner fa-spin"
+                                        style="opacity:0.3;font-size:0.8em;"></i></div>
+                                <i class="fas fa-user-plus stat-icon"></i>
+                            </div>
+                            <div class="stat-card anim-card reveal stagger-3" style="--stat-accent:var(--cyan)">
+                                <div class="stat-label">Last 7 Days</div>
+                                <div class="stat-num" id="growth7Days">�</div>
+                                <i class="fas fa-calendar-week stat-icon"></i>
+                            </div>
+                            <div class="stat-card anim-card reveal stagger-3" style="--stat-accent:var(--purple)">
+                                <div class="stat-label">This Month</div>
+                                <div class="stat-num" id="growthMonth"><i class="fas fa-spinner fa-spin"
+                                        style="opacity:0.3;font-size:0.8em;"></i></div>
+                                <i class="fas fa-calendar-alt stat-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NOTES & APPROVALS TRACKING -->
+                    <div class="cmd-section visible" style="margin-top:1.5rem;">
+                        <div class="section-header">
+                            <div class="section-num">Analytics Notes</div>
+                            <div class="section-title">Notes & Approvals Tracking</div>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-card anim-card reveal">
+                                <h4><i class="fas fa-file-alt" style="color:var(--green)"></i> Platform-Wide Notes Stats
+                                </h4>
+                                <div class="info-row"><span>Total Submitted</span><span id="notesStatTotal"
+                                        style="font-weight:700;">�</span></div>
+                                <div class="info-row"><span>Approved</span><span id="notesStatApproved"
+                                        style="color:var(--green);font-weight:700;">�</span></div>
+                                <div class="info-row"><span>Pending Review</span><span id="notesStatPending"
+                                        style="color:var(--amber);">�</span></div>
+                                <div class="info-row"><span>Rejected</span><span id="notesStatRejected"
+                                        style="color:var(--red);">�</span></div>
+                                <div
+                                    style="margin-top:0.75rem;height:6px;border-radius: 4px;background:var(--elevated);overflow:hidden;">
+                                    <div id="notesApprovalBar"
+                                        style="height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius: 4px;transition:width 0.5s;width:0%">
+                                    </div>
+                                </div>
+                                <div style="font-size:0.72rem;color:var(--dim);margin-top:4px;">Approval rate: <span
+                                        id="notesApprovalRate"><i class="fas fa-spinner fa-spin"
+                                            style="opacity:0.3;font-size:0.7em;"></i></span>%</div>
+                            </div>
+                            <div class="info-card anim-card reveal">
+                                <h4><i class="fas fa-shield-alt" style="color:var(--amber)"></i> Moderation Status</h4>
+                                <div style="color:var(--dim);font-size:0.82rem;margin-bottom:0.5rem;">Rejected notes are
+                                    hidden from student dashboards. Only visible here.</div>
+                                <div class="info-row"><span>Approval Rate</span><span id="approvalRatePct"
+                                        style="font-weight:700;">�</span></div>
+                                <div class="info-row"><span>Rejection Rate</span><span id="rejectionRatePct"
+                                        style="color:var(--red);">�</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Monitoring -->
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">04b Monitoring</div>
+                        <div class="section-title">Recent System Activity</div>
+                    </div>
+                    <div class="card anim-card reveal stagger-1"
+                        style="padding:15px; border-radius: 4px; background:var(--bg2);">
+                        <div id="activityFeed">
+                            <div class="skeleton" style="height:40px;width:100%;margin-bottom:10px;"></div>
+                            <div class="skeleton" style="height:40px;width:80%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- +------------------------------------------�
+             �  SECTION 05 � REVENUE                      �
+             +------------------------------------------�� -->
+        <div class="page-section" id="section-revenue">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>Revenue Control</div>
+                    <h1 class="page-title">Revenue <span>Control</span></h1>
+                    <div class="page-meta"><span>Payment management and plan upgrades</span></div>
+                </div>
+            </div>
+            <div class="content-wrap" style="max-width:1100px;">
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">05 Revenue</div>
+                        <div class="section-title">Plan Distribution & Payments</div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card anim-card reveal stagger-1" style="--stat-accent:var(--purple)">
+                            <div class="stat-label">Total Pro Orgs</div>
+                            <div class="stat-num" id="revProOrgs"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="stat-sub">Active Paid Organizations</div>
+                            <i class="fas fa-crown stat-icon"></i>
+                        </div>
+                        <div class="stat-card anim-card reveal stagger-2" style="--stat-accent:var(--blue)">
+                            <div class="stat-label">Pending Approvals</div>
+                            <div class="stat-num" id="revPendingApprovals"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="stat-sub">Awaiting manual review</div>
+                            <i class="fas fa-clock stat-icon"></i>
+                        </div>
+                        <div class="stat-card anim-card reveal stagger-3" style="--stat-accent:var(--green)">
+                            <div class="stat-label">Total Revenue</div>
+                            <div class="stat-num" id="revTotalRevenue" style="font-size:1.1rem;"><i
+                                    class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="stat-sub">Pro orgs × ₹100</div>
+                            <i class="fas fa-rupee-sign stat-icon"></i>
+                        </div>
+                        <div class="stat-card anim-card reveal stagger-4" style="--stat-accent:var(--cyan)">
+                            <div class="stat-label">This Month Revenue</div>
+                            <div class="stat-num" id="revMonthlyRevenue" style="font-size:1.1rem;"><i
+                                    class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="stat-sub">Activated this month</div>
+                            <i class="fas fa-chart-line stat-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PENDING UPGRADES -->
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">Pending</div>
+                        <div class="section-title">Manual Payment Review</div>
+                    </div>
+                    <div class="data-block">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Organization</th>
+                                        <th>Plan</th>
+                                        <th>Amount</th>
+                                        <th>UPI Name</th>
+                                        <th>Payment Date</th>
+                                        <th>Screenshot</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="upgradesTableBody" class="anim-td-rows">
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- APPROVED ORGS -->
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">Approved</div>
+                        <div class="section-title">Approved Pro Organizations</div>
+                    </div>
+                    <div class="data-block">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Organization</th>
+                                        <th>Admin Name</th>
+                                        <th>Payment Date</th>
+                                        <th>Mode</th>
+                                        <th>Valid Till</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="approvedPaymentsTableBody" class="anim-td-rows">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REJECTED ORGS -->
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">Rejected</div>
+                        <div class="section-title">Rejected Requests</div>
+                    </div>
+                    <div class="data-block">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Organization</th>
+                                        <th>Date</th>
+                                        <th>Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rejectedPaymentsTableBody" class="anim-td-rows">
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- +------------------------------------------�
+             �  SECTION 06 � MODERATION                   �
+             +------------------------------------------�� -->
+        <div class="page-section" id="section-moderation">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot" style="background:var(--yellow)"></span>Moderation
+                        Center</div>
+                    <h1 class="page-title">Moderation <span>Center</span></h1>
+                    <div class="page-meta"><span>Pending approvals, notes review, and flagged content</span></div>
+                </div>
+            </div>
+            <div class="content-wrap" style="max-width:1100px;">
+                <!-- Pending Applications -->
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">06a Pending Applications</div>
+                        <div class="section-title">Organization Applications</div>
+                    </div>
+                    <div id="pendingList">
+                        <div style="padding:1rem;">
+                            <div class="skeleton" style="height:80px;width:100%;margin-bottom:1rem;"></div>
+                            <div class="skeleton" style="height:80px;width:100%;margin-bottom:1rem;"></div>
+                            <div class="skeleton" style="height:80px;width:100%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Notes -->
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">06b Notes Review</div>
+                        <div class="section-title">Student Notes Moderation</div>
+                    </div>
+                    <div class="filter-bar">
+                        <select id="notesOrgFilter" class="filter-select" onchange="loadPendingNotes()">
+                            <option value="">All Organizations</option>
+                        </select>
+                    </div>
+                    <div class="data-block">
+                        <div class="data-block-header">
+                            <div class="data-block-title" style="color:var(--yellow)"><i class="fas fa-clock"></i>
+                                Pending Notes</div>
+                            <span class="data-block-count" id="pendingNotesCount"
+                                style="background:var(--yellow);color:#000;">0</span>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Organization</th>
+                                        <th>Uploaded By</th>
+                                        <th>Preview</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="notesTableBody" class="anim-td-rows">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                            <div class="skeleton" style="height:35px;width:100%;"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="data-block">
+                        <div class="data-block-header">
+                            <div class="data-block-title" style="color:var(--green)"><i class="fas fa-check-circle"></i>
+                                Approved Notes</div>
+                            <span class="data-block-count" id="approvedNotesCount"
+                                style="background:var(--green);color:#000;">0</span>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Organization</th>
+                                        <th>Uploaded By</th>
+                                        <th>Preview</th>
+                                        <th>Date Approved</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="approvedNotesTableBody" class="anim-td-rows">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                            <div class="skeleton" style="height:35px;width:100%;"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- +------------------------------------------�
+             �  SECTION 07 � SECURITY                     �
+             +------------------------------------------�� -->
+        <div class="page-section" id="section-security">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>Security</div>
+                    <h1 class="page-title">Platform <span>Security</span></h1>
+                    <div class="page-meta"><span>Access controls and platform safety</span></div>
+                </div>
+            </div>
+            <div class="content-wrap">
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">07 Security</div>
+                        <div class="section-title">Access & Safety Controls</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-toggle-on"></i> Platform Toggles</h4>
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-label">Maintenance Mode</div>
+                                    <div class="toggle-desc">Show maintenance page to all users</div>
+                                </div>
+                                <div class="toggle" id="toggleMaintenance"
+                                    onclick="togglePlatformSetting('maintenanceMode')"></div>
+                            </div>
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-label">Disable New Registrations</div>
+                                    <div class="toggle-desc">Block all new organization signups</div>
+                                </div>
+                                <div class="toggle" id="toggleRegistrations"
+                                    onclick="togglePlatformSetting('disableRegistrations')"></div>
+                            </div>
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-label">Global Platform Lock</div>
+                                    <div class="toggle-desc">Lock the entire platform (emergency)</div>
+                                </div>
+                                <div class="toggle" id="toggleLock" onclick="togglePlatformSetting('globalLock')"></div>
+                            </div>
+                        </div>
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-chart-bar"></i> Security Overview</h4>
+                            <div class="info-row"><span>Active Sessions</span><span id="secActiveSessions"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Total Super Admins</span><span id="secTotalAdmins"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Suspended Orgs</span><span id="secSuspendedOrgs"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Blocked Users</span><span id="secBlockedUsers"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- +------------------------------------------�
+             �  SECTION 08 � SYSTEM                       �
+             +------------------------------------------�� -->
+        <div class="page-section" id="section-system">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>System Health</div>
+                    <h1 class="page-title">System <span>Health</span></h1>
+                    <div class="page-meta"><span>Infrastructure and service status</span></div>
+                </div>
+            </div>
+            <div class="content-wrap">
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">08 System</div>
+                        <div class="section-title">Infrastructure Status</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-heartbeat"></i> Service Health</h4>
+                            <div class="info-row"><span>API Server</span><span style="color:var(--green)"><i
+                                        class="fas fa-circle" style="font-size:0.5rem;"></i> Operational</span></div>
+                            <div class="info-row"><span>Database</span><span style="color:var(--green)"><i
+                                        class="fas fa-circle" style="font-size:0.5rem;"></i> Connected</span></div>
+                            <div class="info-row"><span>Storage (Supabase)</span><span style="color:var(--green)"><i
+                                        class="fas fa-circle" style="font-size:0.5rem;"></i> Online</span></div>
+                            <div class="info-row"><span>Email Service</span><span style="color:var(--green)"><i
+                                        class="fas fa-circle" style="font-size:0.5rem;"></i> Active</span></div>
+                        </div>
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-database"></i> Platform Metrics</h4>
+                            <div class="info-row"><span>Total Organizations</span><span id="sysOrgs"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Total Users</span><span id="sysUsers"><i
+                                        class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span>
+                            </div>
+                            <div class="info-row"><span>Environment</span><span><span class="pill pill-active"
+                                        style="font-size:0.65rem;">Production</span></span></div>
+                            <div class="info-row"><span>Platform Version</span><span>2.0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- +------------------------------------------�
+             �  SECTION 09 � SETTINGS                     �
+             +------------------------------------------�� -->
+        <div class="page-section" id="section-settings">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>Configuration</div>
+                    <h1 class="page-title">Platform <span>Settings</span></h1>
+                    <div class="page-meta"><span>Global configuration and defaults</span></div>
+                </div>
+            </div>
+            <div class="content-wrap">
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">09 Settings</div>
+                        <div class="section-title">Global Configuration</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-sliders"></i> Plan Defaults</h4>
+                            <div class="info-row"><span>Free Max Faculty</span><span>5</span></div>
+                            <div class="info-row"><span>Free Classrooms/Faculty</span><span>2</span></div>
+                            <div class="info-row"><span>Free Students/Classroom</span><span>60</span></div>
+                            <div class="info-row"><span>Pro Max Faculty</span><span>10</span></div>
+                            <div class="info-row"><span>Pro Classrooms/Faculty</span><span>5</span></div>
+                            <div class="info-row"><span>Pro Students/Classroom</span><span>150</span></div>
+                            <div class="info-row"><span>Pro Price</span><span>?100/month</span></div>
+                        </div>
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-palette"></i> Branding</h4>
+                            <div class="info-row"><span>Platform Name</span><span>Classgrid</span></div>
+                            <div class="info-row"><span>Support Email</span><span>support@classgrid.in</span></div>
+                            <div class="info-row"><span>Domain</span><span>classgrid.in</span></div>
+                            <div class="info-row"><span>Theme</span><span>Dark</span></div>
+                        </div>
+                    </div>
+                    <div class="info-grid" style="margin-top:0;">
+                        <div class="info-card anim-card reveal">
+                            <h4><i class="fas fa-toggle-on"></i> Feature Toggles</h4>
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-label">AI Features</div>
+                                    <div class="toggle-desc">Enable AI-powered features platform-wide</div>
+                                </div>
+                                <div class="toggle on" id="toggleAIFeatures"
+                                    onclick="togglePlatformSetting('aiFeatures')"></div>
+                            </div>
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-label">Notes System</div>
+                                    <div class="toggle-desc">Allow student note uploads</div>
+                                </div>
+                                <div class="toggle on" id="toggleNotesSystem"
+                                    onclick="togglePlatformSetting('notesSystem')"></div>
+                            </div>
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-label">Chat System</div>
+                                    <div class="toggle-desc">Enable classroom chat</div>
+                                </div>
+                                <div class="toggle on" id="toggleChatSystem"
+                                    onclick="togglePlatformSetting('chatSystem')"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- +------------------------------------------�
+             �  SECTION � SUPER ADMINS MANAGEMENT       �
+             +------------------------------------------�� -->
+        <div class="page-section" id="section-superadmins">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>System Access</div>
+                    <h1 class="page-title">Super Admin <span>Management</span></h1>
+                    <div class="page-meta"><span>System-level administrators only</span></div>
+                </div>
+            </div>
+            <div class="content-wrap" style="max-width:1100px;">
+                <div class="cmd-section visible">
+                    <div class="section-header"
+                        style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <div class="section-num">System Admins</div>
+                            <div class="section-title">Platform-Level Access Accounts</div>
+                        </div>
+                        <button class="btn btn-primary" id="createSuperAdminBtn" onclick="openCreateSuperAdminModal()"
+                            style="display:none;">
+                            <i class="fas fa-plus"></i> Create Super Admin
+                        </button>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Joined</th>
+                                    <th>Last Login</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="superAdminsTableBody" class="anim-td-rows">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;"></div>
+                                        <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;"></div>
+                                        <div class="skeleton" style="height:35px;width:100%;"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- +------------------------------------------�
+             �  SECTION � API MONITOR                   �
+             +------------------------------------------�� -->
+        <div class="page-section" id="section-api-monitor">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot live"></span>Live Telemetry</div>
+                    <h1 class="page-title">API <span>Monitor</span></h1>
+                    <div class="page-meta"><span>Last 24 hours of request telemetry</span>
+                        <button class="btn btn-ghost btn-sm" onclick="loadApiMetrics()" style="margin-left:0.75rem;"><i
+                                class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                </div>
+            </div>
+            <div class="content-wrap" style="max-width:1200px;">
+
+                <!-- Health Bar -->
+                <div class="api-health-bar" id="apiHealthBar">
+                    <div class="api-health-indicator" id="apiHealthIndicator">
+                        <span class="health-dot" id="healthDot"></span>
+                        <span id="healthLabel">Loading...</span>
+                    </div>
+                    <div class="api-health-stats">
+                        <div class="api-stat">
+                            <div class="api-stat-num" id="mTotalReq"><i class="fas fa-spinner fa-spin"
+                                    style="opacity:0.3;font-size:0.8em;"></i></div>
+                            <div class="api-stat-label">Total Requests</div>
+                        </div>
+                        <div class="api-stat">
+                            <div class="api-stat-num" id="mSuccessReq" style="color:var(--green)">�</div>
+                            <div class="api-stat-label">Success (2xx)</div>
+                        </div>
+                        <div class="api-stat">
+                            <div class="api-stat-num" id="mClientErr" style="color:var(--yellow)">�</div>
+                            <div class="api-stat-label">Client Errors (4xx)</div>
+                        </div>
+                        <div class="api-stat">
+                            <div class="api-stat-num" id="mServerErr" style="color:var(--red)">�</div>
+                            <div class="api-stat-label">Server Errors (5xx)</div>
+                        </div>
+                        <div class="api-stat">
+                            <div class="api-stat-num" id="mErrorRate" style="color:var(--red)">�</div>
+                            <div class="api-stat-label">Error Rate %</div>
+                        </div>
+                        <div class="api-stat">
+                            <div class="api-stat-num" id="mAvgResp" style="color:var(--cyan)">�</div>
+                            <div class="api-stat-label">Avg Response</div>
+                        </div>
+                        <div class="api-stat">
+                            <div class="api-stat-num" id="mRpm" style="color:var(--purple)">�</div>
+                            <div class="api-stat-label">Req / min (live)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-grid" style="margin-top:1.5rem;">
+                    <!-- Top Routes -->
+                    <div class="cmd-section visible" style="grid-column:1/-1;">
+                        <div class="section-header">
+                            <div class="section-num">Most Used APIs</div>
+                            <div class="section-title">Top 10 Routes (24h)</div>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Route</th>
+                                        <th>Requests</th>
+                                        <th>Error Rate</th>
+                                        <th>Avg Response</th>
+                                        <th>Health</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="apiTopRoutesBody" class="anim-td-rows">
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                            <div class="skeleton" style="height:35px;width:100%;margin-bottom:8px;">
+                                            </div>
+                                            <div class="skeleton" style="height:35px;width:100%;"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Recent Failures -->
+                    <div class="cmd-section visible" style="grid-column:1/-1;">
+                        <div class="section-header">
+                            <div class="section-num">Failure Log</div>
+                            <div class="section-title">Recent Server Errors (5xx)</div>
+                        </div>
+                        <div id="apiFailuresLog"
+                            style="display:flex;flex-direction:column;gap:0.4rem;padding:0.5rem 0;">
+                            <div class="empty-state"><i class="fas fa-check-circle"
+                                    style="color:var(--green);font-size:1.5rem;margin-bottom:0.5rem;"></i>
+                                <p>No failures recorded. All systems healthy!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUDIT LOG + TOP STUDENTS SECTION (Super Admin - all orgs) -->
+        <div class="page-section" id="section-audit-log">
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>Audit Log</div>
+                    <h1 class="page-title">Platform <span>Audit Log</span></h1>
+                    <div class="page-meta"><span>Full history of all admin actions across all organizations</span></div>
+                </div>
+            </div>
+            <div class="content-wrap">
+                <div class="cmd-section visible">
+                    <div class="section-header">
+                        <div class="section-num">Intelligence</div>
+                        <div class="section-title">Admin Actions History</div>
+                    </div>
+
+                    <!-- Audit Log Filters -->
+                    <div
+                        style="margin-bottom:1rem;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--border);padding-top:1.25rem;">
+                        <select id="globalAuditOrgFilter"
+                            style="padding:8px 14px;border-radius: 4px;border:1px solid var(--border);background:var(--elevated);color:var(--text);font-size:0.85rem;outline:none;min-width:200px;">
+                            <option value="">All Organizations</option>
+                        </select>
+                        <select id="globalAuditActionFilter"
+                            style="padding:8px 14px;border-radius: 4px;border:1px solid var(--border);background:var(--elevated);color:var(--text);font-size:0.85rem;outline:none;">
+                            <option value="">All Actions</option>
+                            <option value="add_faculty">Add Faculty</option>
+                            <option value="remove_faculty">Remove Faculty</option>
+                            <option value="remove_student">Remove Student</option>
+                            <option value="change_role">Change Role</option>
+                            <option value="archive_classroom">Archive Classroom</option>
+                            <option value="restore_classroom">Restore Classroom</option>
+                            <option value="approve_note">Approve Note</option>
+                            <option value="reject_note">Reject Note</option>
+                            <option value="create_announcement">Create Announcement</option>
+                            <option value="delete_announcement">Delete Announcement</option>
+                            <option value="approve_org">Approve Org</option>
+                            <option value="suspend_org">Suspend Org</option>
+                            <option value="block_org">Block Org</option>
+                            <option value="delete_org">Delete Org</option>
+                            <option value="suspend_user">Suspend User</option>
+                            <option value="delete_user">Delete User</option>
+                            <option value="reactivate_user">Reactivate User</option>
+                        </select>
+                        <button class="btn btn-ghost btn-sm" onclick="loadGlobalAuditLog()"><i class="fas fa-sync"></i>
+                            Apply Filter</button>
+                        <span style="color:var(--dim);font-size:0.8rem;">Last 100 actions across all orgs</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:150px;">Time</th>
+                                    <th>Actor</th>
+                                    <th>Organization</th>
+                                    <th>Action</th>
+                                    <th>Target</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="globalAuditLogBody" class="anim-td-rows">
+                                <tr>
+                                    <td colspan="6" style="text-align:center;padding:2rem;color:var(--dim);">
+                                        <div class="spinner"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- --- MODALS --- -->
+    <!-- Approve Modal -->
+    <div class="modal" id="approveModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('approveModal')"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-check-circle" style="color:var(--green)"></i> Approve Organization</h2>
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem;">Approve <strong
+                    id="approveOrgName"></strong>? This creates the admin account and sends activation email.</p>
+            <div style="display:flex;gap:1rem;">
+                <button class="btn btn-ghost" onclick="closeModal('approveModal')" style="flex:1;">Cancel</button>
+                <button class="btn-submit" id="approveConfirmBtn" onclick="confirmApprove()"
+                    style="flex:1;margin-top:0;">
+                    <span>Approve</span><i class="fas fa-check"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal" id="rejectModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('rejectModal')"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-times-circle" style="color:var(--red)"></i> Reject Application</h2>
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Reject <strong
+                    id="rejectOrgName"></strong>?</p>
+            <div class="form-group">
+                <label class="form-label">Reason (optional)</label>
+                <input type="text" id="rejectReasonInput" class="form-input"
+                    placeholder="Enter reason for rejection...">
+            </div>
+            <div style="display:flex;gap:1rem;">
+                <button class="btn btn-ghost" onclick="closeModal('rejectModal')" style="flex:1;">Cancel</button>
+                <button class="btn-submit" id="rejectConfirmBtn" onclick="confirmReject()"
+                    style="flex:1;margin-top:0;background:linear-gradient(135deg,var(--red),#c62828);">
+                    <span>Reject</span><i class="fas fa-ban"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    </div>
+
+    <!-- Create Super Admin Modal -->
+    <div class="modal" id="createSuperAdminModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('createSuperAdminModal')"><i
+                    class="fas fa-times"></i></button>
+            <h2><i class="fas fa-user-shield" style="color:var(--blue)"></i> Create Super Admin</h2>
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem;">Add a new super admin. Only the system
+                owner can do this.</p>
+            <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="newAdminName"
+                    class="form-input" placeholder="e.g. Nikhil Shinde"></div>
+            <div class="form-group"><label class="form-label">Email</label><input type="email" id="newAdminEmail"
+                    class="form-input" placeholder="e.g. admin@classgrid.in"></div>
+            <div class="form-group"><label class="form-label">Temporary Password</label><input type="password"
+                    id="newAdminPassword" class="form-input" placeholder="Min 6 characters"></div>
+            <button class="btn-submit" id="createAdminConfirmBtn" onclick="confirmCreateSuperAdmin()"><span>Create
+                    Admin</span><i class="fas fa-plus"></i></button>
+        </div>
+    </div>
+
+    <!-- Delete Org Modal -->
+    <div class="modal" id="deleteOrgModal">
+        <div class="modal-content" style="max-width:480px;">
+            <button class="modal-close" onclick="closeModal('deleteOrgModal')"><i class="fas fa-times"></i></button>
+            <h2 style="color:var(--red)"><i class="fas fa-exclamation-triangle"></i> Delete Organisation</h2>
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem;">Permanently delete <strong
+                    id="deleteOrgName" style="color:var(--red)"></strong> and ALL associated data.</p>
+            <div
+                style="background:var(--elevated);border:1px solid rgba(239,68,68,0.3);border-radius: 4px;padding:1rem;margin-bottom:1rem;">
+                <p style="color:var(--red);font-size:0.8rem;font-weight:600;margin-bottom:0.5rem;">⚠️ This will
+                    permanently delete:</p>
+                <ul style="color:var(--muted);font-size:0.78rem;line-height:1.8;padding-left:1.2rem;">
+                    <li>Organisation record & settings</li>
+                    <li>All classrooms & data</li>
+                    <li>All faculty & student accounts</li>
+                    <li>All chat messages</li>
+                    <li>All materials, announcements & quizzes</li>
+                    <li>All uploaded files</li>
+                </ul>
+            </div>
+            <div class="form-group">
+                <label class="form-label" style="color:var(--red)">Type <span
+                        style="font-family:'Fira Code',monospace;background:var(--bg);padding:2px 8px;border-radius: 4px;font-weight:700;">DELETE</span>
+                    to confirm</label>
+                <input type="text" id="deleteConfirmInput" class="form-input" placeholder="Type DELETE here"
+                    autocomplete="off" style="border-color:rgba(239,68,68,0.3);" oninput="checkDeleteInput()">
+            </div>
+            <div style="display:flex;gap:1rem;">
+                <button class="btn btn-ghost" onclick="closeModal('deleteOrgModal')" style="flex:1;">Cancel</button>
+                <button class="btn-submit" id="deleteConfirmBtn" onclick="confirmDelete()" disabled
+                    style="flex:1;margin-top:0;background:linear-gradient(135deg,#444,#333);color:#888;cursor:not-allowed;opacity:0.6;">
+                    <span><i class="fas fa-trash"></i> Delete Permanently</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Faculty Limit Modal -->
+    <div class="modal" id="limitModal">
+        <div class="modal-content" style="max-width:400px;">
+            <button class="modal-close" onclick="closeModal('limitModal')"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-edit" style="color:var(--purple)"></i> Edit Faculty Limit</h2>
+            <div class="form-group"><label class="form-label">New Faculty Limit</label><input type="number"
+                    id="newLimitInput" class="form-input" placeholder="Enter number" min="1"></div>
+            <button class="btn-submit" id="limitConfirmBtn" onclick="confirmUpdateLimit()"><span>Update
+                    Limit</span></button>
+        </div>
+    </div>
+
+    <!-- Change Plan Modal -->
+    <div class="modal" id="planModal">
+        <div class="modal-content" style="max-width:400px;">
+            <button class="modal-close" onclick="closeModal('planModal')"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-crown" style="color:var(--yellow)"></i> Change Plan</h2>
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Current plan: <strong
+                    id="planCurrentLabel"></strong></p>
+            <div class="form-group">
+                <label class="form-label">New Plan</label>
+                <select id="newPlanSelect" class="form-input">
+                    <option value="FREE">FREE</option>
+                    <option value="PRO">PRO</option>
+                </select>
+            </div>
+            <button class="btn-submit" onclick="confirmChangePlan()"><span>Update Plan</span></button>
+        </div>
+    </div>
+
+    <!-- Screenshot Modal -->
+    <div class="modal" id="screenshotModal">
+        <div class="modal-content" style="max-width:600px;">
+            <button class="modal-close" onclick="closeModal('screenshotModal')"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-image" style="color:var(--blue)"></i> Payment Screenshot</h2>
+            <img id="screenshotImg" src="" alt="Payment Screenshot"
+                style="width:100%;border-radius: 4px;margin-top:0.5rem;">
+        </div>
+    </div>
+
+    <!-- Demo Account Created Modal -->
+    <div class="modal" id="demoCreatedModal">
+        <div class="modal-content" style="max-width:480px;">
+            <button class="modal-close" onclick="closeDemoCreatedModal()"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-flask" style="color:var(--purple);margin-right:6px;"></i> Demo Account Created</h2>
+            <div class="info-box info-box-success" style="margin:1rem 0;">
+                <i class="fas fa-check-circle" style="color:var(--green);"></i> Save these credentials � the password is
+                shown <strong>only once</strong>.
+            </div>
+            <div class="info-row" style="padding:0.5rem 0;"><span>Role</span><span id="demoCreatedRole"
+                    style="font-weight:600;">�</span></div>
+            <div class="info-row" style="padding:0.5rem 0;"><span>Email</span><span id="demoCreatedEmail"
+                    style="font-weight:600;word-break:break-all;">�</span></div>
+            <div class="info-row" style="padding:0.5rem 0;"><span>Password</span>
+                <span style="display:flex;align-items:center;gap:6px;">
+                    <code id="demoCreatedPassword"
+                        style="background:var(--elevated);padding:4px 10px;border-radius: 4px;font-size:0.85rem;user-select:all;">�</code>
+                    <button class="btn btn-sm" style="font-size:0.7rem;padding:4px 10px;"
+                        onclick="copyDemoPassword()"><i class="fas fa-copy"></i></button>
+                </span>
+            </div>
+            <button class="btn-submit" onclick="closeDemoCreatedModal()" style="margin-top:1rem;">Done</button>
+        </div>
+    </div>
+
+    <!-- Demo Password Reset Modal -->
+    <div class="modal" id="demoResetModal">
+        <div class="modal-content" style="max-width:420px;">
+            <button class="modal-close" onclick="closeDemoResetModal()"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-key" style="color:var(--blue);margin-right:6px;"></i> Reset Demo Password</h2>
+            <p style="margin-bottom:1rem;font-size:0.85rem;color:var(--dim);">Leave blank to auto-generate.</p>
+            <input type="hidden" id="demoResetId">
+            <div class="form-group">
+                <label class="form-label">Custom Password (optional)</label>
+                <input type="text" id="demoResetPasswordInput" class="form-input"
+                    placeholder="Leave blank for auto-generate" autocomplete="off">
+            </div>
+            <button class="btn-submit" onclick="submitDemoPasswordReset()"><span>Reset Password</span></button>
+            <div id="demoResetResult" style="display:none;margin-top:1rem;">
+                <div class="info-box info-box-success">
+                    <i class="fas fa-check-circle" style="color:var(--green);"></i> New password: <code
+                        id="demoResetNewPassword"
+                        style="user-select:all;background:var(--elevated);padding:2px 8px;border-radius: 4px;">�</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Org Usage Modal -->
+    <div class="modal" id="usageModal">
+        <div class="modal-content" style="max-width:500px;">
+            <button class="modal-close" onclick="closeModal('usageModal')"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-chart-pie" style="color:var(--cyan);margin-right:6px;"></i> Resource Usage</h2>
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem;">Resource consumption for <strong
+                    id="usageOrgName"></strong></p>
+
+            <div id="usageLoadingState" class="empty-state">
+                <div class="spinner"></div>
+                <p style="margin-top:1rem;color:var(--dim)">Calculating storage and emails...</p>
+            </div>
+
+            <div id="usageDataState" style="display:none;">
+                <div class="info-card anim-card reveal" style="margin-bottom:1rem;background:var(--elevated)">
+                    <h4 style="color:var(--yellow);margin-bottom:0.75rem;"><i class="fas fa-database"></i> Supabase
+                        Storage</h4>
+                    <div class="info-row"><span>Total Storage Consumed</span><span id="usageStorageMB"
+                            style="font-weight:700;">�</span></div>
+                    <div class="info-row"><span>Student Notes Size</span><span id="usageNotesMB"><i
+                                class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span></div>
+                    <div class="info-row"><span>Total Note Files</span><span id="usageNotesFileCount"><i
+                                class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span></div>
+                    <div class="info-row"><span>Database Rows (Notes)</span><span id="usageNotesDBCount"><i
+                                class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span></div>
+                </div>
+
+                <div class="info-card anim-card reveal" style="background:var(--elevated)">
+                    <h4 style="color:var(--blue);margin-bottom:0.75rem;"><i class="fas fa-envelope"></i> Email Analytics
+                    </h4>
+                    <div class="info-row"><span>Total Emails Sent</span><span id="usageEmailTotal"
+                            style="font-weight:700;">�</span></div>
+                    <div class="info-row"><span>Sent Today</span><span id="usageEmailToday"><i
+                                class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span></div>
+                    <div class="info-row"><span>Sent This Month</span><span id="usageEmailMonth"><i
+                                class="fas fa-spinner fa-spin" style="opacity:0.3;font-size:0.7em;"></i></span></div>
+
+                    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+                        <p
+                            style="font-size:0.8rem;color:var(--dim);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:1px;">
+                            Breakdown by Type</p>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;" id="usageEmailBreakdown">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- TOAST -->
+    <div id="toast"></div>
+
+    <div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i
+            class="fas fa-arrow-up"></i></div>
+
+
+    <!-- Suspend User Modal -->
+    <div class="modal" id="suspendUserModal">
+        <div class="modal-content" style="max-width:460px;">
+            <button class="modal-close" onclick="closeModal('suspendUserModal')"><i class="fas fa-times"></i></button>
+            <h3 style="color:var(--yellow);margin-bottom:1rem;"><i class="fas fa-pause-circle"></i> Suspend User</h3>
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">The user will be unable to log in. An
+                email notification with the reason will be sent.</p>
+            <div class="form-group" style="margin-bottom:1.2rem;">
+                <label style="font-size:0.78rem;color:var(--dim);display:block;margin-bottom:0.4rem;">Reason for
+                    Suspension <span style="color:var(--red);">*</span></label>
+                <textarea id="suspendReasonInput" rows="3" placeholder="Enter the reason for suspending this user..."
+                    style="width:100%;padding:10px;border:1px solid var(--border);background:var(--elevated);color:var(--text);border-radius:6px;font-size:0.85rem;resize:vertical;font-family:inherit;"></textarea>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+                <button class="btn btn-ghost" onclick="closeModal('suspendUserModal')" style="flex:1;">Cancel</button>
+                <button class="btn" id="suspendUserConfirmBtn" onclick="confirmSuspendUser()"
+                    style="flex:1;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-weight:600;">
+                    <span><i class="fas fa-pause-circle"></i> Suspend User</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Modal -->
+    <div class="modal" id="deleteUserModal">
+        <div class="modal-content" style="max-width:480px;">
+            <button class="modal-close" onclick="closeModal('deleteUserModal')"><i class="fas fa-times"></i></button>
+            <h3 style="color:var(--red);margin-bottom:1rem;"><i class="fas fa-exclamation-triangle"></i> Permanently
+                Delete User</h3>
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.5rem;"><strong>This action is
+                    irreversible.</strong> All user data, classroom memberships, sessions, and tokens will be
+                permanently removed.</p>
+            <p style="color:var(--dim);font-size:0.8rem;margin-bottom:1rem;">An email will be sent to the user before
+                deletion.</p>
+            <div class="form-group" style="margin-bottom:1rem;">
+                <label style="font-size:0.78rem;color:var(--dim);display:block;margin-bottom:0.4rem;">Reason for
+                    Deletion <span style="color:var(--red);">*</span></label>
+                <textarea id="deleteUserReasonInput" rows="2" placeholder="Enter the reason for deleting this user..."
+                    oninput="checkDeleteUserInput()"
+                    style="width:100%;padding:10px;border:1px solid var(--border);background:var(--elevated);color:var(--text);border-radius:6px;font-size:0.85rem;resize:vertical;font-family:inherit;"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:1.2rem;">
+                <label style="font-size:0.78rem;color:var(--dim);display:block;margin-bottom:0.4rem;">Type <strong
+                        style="color:var(--red);">DELETE</strong> to confirm</label>
+                <input type="text" id="deleteUserConfirmInput" oninput="checkDeleteUserInput()" autocomplete="off"
+                    placeholder="Type DELETE here"
+                    style="width:100%;padding:10px;border:1px solid var(--border);background:var(--elevated);color:var(--text);border-radius:6px;font-size:0.85rem;font-family:monospace;letter-spacing:2px;">
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+                <button class="btn btn-ghost" onclick="closeModal('deleteUserModal')" style="flex:1;">Cancel</button>
+                <button class="btn" id="deleteUserConfirmBtn" disabled onclick="confirmDeleteUser()"
+                    style="flex:1;background:linear-gradient(135deg,#444,#333);color:#888;cursor:not-allowed;opacity:0.6;font-weight:600;">
+                    <span><i class="fas fa-trash"></i> Delete Permanently</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="/js/ui-animations.js"></script>
+    <script src="/js/super-admin.js?v=3"></script>
+</body>
+
+</html>

@@ -1,0 +1,144 @@
+/* ==========================================================================
+   CLASSGRID SHARED UI ANIMATIONS & EFFECTS
+   Provides premium scroll reveals, counters, skeleton loaders, and interactions
+   ========================================================================== */
+
+/* ── CONSTANTS & TIMINGS ── */
+:root {
+    --transition-fast: 150ms;
+    --transition-section: 300ms;
+    --transition-reveal: 600ms;
+    --bezier-premium: cubic-bezier(0.25, 1, 0.5, 1);
+    --border-soft: 1px solid rgba(0, 0, 0, 0.06);
+    --shadow-soft: 0 6px 20px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ── SCROLL REVEAL (INTERSECTION OBSERVER) ── */
+.reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity var(--transition-reveal) var(--bezier-premium),
+        transform var(--transition-reveal) var(--bezier-premium);
+    will-change: opacity, transform;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Optional Stagger Helpers for elements that appear together if not handled in JS */
+.reveal.stagger-1 {
+    transition-delay: 100ms;
+}
+
+.reveal.stagger-2 {
+    transition-delay: 200ms;
+}
+
+.reveal.stagger-3 {
+    transition-delay: 300ms;
+}
+
+/* ── SKELETON LOADERS ── */
+.skeleton {
+    background: linear-gradient(110deg,
+            rgba(0, 0, 0, 0.04) 8%,
+            rgba(0, 0, 0, 0.08) 18%,
+            rgba(0, 0, 0, 0.04) 33%);
+    background-size: 200% 100%;
+    animation: 1.5s shimmer linear infinite;
+    border-radius: 4px;
+    color: transparent !important;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-theme="dark"] .skeleton {
+    background: linear-gradient(110deg,
+            rgba(255, 255, 255, 0.04) 8%,
+            rgba(255, 255, 255, 0.08) 18%,
+            rgba(255, 255, 255, 0.04) 33%);
+    background-size: 200% 100%;
+}
+
+.skeleton::before,
+.skeleton::after,
+.skeleton * {
+    visibility: hidden !important;
+}
+
+@keyframes shimmer {
+    to {
+        background-position-x: -200%;
+    }
+}
+
+/* ── MICRO-INTERACTIONS ── */
+/* Cards */
+.anim-card {
+    transition: transform var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
+    will-change: transform, box-shadow;
+}
+
+.anim-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-hover);
+    z-index: 10;
+}
+
+/* Buttons */
+.anim-btn {
+    transition: transform var(--transition-fast) ease, background-color var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
+}
+
+.anim-btn:active {
+    transform: scale(0.98);
+}
+
+/* Table Rows */
+.anim-row,
+.anim-td-rows tr {
+    transition: background-color 0.2s ease, transform: 0.2s ease;
+}
+
+.anim-row:hover,
+.anim-td-rows tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+    transform: scale(1.002);
+}
+
+[data-theme="light"] .anim-row:hover,
+[data-theme="light"] .anim-td-rows tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* ── PAGE LOAD FADE ── */
+.page-fade-in {
+    animation: pageLoadFade 200ms ease-out forwards;
+}
+
+@keyframes pageLoadFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ── SECTION TRANSITION FADES ── */
+.section-fade {
+    opacity: 0;
+    transition: opacity var(--transition-section) ease;
+}
+
+.section-fade.active {
+    opacity: 1;
+}

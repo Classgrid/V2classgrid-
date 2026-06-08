@@ -1,0 +1,1004 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        (function () {
+            var t = null; var hasUrlToken = window.location.search.indexOf('token=') !== -1;
+            if (t || hasUrlToken) {
+                window.addEventListener('pageshow', function (e) { if (e.persisted && !null) window.location.replace('/login.html'); });
+                window.addEventListener('storage', function (e) { if (e.key === 'jwt_token' && !e.newValue) window.location.replace('/login.html'); });
+                return;
+            }
+            var _cs = document.createElement('style'); _cs.id = '_ag'; _cs.textContent = 'body>*:not(script):not(style){visibility:hidden!important}'; document.head.appendChild(_cs);
+            var _cb = location.origin.includes('localhost') ? 'http://localhost:3000' : '';
+            var _tok = localStorage.getItem('jwt_token'); var _hdrs = { 'Cache-Control': 'no-store' }; if (_tok && _tok !== 'null' && _tok !== 'undefined') { _hdrs['Authorization'] = 'Bearer ' + _tok; } fetch(_cb + '/api/auth/me', { credentials: 'include', cache: 'no-store', headers: _hdrs })
+                .then(function (r) { if (r.ok) return r.json().then(function (u) { window._cookieAuthUser = u; var e = document.getElementById('_ag'); if (e) e.remove(); }); throw 0; })
+                .catch(function () { window.location.replace('/login.html'); });
+        })();
+    </script>
+    <script src="/app-state.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Student Notes | Classgrid</title>
+    <meta name="description" content="Browse approved notes shared within your organization on Classgrid.">
+    <link rel="icon" href="/Classgrid.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --surface2: #141414;
+            --border: rgba(255, 255, 255, 0.07);
+            --border-hi: rgba(255, 255, 255, 0.15);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --muted: #888888;
+            --dim: #444444;
+            --sidebar-w: 240px;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* ── READING PROGRESS ── */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 2px;
+            z-index: 300;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: var(--grad-bp);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: #000;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 200;
+            overflow-y: auto;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1.5rem 1.4rem 1.3rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 9.5px;
+            background: var(--grad-bp);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            border-radius: 7px;
+            z-index: 0;
+        }
+
+        .logo-box img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .brand-name em {
+            font-style: normal;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-section {
+            padding: 1.2rem 1rem 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dim);
+            padding: 0 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 1px;
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(74, 144, 245, 0.1);
+            color: #fff;
+        }
+
+        .nav-item.active i {
+            color: var(--blue-light);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.6rem 1rem;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        /* ── HAMBURGER ── */
+        .ham {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 300;
+            flex-direction: column;
+            gap: 5px;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            cursor: pointer;
+        }
+
+        .ham span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.28s ease;
+        }
+
+        .ham.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .ham.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .ham.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 199;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* ── MAIN ── */
+        .main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+        }
+
+        /* ── AUTH GATE ── */
+        .auth-gate {
+            display: none;
+            text-align: center;
+            padding: 10rem 2rem 4rem;
+        }
+
+        .auth-gate i {
+            font-size: 3rem;
+            color: var(--blue);
+            margin-bottom: 1.2rem;
+            display: block;
+        }
+
+        .auth-gate h2 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-gate p {
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-gate a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.8rem 2rem;
+            background: var(--grad-bp);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        .auth-gate a:hover {
+            opacity: 0.9;
+        }
+
+        /* ── PAGE HERO ── */
+        .page-hero {
+            padding: 4rem 4rem 3rem;
+            border-bottom: 1px solid var(--border);
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(74, 144, 245, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue);
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            color: #fff;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+        }
+
+        .page-title span {
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+            color: var(--muted);
+            max-width: 560px;
+            line-height: 1.8;
+        }
+
+        .page-hero-inner {
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── CONTENT ── */
+        .content-wrap {
+            padding: 3rem 4rem 5rem;
+            max-width: 1100px;
+        }
+
+        .sec {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            margin-bottom: 3rem;
+        }
+
+        .sec.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.3px;
+        }
+
+        .section-desc {
+            font-size: 0.875rem;
+            color: var(--muted);
+            line-height: 1.75;
+            margin-bottom: 1.8rem;
+        }
+
+        /* ── FILTER BAR ── */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-btn {
+            padding: 6px 16px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--border-hi);
+            color: #fff;
+        }
+
+        .filter-btn.active {
+            background: rgba(74, 144, 245, 0.12);
+            border-color: rgba(74, 144, 245, 0.3);
+            color: var(--blue-light);
+        }
+
+        /* ── NOTES GRID ── */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+
+        .note-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.4rem 1.5rem;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .note-card:hover {
+            border-color: var(--border-hi);
+            transform: translateY(-2px);
+        }
+
+        .note-card-badges {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 0.6rem;
+        }
+
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 0.68rem;
+            font-weight: 600;
+        }
+
+        .type-badge.self_made {
+            background: rgba(34, 197, 94, 0.10);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .type-badge.teacher {
+            background: rgba(74, 144, 245, 0.10);
+            color: #7eb8ff;
+            border: 1px solid rgba(74, 144, 245, 0.2);
+        }
+
+        .type-badge.university {
+            background: rgba(168, 85, 247, 0.10);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .type-badge.buyed {
+            background: rgba(251, 191, 36, 0.10);
+            color: #fde68a;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .note-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .note-card-desc {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 0.7rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .note-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.73rem;
+            color: var(--dim);
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+
+        .note-card-meta i {
+            color: var(--blue);
+            margin-right: 3px;
+        }
+
+        .note-card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .note-btn {
+            padding: 0.45rem 1rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border: none;
+        }
+
+        .note-btn-preview {
+            background: rgba(74, 144, 245, 0.1);
+            border: 1px solid rgba(74, 144, 245, 0.2);
+            color: var(--blue-light);
+        }
+
+        .note-btn-preview:hover {
+            background: rgba(74, 144, 245, 0.2);
+        }
+
+        .note-btn-download {
+            background: var(--grad-bp);
+            color: #fff;
+        }
+
+        .note-btn-download:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .notes-empty {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--dim);
+        }
+
+        .notes-empty i {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+            display: block;
+            color: var(--muted);
+            opacity: 0.4;
+        }
+
+        .notes-empty p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 0.5rem;
+        }
+
+        .total-badge {
+            font-size: 0.78rem;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 3px 12px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            margin-left: 8px;
+        }
+
+        /* ── BACK TO TOP ── */
+        .back-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 40px;
+            height: 40px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 100;
+        }
+
+        .back-top.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .back-top:hover {
+            background: var(--surface2);
+            transform: translateY(-2px);
+        }
+
+        /* ── MOBILE ── */
+        @media(max-width:768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .ham {
+                display: flex;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .page-hero {
+                padding: 5.5rem 1.5rem 2rem;
+            }
+
+            .content-wrap {
+                padding: 2rem 1.5rem 4rem;
+            }
+
+            .reading-progress {
+                left: 0;
+            }
+
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- READING PROGRESS -->
+    <div class="reading-progress">
+        <div class="reading-progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- HAMBURGER -->
+    <button class="ham" id="hamBtn"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <a href="index" class="sidebar-logo">
+            <div class="logo-box"><img src="/Classgrid.png" alt="Classgrid"></div>
+            <span class="brand-name">Class<em>grid</em></span>
+        </a>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Platform</div>
+            <a href="/classroom" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/notes.html" class="nav-item"><i class="fas fa-cloud-upload-alt"></i> Upload Notes</a>
+            <a href="/approved-notes.html" class="nav-item active"><i class="fas fa-book-open"></i> Student Notes</a>
+            <a href="/my-classrooms" class="nav-item"><i class="fas fa-chalkboard"></i> My Classrooms</a>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Navigation</div>
+            <a href="index" class="nav-item"><i class="fas fa-house"></i> Home</a>
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <!-- AUTH GATE -->
+        <div class="auth-gate" id="authGate">
+            <i class="fas fa-lock"></i>
+            <h2>Authentication Required</h2>
+            <p>Please log in to browse approved notes.</p>
+            <a href="/login"><i class="fas fa-sign-in-alt"></i> Log In</a>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div id="mainPage" style="display:none;">
+
+            <!-- HERO -->
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>Student Notes</div>
+                    <h1 class="page-title">Browse <span>Notes</span></h1>
+                    <p class="page-subtitle">Discover approved study materials shared by students and faculty within
+                        your organization.</p>
+                </div>
+            </div>
+
+            <div class="content-wrap">
+                <div class="sec" id="s1">
+                    <div class="section-label">Library</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.5rem;">
+                        <div class="section-title">Approved Notes</div>
+                        <span class="total-badge" id="notesCount">0</span>
+                    </div>
+                    <p class="section-desc">All notes below have been reviewed and approved by your organization admin.
+                    </p>
+
+                    <!-- FILTER BAR -->
+                    <div class="filter-bar" id="filterBar">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="self_made">🟢 Self Made</button>
+                        <button class="filter-btn" data-filter="teacher">🔵 Teacher Notes</button>
+                        <button class="filter-btn" data-filter="university">🟣 University</button>
+                        <button class="filter-btn" data-filter="buyed">🟡 Buyed</button>
+                    </div>
+
+                    <!-- NOTES GRID -->
+                    <div class="notes-grid" id="notesGrid">
+                        <div class="notes-empty">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <div>Loading notes…</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- BACK TO TOP -->
+    <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        const API = '/api';
+        function getToken() { return localStorage.getItem('jwt_token'); }
+        function esc(str) {
+            if (!str) return '';
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return str.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // ── Sidebar toggle ──
+        const ham = document.getElementById('hamBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        ham.addEventListener('click', () => { ham.classList.toggle('open'); sidebar.classList.toggle('open'); sidebarOverlay.classList.toggle('show'); });
+        sidebarOverlay.addEventListener('click', () => { ham.classList.remove('open'); sidebar.classList.remove('open'); sidebarOverlay.classList.remove('show'); });
+
+        // ── Scroll progress + back to top ──
+        const progressBar = document.getElementById('progressBar');
+        const backTop = document.getElementById('backTop');
+        window.addEventListener('scroll', () => {
+            const s = window.scrollY;
+            const d = document.documentElement.scrollHeight - window.innerHeight;
+            if (d > 0 && progressBar) progressBar.style.width = (s / d * 100) + '%';
+            if (backTop) backTop.classList.toggle('show', s > 300);
+        }, { passive: true });
+
+        // ── Section observer ──
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+        }, { threshold: 0.06, rootMargin: '0px 0px -40px 0px' });
+
+        // ── Auth check ──
+        const token = getToken();
+        if (!token) {
+            document.getElementById('authGate').style.display = 'block';
+        } else {
+            document.getElementById('mainPage').style.display = 'block';
+            document.querySelectorAll('.sec').forEach(el => io.observe(el));
+
+            // GSAP
+            if (window.gsap) {
+                gsap.registerPlugin(ScrollTrigger);
+                gsap.from('.page-hero-inner h1', { duration: 1, y: 40, opacity: 0, ease: 'power4.out', delay: 0.1 });
+                gsap.from('.page-hero-inner p', { duration: 0.9, y: 30, opacity: 0, ease: 'power4.out', delay: 0.3 });
+            }
+
+            loadApprovedNotes();
+        }
+
+        // ── Data ──
+        let allNotes = [];
+        let activeFilter = 'all';
+
+        const TYPE_LABELS = {
+            self_made: '🟢 Self Made',
+            teacher: '🔵 Teacher Notes',
+            university: '🟣 University',
+            buyed: '🟡 Buyed'
+        };
+
+        // ── Filter buttons ──
+        document.getElementById('filterBar').addEventListener('click', (e) => {
+            const btn = e.target.closest('.filter-btn');
+            if (!btn) return;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter;
+            renderNotes();
+        });
+
+        // ── Load Notes ──
+        async function loadApprovedNotes() {
+            const grid = document.getElementById('notesGrid');
+            grid.innerHTML = '<div class="notes-empty"><i class="fas fa-spinner fa-spin"></i><div>Loading notes…</div></div>';
+
+            try {
+                // Check org membership
+                let hasOrg = false;
+                const meRes = await fetch(`${API}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${getToken()}` }, credentials: 'include'
+                });
+                if (meRes.ok) {
+                    const meData = await meRes.json();
+                    const user = meData.user || meData;
+                    hasOrg = !!(user.organization_id || user.organization);
+                }
+
+                if (!hasOrg) {
+                    try {
+                        const clsRes = await fetch(`${API}/classrooms/my`, {
+                            headers: { 'Authorization': `Bearer ${getToken()}` }, credentials: 'include'
+                        });
+                        if (clsRes.ok) {
+                            const clsData = await clsRes.json();
+                            hasOrg = (clsData.classrooms && clsData.classrooms.length > 0);
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+
+                if (!hasOrg) {
+                    grid.innerHTML = `
+                        <div class="notes-empty" style="grid-column:1/-1;">
+                            <i class="fas fa-link"></i>
+                            <div>Join a Classroom First</div>
+                            <p>Enter a class code on the <a href="/my-classrooms" style="color:var(--blue-light)">My Classrooms</a> page to get connected to an organization.</p>
+                        </div>`;
+                    return;
+                }
+
+                const res = await fetch(`${API}/notes/org`, {
+                    headers: { 'Authorization': `Bearer ${getToken()}` }, credentials: 'include'
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.detail || errData.message || 'Failed to load notes');
+                }
+
+                const data = await res.json();
+                allNotes = data.notes || [];
+
+                document.getElementById('notesCount').textContent = allNotes.length;
+                renderNotes();
+            } catch (err) {
+                console.error('Load approved notes error:', err);
+                grid.innerHTML = `
+                    <div class="notes-empty" style="grid-column:1/-1;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>Failed to load notes</div>
+                        <p>${esc(err.message)}</p>
+                    </div>`;
+            }
+        }
+
+        function renderNotes() {
+            const grid = document.getElementById('notesGrid');
+            const filtered = activeFilter === 'all'
+                ? allNotes
+                : allNotes.filter(n => (n.note_type || 'self_made') === activeFilter);
+
+            document.getElementById('notesCount').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="notes-empty" style="grid-column:1/-1;">
+                        <i class="fas fa-folder-open"></i>
+                        <div>${activeFilter === 'all' ? 'No notes shared yet' : 'No notes in this category'}</div>
+                        <p>${activeFilter === 'all' ? 'Notes will appear here once faculty or students upload and they are approved.' : 'Try a different filter.'}</p>
+                    </div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(n => {
+                const date = new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                const noteType = n.note_type || 'self_made';
+                return `
+                <div class="note-card">
+                    <div class="note-card-badges">
+                        <span class="type-badge ${noteType}">${TYPE_LABELS[noteType] || noteType}</span>
+                    </div>
+                    <div class="note-card-title">${esc(n.title)}</div>
+                    ${n.description ? `<div class="note-card-desc">${esc(n.description)}</div>` : ''}
+                    <div class="note-card-meta">
+                        <span><i class="fas fa-user"></i>${esc(n.uploaded_by || 'Unknown')}</span>
+                        <span><i class="fas fa-calendar"></i>${date}</span>
+                    </div>
+                    <div class="note-card-actions">
+                        <a href="${n.file_url}" target="_blank" class="note-btn note-btn-preview">
+                            <i class="fas fa-eye"></i> Preview
+                        </a>
+                        <a href="${n.file_url}" download class="note-btn note-btn-download">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    </script>
+</body>
+
+</html>

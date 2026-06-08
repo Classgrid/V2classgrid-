@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- Primary SEO -->
+    <title>Get Started – Classgrid | Choose Your Plan</title>
+    <meta name="description"
+        content="Choose your Classgrid plan. Simple, transparent pricing for institutions of all sizes. Start free or upgrade to Pro for advanced AI-powered classroom features." />
+    <meta name="keywords"
+        content="Classgrid pricing, free classroom platform, AI LMS pricing, education software plans, institutional software India" />
+    <meta name="author" content="Nikhil Shinde" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://classgrid.in/get-started" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Get Started – Classgrid | Choose Your Plan" />
+    <meta property="og:description"
+        content="Simple, transparent pricing for institutions of all sizes. Start free or upgrade to Pro." />
+    <meta property="og:url" content="https://classgrid.in/get-started" />
+    <meta property="og:image" content="https://classgrid.in/images/classgrid-preview.png" />
+    <meta property="og:site_name" content="Classgrid" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #0a0a0a;
+            --white: #ffffff;
+            --off-white: #f7f7f5;
+            --gray-50: #fafafa;
+            --gray-100: #f4f4f4;
+            --gray-200: #e8e8e8;
+            --gray-300: #d0d0d0;
+            --gray-400: #a0a0a0;
+            --gray-500: #707070;
+            --gray-600: #505050;
+            --gray-700: #353535;
+            --gray-800: #202020;
+            --gray-900: #131313;
+            --font-display: 'DM Serif Display', Georgia, serif;
+            --font-body: 'DM Sans', system-ui, sans-serif;
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.14);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--off-white);
+            color: var(--black);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ── DARK MODE ── */
+        body.dark {
+            --off-white: #0f0f0f;
+            --white: #181818;
+            --gray-50: #161616;
+            --gray-100: #1e1e1e;
+            --gray-200: #2a2a2a;
+            --gray-300: #3a3a3a;
+            --gray-400: #5a5a5a;
+            --gray-500: #888;
+            --gray-600: #aaa;
+            --gray-700: #ccc;
+            --gray-800: #e0e0e0;
+            --gray-900: #f0f0f0;
+            --black: #f0f0f0;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        body.dark header {
+            background: rgba(15, 15, 15, 0.94);
+            border-color: #2a2a2a;
+        }
+
+        body.dark .plan-free {
+            background: #181818;
+            border-color: #2a2a2a;
+        }
+
+        body.dark .plan-pro {
+            background: #0a0a0a;
+            border-color: #2a2a2a;
+            color: #f0f0f0;
+        }
+
+        body.dark .plan-pro .plan-label {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        body.dark .plan-pro .plan-name {
+            color: #f0f0f0;
+        }
+
+        body.dark .plan-pro .plan-desc {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        body.dark .plan-pro .feature-list li {
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        body.dark .plan-pro .fi {
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        body.dark .plan-pro .plan-divider {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        body.dark .confirm-section {
+            background: #181818;
+            border-color: #2a2a2a;
+        }
+
+        body.dark .modal-box {
+            background: #181818;
+        }
+
+        body.dark .modal-header {
+            background: #181818;
+            border-color: #2a2a2a;
+        }
+
+        body.dark .modal-meta {
+            background: #111;
+            border-color: #2a2a2a;
+        }
+
+        body.dark .guide-block,
+        body.dark .guide-block-full {
+            background: #181818;
+        }
+
+        body.dark .guidelines-grid {
+            background: #2a2a2a;
+            border-color: #2a2a2a;
+        }
+
+        body.dark .g-alert-warn {
+            background: #1a0d0d;
+            border-color: #4a2020;
+            color: #f4a0a0;
+        }
+
+        body.dark .g-alert-info {
+            background: #0d1420;
+            border-color: #1e3560;
+            color: #90b8f0;
+        }
+
+        body.dark .form-group input[type="text"],
+        body.dark .form-group input[type="file"] {
+            background: #111;
+            border-color: #2a2a2a;
+            color: #f0f0f0;
+        }
+
+        body.dark .form-group input[type="text"]:focus {
+            border-color: #888;
+        }
+
+        body.dark .section-divider {
+            background: #2a2a2a;
+        }
+
+        body.dark .plan-divider {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ── THEME TOGGLE BUTTON ── */
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+            color: var(--gray-600);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .theme-toggle:hover {
+            background: var(--gray-100);
+            color: var(--black);
+        }
+
+        /* ── HEADER ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(247, 247, 245, 0.94);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        nav {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            text-decoration: none;
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            color: var(--black);
+            letter-spacing: -0.3px;
+        }
+
+        .brand img {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            text-decoration: none;
+            transition: color 0.2s;
+            letter-spacing: 0.01em;
+        }
+
+        .nav-links a:hover {
+            color: var(--black);
+        }
+
+        .nav-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.45rem 1.1rem;
+            background: var(--black);
+            color: var(--white);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: background 0.2s;
+        }
+
+        .nav-cta:hover {
+            background: var(--gray-800);
+        }
+
+        /* ── MAIN WRAP ── */
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1.5rem 6rem;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            border: 1px solid var(--gray-300);
+            border-radius: 50px;
+            padding: 4px 14px;
+            margin-bottom: 1.5rem;
+            background: var(--white);
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.2rem, 5vw, 3.4rem);
+            font-weight: 400;
+            color: var(--black);
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            color: var(--gray-500);
+            max-width: 460px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ── PRICING GRID ── */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 5rem;
+            align-items: stretch;
+        }
+
+        .plan-card {
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        /* Free plan */
+        .plan-free {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Pro plan */
+        .plan-pro {
+            background: var(--black);
+            border: 1px solid var(--black);
+            box-shadow: var(--shadow-lg);
+            color: var(--white);
+        }
+
+        .plan-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+        }
+
+        .plan-free .plan-label {
+            color: var(--gray-400);
+        }
+
+        .plan-pro .plan-label {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .plan-name {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.4rem;
+        }
+
+        .plan-free .plan-name {
+            color: var(--black);
+        }
+
+        .plan-pro .plan-name {
+            color: var(--white);
+        }
+
+        .plan-desc {
+            font-size: 0.82rem;
+            line-height: 1.65;
+            margin-bottom: 2rem;
+        }
+
+        .plan-free .plan-desc {
+            color: var(--gray-500);
+        }
+
+        .plan-pro .plan-desc {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .plan-divider {
+            height: 1px;
+            margin-bottom: 1.6rem;
+        }
+
+        .plan-free .plan-divider {
+            background: var(--gray-200);
+        }
+
+        .plan-pro .plan-divider {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2.2rem;
+            flex: 1;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .plan-free .feature-list li {
+            color: var(--gray-600);
+        }
+
+        .plan-pro .feature-list li {
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .feature-list li .fi {
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+            font-size: 0.55rem;
+        }
+
+        .plan-free .fi {
+            background: var(--gray-100);
+            color: var(--gray-500);
+            border: 1px solid var(--gray-200);
+        }
+
+        .plan-pro .fi {
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-plan {
+            display: block;
+            width: 100%;
+            padding: 0.9rem 1.5rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-free {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .btn-free:hover {
+            background: var(--gray-800);
+        }
+
+        .btn-pro {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        .btn-pro:hover {
+            background: var(--gray-100);
+        }
+
+        /* ── DIVIDER ── */
+        .section-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 0 0 5rem;
+        }
+
+        /* ── GUIDELINES ── */
+        .guidelines-section {}
+
+        .guidelines-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .guidelines-header .section-tag {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: 0.9rem;
+        }
+
+        .guidelines-header h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 400;
+            color: var(--black);
+            letter-spacing: -0.5px;
+        }
+
+        .guidelines-header p {
+            margin-top: 0.6rem;
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        .guidelines-header .qr-upi {
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+            white-space: normal;
+            padding: 0 10px;
+        }
+
+        .guidelines-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--gray-200);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .guide-block {
+            background: var(--white);
+            padding: 2rem;
+        }
+
+        .guide-block:nth-child(1) {
+            border-radius: var(--radius-md) 0 0 0;
+        }
+
+        .guide-block:nth-child(2) {
+            border-radius: 0 var(--radius-md) 0 0;
+        }
+
+        .guide-num {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: 0.5rem;
+        }
+
+        .guide-block h3 {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 400;
+            color: var(--black);
+            margin-bottom: 0.9rem;
+            letter-spacing: -0.2px;
+        }
+
+        .guide-block p {
+            font-size: 0.82rem;
+            color: var(--gray-600);
+            line-height: 1.75;
+        }
+
+        .guide-block p+p {
+            margin-top: 0.6rem;
+        }
+
+        .guide-block strong {
+            color: var(--gray-800);
+            font-weight: 600;
+        }
+
+        /* Full-width guide block */
+        .guide-block-full {
+            background: var(--white);
+            padding: 2rem;
+            grid-column: 1 / -1;
+        }
+
+        /* Warning / info blocks within guidelines */
+        .g-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border-radius: var(--radius-sm);
+            padding: 0.85rem 1rem;
+            margin-top: 1rem;
+            font-size: 0.78rem;
+            line-height: 1.65;
+        }
+
+        .g-alert-warn {
+            background: #fff5f5;
+            border: 1px solid #f8d7d7;
+            color: #8a2929;
+        }
+
+        .g-alert-info {
+            background: #f5f8ff;
+            border: 1px solid #d5e2f8;
+            color: #2a4a8a;
+        }
+
+        .g-alert i {
+            margin-top: 1px;
+            flex-shrink: 0;
+            font-size: 0.78rem;
+        }
+
+        /* ── CONFIRMATION ── */
+        .confirm-section {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .confirm-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: var(--black);
+            margin-bottom: 1.5rem;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .check-item:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .custom-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid var(--gray-300);
+            background: var(--white);
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: var(--white);
+            transition: all 0.18s;
+        }
+
+        .custom-check.checked {
+            background: var(--black);
+            border-color: var(--black);
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        .check-label {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            line-height: 1.6;
+            user-select: none;
+        }
+
+        .check-label strong {
+            color: var(--black);
+            font-weight: 600;
+        }
+
+        /* ── CTA ── */
+        .cta-wrap {
+            text-align: center;
+        }
+
+        .btn-create {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 1rem 2.5rem;
+            background: var(--black);
+            color: var(--white);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.2s, opacity 0.2s;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-create:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-create:not(:disabled):hover {
+            background: var(--gray-800);
+        }
+
+        .cta-note {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            margin-top: 0.85rem;
+        }
+
+        .cta-note.ready {
+            color: #2a7a4a;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.3rem 0.8rem;
+            margin-top: 1.2rem;
+        }
+
+        .footer-links a {
+            font-size: 0.74rem;
+            color: var(--gray-400);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--black);
+        }
+
+        .footer-links span {
+            color: var(--gray-300);
+            font-size: 0.7rem;
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.8rem 2rem 1.2rem;
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            z-index: 1;
+        }
+
+        .modal-header h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--black);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray-500);
+            font-size: 1rem;
+            padding: 4px;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--black);
+        }
+
+        .modal-body {
+            padding: 1.8rem 2rem;
+        }
+
+        .modal-meta {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .modal-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .modal-meta-row .label {
+            color: var(--gray-500);
+        }
+
+        .modal-meta-row .value {
+            font-weight: 600;
+            color: var(--black);
+        }
+
+        .modal-meta-row.price-row .value {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+        }
+
+        .modal-loading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: var(--gray-400);
+            padding: 0.5rem 0;
+        }
+
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--gray-200);
+            border-top-color: var(--gray-500);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .qr-wrap {
+            text-align: center;
+            padding: 1.2rem 0;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 1.5rem;
+        }
+
+        .qr-wrap img {
+            width: 140px;
+            height: 140px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-200);
+            object-fit: contain;
+        }
+
+        .qr-upi {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.6rem;
+            word-break: break-all;
+        }
+
+        .qr-upi strong {
+            color: var(--black);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.45rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="file"] {
+            width: 100%;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            color: var(--black);
+            background: var(--white);
+            transition: border-color 0.2s;
+            display: block;
+        }
+
+        .form-group input[type="text"] {
+            padding: 0.7rem 0.9rem;
+            outline: none;
+        }
+
+        .form-group input[type="text"]:focus {
+            border-color: var(--black);
+        }
+
+        .form-group input[type="file"] {
+            padding: 0.5rem 0.7rem;
+            cursor: pointer;
+        }
+
+        .form-group .hint {
+            font-size: 0.72rem;
+            color: var(--gray-400);
+            margin-top: 0.3rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--black);
+            color: var(--white);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: var(--gray-800);
+        }
+
+        .modal-note {
+            font-size: 0.72rem;
+            color: var(--gray-400);
+            text-align: center;
+            margin-top: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .nav-cta span {
+                display: none;
+            }
+
+            .nav-cta {
+                padding: 0.45rem 0.8rem;
+            }
+
+            .hero {
+                padding: 50px 0 40px;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .guidelines-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .guide-block:nth-child(1) {
+                border-radius: 0;
+            }
+
+            .guide-block:nth-child(2) {
+                border-radius: 0;
+            }
+
+            .plan-card {
+                padding: 1.8rem;
+            }
+
+            .confirm-section {
+                padding: 1.5rem;
+            }
+
+            .modal-header {
+                padding: 1.3rem 1.3rem 1rem;
+            }
+
+            .modal-body {
+                padding: 1.3rem;
+            }
+
+            .modal-meta-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <nav>
+            <a href="index" class="brand">
+                <img src="/Classgrid.png" alt="Classgrid">
+                Classgrid
+            </a>
+            <div class="nav-right">
+                <div class="nav-links">
+                    <a href="index">Home</a>
+                    <a href="features">Features</a>
+                    <a href="security">Security</a>
+                    <a href="contact">Contact</a>
+                </div>
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- HERO -->
+        <div class="hero">
+            <span class="hero-tag">Pricing</span>
+            <h1>Choose Your Plan</h1>
+            <p>Simple pricing for institutions of all sizes. Start free, upgrade when you're ready.</p>
+        </div>
+
+        <!-- PRICING CARDS -->
+        <div class="pricing-grid">
+
+            <!-- FREE PLAN -->
+            <div class="plan-card plan-free">
+                <div class="plan-label">Free</div>
+                <div class="plan-name">Starter</div>
+                <div class="plan-desc">Perfect for small institutes and pilot usage. No commitment required.</div>
+                <div class="plan-divider"></div>
+                <ul class="feature-list">
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Up to <strong>5 faculty</strong> accounts
+                    </li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> <strong>2 classrooms</strong> per faculty
+                    </li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Up to <strong>60 students</strong> per
+                        classroom</li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Effective capacity: <strong>10 classrooms,
+                            600 students</strong></li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Classroom management &amp; notes sharing
+                    </li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Announcements &amp; classroom chat</li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> AI academic assistant (standard)</li>
+                </ul>
+                <a href="org-apply.html?plan=FREE" class="btn-plan btn-free">Get Started Free</a>
+            </div>
+
+            <!-- PRO PLAN -->
+            <div class="plan-card plan-pro">
+                <div class="plan-label">Pro</div>
+                <div class="plan-name">Professional</div>
+                <div class="plan-desc">Full-featured access for growing institutions. <strong>₹100/month</strong></div>
+                <div class="plan-divider"></div>
+                <ul class="feature-list">
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Up to <strong>10 faculty</strong> accounts
+                    </li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> <strong>5 classrooms</strong> per faculty
+                    </li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Up to <strong>150 students</strong> per
+                        classroom</li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Effective capacity: <strong>50 classrooms,
+                            7,500 students</strong></li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Everything in Free plan</li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Smart Attendance system</li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Daily &amp; weekly attendance reports</li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Monthly attendance summaries</li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Advanced classroom analytics</li>
+                    <li><span class="fi"><i class="fas fa-check"></i></span> Priority feature access</li>
+                </ul>
+                <a href="org-apply.html?plan=PRO" class="btn-plan btn-pro">Buy Pro Plan</a>
+            </div>
+
+        </div><!-- /pricing-grid -->
+
+        <div class="section-divider"></div>
+
+        <!-- GUIDELINES -->
+        <div class="guidelines-section">
+
+            <div class="guidelines-header">
+                <div class="section-tag">Platform Documentation</div>
+                <h2>Organization Guidelines &amp; Policy</h2>
+                <p>Read carefully before creating your organization. These policies govern all users on Classgrid.</p>
+            </div>
+
+            <div class="guidelines-grid">
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 1</div>
+                    <h3>Who May Create an Organization?</h3>
+                    <p>An organization may only be created by a verified representative of an academic institution —
+                        such as a coaching institute owner, academic administrator, verified faculty head, or authorized
+                        institutional representative. <strong>Students must not create organizations.</strong>
+                        Organizations represent institutes, not individuals. By creating one, you confirm you have
+                        authority to represent the institute.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 2</div>
+                    <h3>Organization Code &amp; Faculty Authorization</h3>
+                    <p>Each organization is assigned a unique <strong>Organization Code</strong> that links faculty
+                        accounts to the correct institute, prevents cross-organization misuse, and secures institutional
+                        identity. Only the organization admin may distribute this code. Faculty must use the official
+                        code during registration. Unauthorized usage may result in suspension. Faculty cannot create
+                        duplicate organizations using the same institute name.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 3</div>
+                    <h3>Faculty Account Rules</h3>
+                    <p>On the Free Plan, up to <strong>5 faculty accounts</strong> with <strong>2 classrooms
+                            each</strong> are allowed.
+                        On the Pro Plan, up to <strong>10 faculty accounts</strong> with <strong>5 classrooms
+                            each</strong>.
+                        Faculty accounts are created and managed by the organization admin, bound to the organization
+                        identity, and restricted to their assigned classrooms. Faculty cannot access other
+                        organizations'
+                        data. All limits are <strong>enforced at the API level</strong> — exceeding them will require a
+                        plan upgrade.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 4</div>
+                    <h3>Student Access Rules</h3>
+                    <p>Students may join classrooms only through authorized methods: a <strong>Classroom Join
+                            Code</strong> shared by faculty, or the admin approval system. Students cannot access other
+                        organizations' classrooms, view cross-institute content, or bypass approval systems. Each
+                        classroom is fully isolated per organization.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 5</div>
+                    <h3>Classroom Structure</h3>
+                    <p>In Classgrid, <strong>one classroom equals one subject</strong>. Each classroom maintains
+                        separate announcements, notes and materials, chat, and attendance records (Pro feature). All
+                        classroom data is isolated and organization-specific.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 6</div>
+                    <h3>Plan Structure &amp; Feature Access</h3>
+                    <p>Classgrid operates on tier-based plans. The <strong>Free Plan</strong> includes the classroom
+                        system, announcements, notes upload, chat, AI academic assistant, up to 60 students per
+                        classroom, and up to 5 faculty accounts. It does not include Smart Attendance, advanced
+                        analytics, or automated reports. The <strong>Pro Plan</strong> includes everything in Free plus
+                        increased limits, Smart Attendance, attendance reports, monthly summaries, advanced insights,
+                        and priority access.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 7</div>
+                    <h3>Smart Attendance Policy (Pro)</h3>
+                    <p>Faculty starts a timed attendance session that remains active for <strong>4 minutes</strong>.
+                        Students must enter the session code personally. One mark per student per session. The session
+                        automatically expires and attendance is logged server-side — it cannot be edited by students.
+                        Sharing attendance codes publicly is strictly prohibited. Tampering or impersonation may result
+                        in disciplinary action.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 8</div>
+                    <h3>Student Honor Code</h3>
+                    <p>The Honor Code is a unique organization code that students use to join their institution on
+                        Classgrid. Students can join by entering either an <strong>Honor Code</strong> (links you to
+                        your
+                        organization) or a <strong>Classroom Code</strong> (automatically links you to both the
+                        classroom
+                        and the organization). Once linked to an organization, you cannot join a different one. Students
+                        agree to use only the code provided by their institution, avoid sharing codes with unauthorized
+                        users, and not attempt to join organizations they do not belong to. Misuse may result in account
+                        suspension or removal.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 9</div>
+                    <h3>AI Usage Policy</h3>
+                    <p>AI assistance is provided for <strong>academic support only</strong>. Responses are generated
+                        using external AI providers and are not a replacement for faculty instruction. Excessive misuse
+                        may result in temporary rate limiting or restrictions.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 10</div>
+                    <h3>Content &amp; Data Responsibility</h3>
+                    <p>Organization admins are responsible for notes uploaded by faculty, announcements and classroom
+                        materials, student moderation, and academic conduct. Classgrid does not claim ownership of
+                        academic content. <strong>Uploaded materials remain the property of the organization.</strong>
+                    </p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 11</div>
+                    <h3>Subscription &amp; Plan Activation</h3>
+                    <p>Paid plan activation occurs instantly via Razorpay Checkout. If payment
+                        fails or is interrupted during processing, the activation is aborted and any deducted amount
+                        will
+                        be refunded according to standard Razorpay policies. Organizations must ensure accurate billing
+                        details when submitting upgrade requests. Fraudulent or disputed payments may result in
+                        suspension.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 12</div>
+                    <h3>Monitoring &amp; Security</h3>
+                    <p>All sessions are <strong>JWT secured</strong> with HTTP-only cookies. Passwords are
+                        <strong>bcrypt hashed</strong> and never stored in plain text. Login activity may trigger
+                        security notification emails. Role-based access control prevents unauthorized access to any part
+                        of the platform.
+                    </p>
+                </div>
+
+                <div class="guide-block-full guide-block">
+                    <div class="guide-num">Section 13</div>
+                    <h3>Prohibited Use</h3>
+                    <p>Organizations must not upload illegal, offensive, or copyrighted content without permission;
+                        impersonate other institutes or create misleading organization names; share classroom join codes
+                        publicly outside the institute; or use the platform for non-academic purposes.</p>
+                    <div class="g-alert g-alert-warn">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <span>Violation of these policies may result in <strong>immediate account suspension</strong>.
+                            Classgrid reserves the right to revoke organization access without prior notice.</span>
+                    </div>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 14</div>
+                    <h3>Platform Scope</h3>
+                    <p>Classgrid currently supports organization-based classroom structure, faculty and student
+                        dashboards, real-time classroom chat, notes and material sharing, Smart Attendance (Pro), and an
+                        AI academic assistant. Advanced analytics and billing automation may be introduced in future
+                        updates. The platform is in active development.</p>
+                </div>
+
+                <div class="guide-block">
+                    <div class="guide-num">Section 15</div>
+                    <h3>By Creating an Organization, You Confirm</h3>
+                    <p>You confirm that you are <strong>authorized to represent the institute</strong>, accept
+                        responsibility for faculty and student management, understand plan limits and feature
+                        restrictions, and agree to all policies listed above.</p>
+                </div>
+
+            </div><!-- /guidelines-grid -->
+
+        </div><!-- /guidelines-section -->
+
+        <!-- CONFIRMATION -->
+        <div class="confirm-section">
+            <h2>Confirm &amp; Proceed</h2>
+
+            <label class="check-item">
+                <input type="checkbox" id="check1" onchange="updateBtn()">
+                <div class="custom-check" id="check1Visual"><i class="fas fa-check"></i></div>
+                <span class="check-label"><strong>I confirm I am authorized</strong> to create and manage this
+                    organization on behalf of my institution.</span>
+            </label>
+
+            <label class="check-item">
+                <input type="checkbox" id="check2" onchange="updateBtn()">
+                <div class="custom-check" id="check2Visual"><i class="fas fa-check"></i></div>
+                <span class="check-label"><strong>I have read and understood</strong> all platform guidelines, policies,
+                    and restrictions listed above.</span>
+            </label>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-wrap">
+            <button class="btn-create" id="createOrgBtn" onclick="goApply()" disabled>
+                <i class="fas fa-rocket"></i> Create Organization
+            </button>
+            <p class="cta-note" id="ctaNote">Both confirmations are required to proceed.</p>
+            <div class="footer-links">
+                <a href="features">Features</a>
+                <span>·</span>
+                <a href="security">Security</a>
+                <span>·</span>
+                <a href="privacy">Privacy Policy</a>
+                <span>·</span>
+                <a href="terms">Terms of Use</a>
+                <span>·</span>
+                <a href="contact">Contact</a>
+            </div>
+        </div>
+
+    </main>
+
+
+
+    <script>
+        // ── Theme Toggle ──
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+
+        function applyTheme(dark) {
+            document.body.classList.toggle('dark', dark);
+            themeIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
+            localStorage.setItem('cg-theme', dark ? 'dark' : 'light');
+        }
+
+        function toggleTheme() {
+            applyTheme(!document.body.classList.contains('dark'));
+        }
+
+        // Init from saved preference or system
+        const saved = localStorage.getItem('cg-theme');
+        if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            applyTheme(true);
+        }
+
+        // ── Checkbox logic ──
+        document.querySelectorAll('.check-item').forEach(label => {
+            label.addEventListener('click', () => {
+                const cb = label.querySelector('input[type="checkbox"]');
+                const visual = label.querySelector('.custom-check');
+                cb.checked = !cb.checked;
+                visual.classList.toggle('checked', cb.checked);
+                updateBtn();
+            });
+        });
+
+        function updateBtn() {
+            const c1 = document.getElementById('check1').checked;
+            const c2 = document.getElementById('check2').checked;
+            const btn = document.getElementById('createOrgBtn');
+            const note = document.getElementById('ctaNote');
+            btn.disabled = !(c1 && c2);
+            if (c1 && c2) {
+                note.textContent = '✓ All confirmed. You\'re ready to create your organization.';
+                note.classList.add('ready');
+            } else {
+                note.textContent = 'Both confirmations are required to proceed.';
+                note.classList.remove('ready');
+            }
+        }
+
+        function goApply() {
+            window.location.href = 'org-apply.html?plan=FREE';
+        }
+    </script>
+
+</body>
+
+</html>

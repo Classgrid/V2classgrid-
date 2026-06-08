@@ -1,0 +1,390 @@
+
+>         <div 
+class="page-section" i
+d="section-analytics">
+              <div 
+class="page-hero">
+                  
+<div class="page-hero-
+inner">
+                      
+<div class="page-badge
+"><span class="badge-d
+ot"></span>Analytics</
+div>
+                      
+<h1 class="page-title"
+                      
+    style="display:fle
+x;align-items:center;j
+ustify-content:space-b
+etween;flex-wrap:wrap;
+gap:10px;">
+                      
+    <span>Platform <sp
+an>Analytics</span></s
+pan>
+                      
+    <div style="displa
+y:flex;gap:10px;align-
+items:center;">
+                      
+        <span 
+id="lastRefreshSuper"
+                      
+            style="fon
+t-size:0.75rem;color:v
+ar(--dim);white-space:
+nowrap;font-weight:500
+;"></span>
+                      
+        <button 
+class="btn btn-ghost" 
+onclick="fastFetchAnal
+ytics()" 
+title="Manual Live 
+Refresh"
+                      
+            
+style="padding:8px 14p
+x;background:rgba(255,
+255,255,0.05);border:1
+px solid rgba(255,255,
+255,0.1);"><i
+                      
+                
+class="fas 
+fa-sync-alt" id="refre
+shIconSuper"></i> 
+<span
+                      
+                style=
+"font-size:0.85rem;">F
+ast 
+Fetch</span></button>
+                      
+    </div>
+                      
+</h1>
+                      
+<div class="page-meta"
+><span>Growth, usage, 
+and engagement 
+metrics</span></div>
+                  
+</div>
+              </div>
+              <div 
+class="content-wrap">
+                  
+<div 
+class="cmd-section 
+visible">
+                      
+<div class="section-he
+ader">
+                      
+    <div class="sectio
+n-num">04 ? 
+Analytics</div>
+                      
+    <div class="sectio
+n-title">Growth & 
+Engagement</div>
+                      
+</div>
+                      
+<div 
+class="info-grid">
+                      
+    <div 
+class="info-card 
+anim-card reveal">
+                      
+        <h4><i 
+class="fas 
+fa-chart-line" style="
+color:var(--cyan)"></i
+> Student Growth</h4>
+                      
+        <div class="in
+fo-row"><span>Total 
+Students</span><span i
+d="analyticsGrowthTota
+l">?</span>
+                      
+        </div>
+                      
+        <div class="in
+fo-row"><span>Joined 
+Today</span><span id="
+analyticsGrowthToday">
+?</span>
+                      
+        </div>
+                      
+        <div class="in
+fo-row"><span>Last 7 
+Days</span><span id="a
+nalyticsGrowth7Days">?
+</span></div>
+                      
+        <div class="in
+fo-row"><span>This 
+Month</span><span id="
+analyticsGrowthMonth">
+?</span></div>
+                      
+    </div>
+                      
+    <div 
+class="info-card 
+anim-card reveal">
+                      
+        <h4><i 
+class="fas 
+fa-file-alt" style="co
+lor:var(--green)"></i>
+ Notes & 
+Approvals</h4>
+                      
+        <div class="in
+fo-row"><span>Total 
+Uploaded</span><span i
+d="analyticsNotesTotal
+">?</span>
+                      
+        </div>
+                      
+        <div class="in
+fo-row"><span>Approved
+</span><span id="analy
+ticsNotesApproved"
+                      
+                style=
+"color:var(--green)">?
+</span></div>
+                      
+        <div class="in
+fo-row"><span>Pending 
+Review</span><span id=
+"analyticsNotesPending
+"
+                      
+                style=
+"color:var(--yellow)">
+?</span></div>
+                      
+        <div class="in
+fo-row"><span>Rejected
+</span><span id="analy
+ticsNotesRejected"
+                      
+                style=
+"color:var(--red)">?</
+span></div>
+                      
+    </div>
+                      
+</div>
+                      
+<div 
+class="info-grid">
+                      
+    <div 
+class="info-card 
+anim-card reveal">
+                      
+        <h4><i 
+class="fas 
+fa-fire"></i> Most 
+Active 
+Organizations</h4>
+                      
+        <div 
+id="analyticsTopOrgs">
+                      
+            <div class
+="info-row"><span>Load
+ing...</span><span>?</
+span></div>
+                      
+        </div>
+                      
+    </div>
+                      
+    <div 
+class="info-card 
+anim-card reveal">
+                      
+        <h4><i 
+class="fas 
+fa-clock"></i> 
+Platform 
+Breakdown</h4>
+                      
+        <div class="in
+fo-row"><span>Total 
+Admins</span><span id=
+"analyticsTotalAdmins"
+>?</span>
+                      
+        </div>
+                      
+        <div class="in
+fo-row"><span>Total 
+Faculty</span><span id
+="analyticsTotalFacult
+y">?</span>
+                      
+        </div>
+                      
+        <div class="in
+fo-row"><span>Total 
+Students</span><span i
+d="analyticsTotalStude
+nts">?</span>
+                      
+        </div>
+                      
+        <div class="in
+fo-row"><span>Org 
+Admins</span><span id=
+"analyticsTotalOrgAdmi
+ns">?</span>
+                      
+        </div>
+                      
+    </div>
+                      
+</div>
+  
+                      
+<!-- TOP PERFORMING 
+STUDENTS 
+PLATFORM-WIDE -->
+                      
+<div 
+class="cmd-section 
+visible" style="margin
+-top:1.5rem;">
+                      
+    <div class="sectio
+n-header">
+                      
+        <div class="se
+ction-num">Analytics 
+? Performance</div>
+                      
+        <div class="se
+ction-title">Platform 
+Top Students</div>
+                      
+    </div>
+                      
+    <!-- Top Students 
+Card -->
+                      
+    <div style="margin
+-bottom:2rem;">
+                      
+        <div
+                      
+            style="dis
+play:flex;align-items:
+center;justify-content
+:space-between;margin-
+bottom:1rem;flex-wrap:
+wrap;gap:8px;">
+                      
+            <h3 style=
+"margin:0;color:var(--
+text);font-size:1rem;"
+><i class="fas 
+fa-trophy"
+                      
+                    st
+yle="color:#FFD700;mar
+gin-right:8px;"></i>To
+p Performing Students 
+? All Orgs
+                      
+                (Top 
+20)</h3>
+                      
+            <button 
+class="btn btn-ghost 
+btn-sm" onclick="loadG
+lobalStudentPerformanc
+e()"><i
+                      
+                    
+class="fas 
+fa-sync"></i> 
+Refresh</button>
+                      
+        </div>
+                      
+        <div style="fo
+nt-size:0.8rem;color:v
+ar(--dim);margin-botto
+m:12px;"><i 
+class="fas fa-clock"
+                      
+                style=
+"margin-right:5px;"></
+i>Score = Quiz40% + 
+Attendance30% + 
+Notes20% +
+                      
+            
+Activity10%. Cached 
+10 min.</div>
+                      
+        <div id="globa
+lTopStudentsContainer"
+>
+                      
+            <div style
+="text-align:center;pa
+dding:1.5rem;color:var
+(--dim);">
+                      
+                <div 
+class="spinner"></div>
+                      
+            </div>
+                      
+        </div>
+                      
+    </div>
+  
+                      
+</div>
+                      
+<!-- STORAGE TRACKING 
+-->
+                      
+<div 
+class="cmd-section 
+visible" style="margin
+-top:1.5rem;">
+                      
+    <div class="sectio
+n-header">
+                      
+        <div class="se
+ction-num">Analytics 
+? Storage</div>
+                      
+        <div class="se
+ction-title">Platform 
+Storage 
+Consumption</div>
+                      
+    </div>
+                      
+    <div 
+class="info-grid">
+
+

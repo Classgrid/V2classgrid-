@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- Primary SEO -->
+    <title>Contact Us | Classgrid – AI Classroom Platform</title>
+    <meta name="description"
+        content="Get in touch with the Classgrid team for institutional onboarding, Pro upgrades, partnership inquiries, or technical support." />
+    <meta name="keywords"
+        content="contact Classgrid, Classgrid support, institutional onboarding, education platform support, AI classroom help" />
+    <meta name="author" content="Nikhil Shinde" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://classgrid.in/contact" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Contact Classgrid – AI Classroom Platform" />
+    <meta property="og:description"
+        content="Reach out for institutional onboarding, Pro upgrades, or technical support." />
+    <meta property="og:url" content="https://classgrid.in/contact" />
+    <meta property="og:image" content="https://classgrid.in/images/classgrid-preview.png" />
+    <meta property="og:site_name" content="Classgrid" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        :root {
+            --bg: #000;
+            --surface: #0f0f0f;
+            --surface2: #141414;
+            --border: rgba(255, 255, 255, 0.07);
+            --border-hi: rgba(255, 255, 255, 0.15);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #fff;
+            --muted: #888;
+            --dim: #444;
+            --sidebar-w: 240px;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* ═══ MOBILE TOP-NAV (hidden on desktop) ═══ */
+        .top-nav {
+            display: none;
+        }
+
+        /* ═══ READING PROGRESS ═══ */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 2px;
+            z-index: 300;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: var(--grad-bp);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* ═══ SIDEBAR (desktop) ═══ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: #000;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 200;
+            overflow-y: auto;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1.5rem 1.4rem 1.3rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 9.5px;
+            background: var(--grad-bp);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            border-radius: 7px;
+            z-index: 0;
+        }
+
+        .logo-box img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .brand-name em {
+            font-style: normal;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-section {
+            padding: 1.2rem 1rem 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dim);
+            padding: 0 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 1px;
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(74, 144, 245, 0.1);
+            color: #fff;
+        }
+
+        .nav-item.active i {
+            color: var(--blue-light);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.6rem 1rem;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-size: 0.73rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .sidebar-badge strong {
+            color: #aaa;
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.76rem;
+        }
+
+        /* ═══ HAMBURGER (tablet only, between 601-900px) ═══ */
+        .ham {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 300;
+            flex-direction: column;
+            gap: 5px;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            cursor: pointer;
+        }
+
+        .ham span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.28s;
+        }
+
+        .ham.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .ham.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .ham.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 199;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* ═══ MAIN ═══ */
+        .main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+        }
+
+        /* ═══ PAGE HERO ═══ */
+        .page-hero {
+            padding: 4rem 4rem 3rem;
+            border-bottom: 1px solid var(--border);
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(74, 144, 245, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue);
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            color: #fff;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+        }
+
+        .page-title span {
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+            color: var(--muted);
+            max-width: 560px;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            color: var(--blue-light);
+            background: rgba(74, 144, 245, 0.08);
+            border: 1px solid rgba(74, 144, 245, 0.2);
+            border-radius: 50px;
+            padding: 3px 12px;
+        }
+
+        /* ═══ SUCCESS BANNER ═══ */
+        .success-banner {
+            display: none;
+            margin: 0;
+            padding: 1rem 4rem;
+            background: rgba(34, 197, 94, 0.08);
+            border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            font-size: 0.875rem;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .success-banner.show {
+            display: flex;
+        }
+
+        /* ═══ CONTENT ═══ */
+        .content-wrap {
+            padding: 3rem 4rem 5rem;
+        }
+
+        .contact-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            margin-bottom: 4rem;
+        }
+
+        .contact-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.3px;
+        }
+
+        .section-desc {
+            font-size: 0.875rem;
+            color: var(--muted);
+            line-height: 1.75;
+            margin-bottom: 1.8rem;
+        }
+
+        /* ═══ CONTACT GRID (desktop: form + info cards) ═══ */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .form-card {
+            grid-column: 1;
+            grid-row: 1/span 5;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-card .sub {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 1.6rem;
+        }
+
+        .form-card form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-fields {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            padding: 0.7rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-group select option {
+            background: #111;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: rgba(74, 144, 245, 0.5);
+            box-shadow: 0 0 0 3px rgba(74, 144, 245, 0.08);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn-send {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--grad-bp);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 4px 20px rgba(74, 144, 245, 0.2);
+            margin-top: auto;
+        }
+
+        .btn-send:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .anti-spam {
+            display: none !important;
+        }
+
+        /* ═══ INFO BLOCKS ═══ */
+        .info-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.2rem 1.4rem;
+            transition: border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-block:hover {
+            border-color: var(--border-hi);
+        }
+
+        .info-block-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.7rem;
+        }
+
+        .info-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            background: rgba(74, 144, 245, 0.1);
+            color: var(--blue-light);
+            border: 1px solid rgba(74, 144, 245, 0.15);
+        }
+
+        .info-icon.green {
+            background: rgba(34, 197, 94, 0.1);
+            color: #86efac;
+            border-color: rgba(34, 197, 94, 0.15);
+        }
+
+        .info-icon.purple {
+            background: rgba(139, 111, 255, 0.1);
+            color: #c4b5fd;
+            border-color: rgba(139, 111, 255, 0.15);
+        }
+
+        .info-icon.orange {
+            background: rgba(249, 115, 22, 0.1);
+            color: #fdba74;
+            border-color: rgba(249, 115, 22, 0.15);
+        }
+
+        .info-block h4 {
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .info-block p,
+        .info-block a {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.65;
+            text-decoration: none;
+            display: block;
+        }
+
+        .info-block a:hover {
+            color: var(--blue-light);
+        }
+
+        .info-block a.email-link {
+            color: var(--blue-light);
+            font-weight: 500;
+            margin-top: 0.2rem;
+        }
+
+        .info-note {
+            font-size: 0.7rem;
+            color: var(--dim);
+            margin-top: 0.4rem;
+            font-style: italic;
+        }
+
+        .wa-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 0.6rem;
+            padding: 0.5rem 0.9rem;
+            background: rgba(37, 211, 102, 0.1);
+            border: 1px solid rgba(37, 211, 102, 0.25);
+            border-radius: 7px;
+            color: #86efac;
+            font-size: 0.76rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .wa-btn:hover {
+            background: rgba(37, 211, 102, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .social-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.7rem;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            width: 34px;
+            height: 34px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.22s;
+        }
+
+        .social-btn:hover {
+            border-color: var(--border-hi);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* ═══ TRUST ═══ */
+        .trust-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-left: 2px solid rgba(74, 144, 245, 0.4);
+            border-radius: 0 12px 12px 0;
+            padding: 1.4rem 1.8rem;
+        }
+
+        .trust-block p {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.8;
+        }
+
+        /* ═══ MAP ═══ */
+        .map-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .map-card-header {
+            padding: 1.2rem 1.6rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .map-card-header h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .map-card-header p {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .map-wrapper {
+            height: 340px;
+        }
+
+        .map-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            filter: brightness(0.85) contrast(1.1);
+        }
+
+        /* ═══ FOOTER ═══ */
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem 1.4rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid var(--border-hi);
+        }
+
+        .footer-links a {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 0.3px;
+            transition: color 0.2s, opacity 0.2s;
+            opacity: 0.75;
+        }
+
+        .footer-links a:hover {
+            color: var(--blue-light);
+            opacity: 1;
+        }
+
+        /* ═══ BACK TO TOP ═══ */
+        .back-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            background: #111;
+            border: 1px solid var(--border-hi);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            z-index: 50;
+            font-size: 0.8rem;
+            border-radius: 8px;
+        }
+
+        .back-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-top:hover {
+            background: #1a1a1a;
+        }
+
+        /* ═══ CHATBOT ═══ */
+        .chatbot-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 5.5rem;
+            z-index: 400;
+        }
+
+        .chatbot-toggle {
+            width: 48px;
+            height: 48px;
+            background: var(--grad-bp);
+            border-radius: 12px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(74, 144, 245, 0.35);
+            transition: all 0.2s;
+            animation: pulse-glow 3s infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 4px 20px rgba(74, 144, 245, 0.35);
+            }
+
+            50% {
+                box-shadow: 0 4px 30px rgba(74, 144, 245, 0.6);
+            }
+        }
+
+        .chatbot-toggle:hover {
+            transform: translateY(-2px);
+        }
+
+        .chatbot-panel {
+            position: fixed;
+            bottom: 5.5rem;
+            right: 5.5rem;
+            width: 360px;
+            max-height: 520px;
+            background: #0d0d0d;
+            border: 1px solid var(--border-hi);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: scale(0.9) translateY(10px);
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 400;
+        }
+
+        .chatbot-panel.open {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: all;
+        }
+
+        .chatbot-head {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chatbot-head-left {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .chatbot-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--grad-bp);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: #fff;
+        }
+
+        .chatbot-head h4 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .chatbot-head p {
+            font-size: 0.68rem;
+            color: var(--green);
+        }
+
+        .chatbot-close-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .chatbot-close-btn:hover {
+            color: #fff;
+        }
+
+        .chatbot-msgs {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 340px;
+        }
+
+        .chatbot-msgs::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chatbot-msgs::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .msg {
+            max-width: 88%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            line-height: 1.55;
+            animation: msgIn 0.25s ease;
+        }
+
+        @keyframes msgIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .msg.bot {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 3px;
+            color: rgba(255, 255, 255, 0.85);
+            align-self: flex-start;
+        }
+
+        .msg.user {
+            background: linear-gradient(135deg, #4a90f5, #8b6fff);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 3px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 2px 0;
+        }
+
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--muted);
+            animation: dot-bounce 1.2s infinite;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dot-bounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .chatbot-input-row {
+            padding: 0.8rem 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chatbot-input-row input {
+            flex: 1;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            padding: 0.6rem 0.9rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chatbot-input-row input:focus {
+            border-color: var(--border-hi);
+        }
+
+        .chatbot-send {
+            background: var(--grad-bp);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: opacity 0.2s;
+        }
+
+        .chatbot-send:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           RESPONSIVE — MOBILE (≤ 600px): top-nav, no sidebar
+           ═══════════════════════════════════════════════════ */
+        @media(max-width:600px) {
+
+            /* Show mobile top-nav */
+            .top-nav {
+                display: flex;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: rgba(0, 0, 0, 0.92);
+                backdrop-filter: blur(12px);
+                border-bottom: 1px solid var(--border);
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.85rem 1.2rem;
+            }
+
+            .nav-brand {
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                text-decoration: none;
+            }
+
+            .nav-logo-box {
+                width: 30px;
+                height: 30px;
+                background: #000;
+                border-radius: 7px;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .nav-logo-box::before {
+                content: '';
+                position: absolute;
+                inset: -1.5px;
+                border-radius: 8.5px;
+                background: var(--grad-bp);
+                z-index: -1;
+            }
+
+            .nav-logo-box::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: #000;
+                border-radius: 6px;
+                z-index: 0;
+            }
+
+            .nav-logo-box img {
+                width: 22px;
+                height: 22px;
+                object-fit: contain;
+                position: relative;
+                z-index: 1;
+            }
+
+            .nav-brand-name {
+                font-family: 'Sora', sans-serif;
+                font-weight: 700;
+                font-size: 0.9rem;
+                color: #fff;
+            }
+
+            .nav-brand-name em {
+                font-style: normal;
+                background: var(--grad-bp);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+            }
+
+            .nav-links {
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .nav-link {
+                font-size: 0.72rem;
+                font-weight: 600;
+                color: var(--muted);
+                text-decoration: none;
+                padding: 0.35rem 0.7rem;
+                border-radius: 6px;
+                transition: all 0.2s;
+            }
+
+            .nav-link:hover,
+            .nav-link.active {
+                background: rgba(74, 144, 245, 0.1);
+                color: #fff;
+            }
+
+            /* Hide desktop elements */
+            .sidebar,
+            .ham,
+            .sidebar-overlay,
+            .reading-progress {
+                display: none !important;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            /* Adjust hero */
+            .page-hero {
+                padding: 2rem 1.2rem 1.6rem;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+                letter-spacing: -1px;
+            }
+
+            .page-subtitle {
+                font-size: 0.85rem;
+                line-height: 1.7;
+            }
+
+            .success-banner {
+                padding: 0.9rem 1.2rem;
+                font-size: 0.8rem;
+            }
+
+            /* Adjust content */
+            .content-wrap {
+                padding: 1.4rem 1.2rem 5rem;
+            }
+
+            .contact-section {
+                margin-bottom: 2rem;
+            }
+
+            /* Stack the grid to single column */
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 0.9rem;
+            }
+
+            .form-card {
+                grid-column: 1;
+                grid-row: auto;
+                padding: 1.4rem;
+                border-radius: 14px;
+            }
+
+            /* 2-col paired info cards on phone */
+            .info-grid-2 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.9rem;
+            }
+
+            /* WhatsApp full width on mobile */
+            .wa-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            /* Map */
+            .map-wrapper {
+                height: 220px;
+            }
+
+            .map-card {
+                border-radius: 14px;
+            }
+
+            .map-card-header {
+                padding: 1rem 1.2rem;
+            }
+
+            .map-card-header h3 {
+                font-size: 0.88rem;
+            }
+
+            /* Trust */
+            .trust-block {
+                padding: 1.1rem 1.3rem;
+                border-radius: 0 10px 10px 0;
+            }
+
+            .trust-block p {
+                font-size: 0.8rem;
+            }
+
+            /* Footer */
+            .footer-links {
+                gap: 0.5rem 1rem;
+                padding-top: 1.5rem;
+            }
+
+            .footer-links a {
+                font-size: 0.78rem;
+            }
+
+            /* Chatbot repositioned */
+            .chatbot-fab {
+                right: 1.2rem;
+                bottom: 1.2rem;
+            }
+
+            .chatbot-panel {
+                right: 1rem;
+                bottom: 4.8rem;
+                width: calc(100vw - 2rem);
+                max-width: 380px;
+            }
+
+            .back-top {
+                right: 1rem;
+                bottom: 4.5rem;
+            }
+        }
+
+        @media(max-width:420px) {
+            .info-grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .content-wrap {
+                padding: 1.5rem 1rem 3rem;
+            }
+
+            .page-hero {
+                padding: 2rem 1rem 1.5rem;
+            }
+        }
+
+        /* ═══ TABLET (601px–900px): hamburger sidebar ═══ */
+        @media(min-width:601px) and (max-width:900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .reading-progress {
+                left: 0;
+            }
+
+            .ham {
+                display: flex;
+            }
+
+            .content-wrap {
+                padding: 2rem 1.5rem 4rem;
+            }
+
+            .page-hero {
+                padding: 4.5rem 1.5rem 2rem;
+            }
+
+            .success-banner {
+                padding: 1rem 1.5rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .form-card {
+                grid-column: 1;
+                grid-row: auto;
+            }
+
+            .chatbot-fab {
+                right: 1rem;
+                bottom: 1rem;
+            }
+
+            .chatbot-panel {
+                right: 1rem;
+                bottom: 4.5rem;
+                width: calc(100vw - 2rem);
+            }
+
+            .back-top {
+                right: 1rem;
+                bottom: 4.5rem;
+            }
+        }
+
+        /* ═══ MEDIUM DESKTOP (901px–1100px) ═══ */
+        @media(min-width:901px) and (max-width:1100px) {
+            .contact-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .form-card {
+                grid-column: 1;
+                grid-row: 1/span 5;
+            }
+        }
+
+        /* Mobile info-grid-2 is only used inside ≤600px, hide wrapper class on desktop */
+        @media(min-width:601px) {
+            .info-grid-2 {
+                display: contents;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-hero-inner {
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══ MOBILE TOP-NAV (only visible ≤600px) ═══ -->
+    <nav class="top-nav">
+        <a href="index" class="nav-brand">
+            <div class="nav-logo-box">
+                <img src="/Classgrid.png" alt="Classgrid">
+            </div>
+            <span class="nav-brand-name">Class<em>grid</em></span>
+        </a>
+        <div class="nav-links">
+            <a href="index" class="nav-link">Home</a>
+            <a href="features" class="nav-link">Features</a>
+            <a href="get-started" class="nav-link">Pro</a>
+            <a href="contact" class="nav-link active">Contact</a>
+        </div>
+    </nav>
+
+    <!-- ═══ DESKTOP ELEMENTS ═══ -->
+    <div class="reading-progress">
+        <div class="reading-progress-bar" id="progressBar"></div>
+    </div>
+    <button class="ham" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ═══ SIDEBAR (desktop + tablet hamburger) ═══ -->
+    <aside class="sidebar" id="sidebar">
+        <a href="index" class="sidebar-logo">
+            <div class="logo-box"><img src="/Classgrid.png" alt="Classgrid"></div>
+            <span class="brand-name">Class<em>grid</em></span>
+        </a>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Navigation</div>
+            <a href="index" class="nav-item"><i class="fas fa-house"></i> Home</a>
+            <a href="features" class="nav-item"><i class="fas fa-bolt"></i> Features</a>
+            <a href="get-started" class="nav-item"><i class="fas fa-rocket"></i> Get Started</a>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Legal</div>
+            <a href="privacy" class="nav-item"><i class="fas fa-shield-halved"></i> Privacy Policy</a>
+            <a href="terms" class="nav-item"><i class="fas fa-file-contract"></i> Terms of Service</a>
+            <a href="security" class="nav-item"><i class="fas fa-lock"></i> Security</a>
+            <a href="contact" class="nav-item active"><i class="fas fa-envelope"></i> Contact</a>
+        </div>
+        <div class="sidebar-footer">
+            <div class="sidebar-badge">
+                <strong>For Institutions</strong>
+                Questions about onboarding or Pro? We respond within 24 hours.
+            </div>
+        </div>
+    </aside>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <main class="main">
+        <div class="success-banner" id="successBanner">
+            <i class="fas fa-circle-check"></i>
+            <span>Thank you. Your message has been received. Our team will respond shortly.</span>
+        </div>
+
+        <div class="page-hero">
+            <div class="page-hero-inner">
+                <div class="page-badge"><span class="badge-dot"></span>Contact & Support</div>
+                <h1 class="page-title">Get in Touch with <span>Classgrid</span></h1>
+                <p class="page-subtitle">Have questions about onboarding your institution, upgrading to Pro, or managing
+                    your organization? Our team is here to help.</p>
+                <div class="hero-tag"><i class="fas fa-building-columns"></i> For Institutions & Academic Teams</div>
+            </div>
+        </div>
+
+        <div class="content-wrap">
+
+            <!-- SECTION 1: FORM + INFO -->
+            <div class="contact-section" id="s1">
+                <div class="section-label">01</div>
+                <div class="section-title">Send Us a Message</div>
+                <p class="section-desc">Fill out the form below and we'll get back to you within 24 hours.</p>
+
+                <div class="contact-grid">
+                    <!-- FORM -->
+                    <div class="form-card">
+                        <h3>Contact Form</h3>
+                        <p class="sub">All fields marked * are required.</p>
+                        <form id="contactForm" action="https://formspree.io/f/xbdaqrbr" method="POST">
+                            <input type="hidden" name="_subject" value="New Contact Message – Classgrid">
+                            <input type="hidden" name="_redirect" value="https://www.classgrid.in/contact?success=true">
+                            <input type="text" name="_gotcha" class="anti-spam" tabindex="-1" autocomplete="off">
+                            <div class="form-fields">
+                                <div class="form-group">
+                                    <label for="name">Full Name *</label>
+                                    <input type="text" id="name" name="name" required placeholder="Your full name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email Address *</label>
+                                    <input type="email" id="email" name="email" required placeholder="your@email.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="organization">Organization Name</label>
+                                    <input type="text" id="organization" name="organization"
+                                        placeholder="Institute or college name (optional)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject">Subject *</label>
+                                    <select id="subject" name="subject" required>
+                                        <option value="">Select a subject</option>
+                                        <option value="General Inquiry">General Inquiry</option>
+                                        <option value="Application Status">Application Status</option>
+                                        <option value="Payment Issue">Payment Issue</option>
+                                        <option value="Technical Issue">Technical Issue</option>
+                                        <option value="Upgrade to Pro">Upgrade to Pro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="message">Message *</label>
+                                    <textarea id="message" name="message" rows="5" required
+                                        placeholder="Describe your query in detail…"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-send" id="submitBtn">
+                                <i class="fas fa-paper-plane"></i>
+                                <span id="submitText">Send Message</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- INFO CARDS (on desktop they fill cols 2-3; on mobile they stack with info-grid-2 pairs) -->
+
+                    <!-- Email + Escalation pair -->
+                    <div class="info-grid-2">
+                        <div class="info-block">
+                            <div class="info-block-header">
+                                <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                                <h4>Official Email</h4>
+                            </div>
+                            <a href="mailto:support@classgrid.in" class="email-link">support@classgrid.in</a>
+                            <p class="info-note">We typically respond within 24 hours.</p>
+                        </div>
+
+                        <div class="info-block"
+                            style="border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.04);">
+                            <div class="info-block-header">
+                                <div class="info-icon"
+                                    style="background:rgba(239,68,68,0.1);color:#fca5a5;border-color:rgba(239,68,68,0.2);">
+                                    <i class="fas fa-triangle-exclamation"></i>
+                                </div>
+                                <h4 style="color:#fca5a5;">Escalation — Founder Direct</h4>
+                            </div>
+                            <p style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-bottom:0.4rem;">Only for
+                                <strong style="color:#fca5a5;">critical, time-sensitive, or unresolved</strong> issues.
+                            </p>
+                            <a href="mailto:nikhil.shinde@classgrid.in" class="email-link"
+                                style="color:#fca5a5;">nikhil.shinde@classgrid.in</a>
+                            <p class="info-note" style="color:rgba(239,68,68,0.5);">⚠ Use support@ first.</p>
+                        </div>
+                    </div>
+
+                    <!-- WhatsApp -->
+                    <div class="info-block">
+                        <div class="info-block-header">
+                            <div class="info-icon green"><i class="fab fa-whatsapp"></i></div>
+                            <h4>WhatsApp</h4>
+                        </div>
+                        <p>Message on WhatsApp for faster support.</p>
+                        <button class="wa-btn" onclick="openWhatsApp()"><i class="fab fa-whatsapp"></i> Click to start a
+                            chat</button>
+                    </div>
+
+                    <!-- Institutions + Tech Support pair -->
+                    <div class="info-grid-2">
+                        <div class="info-block">
+                            <div class="info-block-header">
+                                <div class="info-icon purple"><i class="fas fa-building-columns"></i></div>
+                                <h4>For Institutions</h4>
+                            </div>
+                            <p>Include your <strong style="color:#ccc;">Institute Name</strong>, <strong
+                                    style="color:#ccc;">App ID</strong> & <strong style="color:#ccc;">Admin
+                                    Email</strong>.</p>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-block-header">
+                                <div class="info-icon orange"><i class="fas fa-wrench"></i></div>
+                                <h4>Technical Support</h4>
+                            </div>
+                            <p>Mention your <strong style="color:#ccc;">Org Code</strong>, <strong
+                                    style="color:#ccc;">Email</strong> & attach a screenshot.</p>
+                        </div>
+                    </div>
+
+                    <!-- Hours + Location pair -->
+                    <div class="info-grid-2">
+                        <div class="info-block">
+                            <div class="info-block-header">
+                                <div class="info-icon"><i class="fas fa-clock"></i></div>
+                                <h4>Office Hours</h4>
+                            </div>
+                            <p>Mon–Fri: 9 AM – 6 PM</p>
+                            <p>Sat: 10 AM – 2 PM</p>
+                            <p>Sun: Closed</p>
+                        </div>
+
+                        <div class="info-block">
+                            <div class="info-block-header">
+                                <div class="info-icon"><i class="fas fa-location-dot"></i></div>
+                                <h4>Location</h4>
+                            </div>
+                            <p>Sector 26, Pradhikaran, Nigdi</p>
+                            <p>Pimpri-Chinchwad, Pune – 411044</p>
+                            <p class="info-note">Near Akurdi Railway Station</p>
+                        </div>
+                    </div>
+
+                    <!-- Social -->
+                    <div class="info-block">
+                        <div class="info-block-header">
+                            <div class="info-icon"><i class="fas fa-share-nodes"></i></div>
+                            <h4>Follow Classgrid</h4>
+                        </div>
+                        <div class="social-row">
+                            <a href="https://www.instagram.com/classgridedu/" target="_blank" rel="noopener"
+                                class="social-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="https://www.facebook.com/profile.php?id=61588646851017" target="_blank"
+                                rel="noopener" class="social-btn" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="https://github.com/nikhilnick5050" target="_blank" rel="noopener"
+                                class="social-btn" title="GitHub"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: MAP -->
+            <div class="contact-section" id="s2">
+                <div class="section-label">02</div>
+                <div class="section-title">Our Location</div>
+                <p class="section-desc">Sector 26, Pradhikaran, Nigdi, Pimpri-Chinchwad, Pune – 411044, Maharashtra,
+                    India.</p>
+                <div class="map-card">
+                    <div class="map-card-header">
+                        <div class="info-icon"><i class="fas fa-location-dot"></i></div>
+                        <div>
+                            <h3>Find Us Here</h3>
+                            <p>Sector 26, Pradhikaran, Nigdi, Pimpri-Chinchwad, Pune – 411044</p>
+                        </div>
+                    </div>
+                    <div class="map-wrapper">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3780.9686785394634!2d73.76959931490052!3d18.64767098733584!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2b9c4f2e4f3e9%3A0x1d1d1d1d1d1d1d1d!2sPimpri%20Chinchwad%20College%20Of%20Engineering%2C%20Nigdi%2C%20Pimpri-Chinchwad%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
+                            allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: TRUST -->
+            <div class="contact-section" id="s3">
+                <div class="section-label">03</div>
+                <div class="section-title">Our Commitment</div>
+                <div class="trust-block">
+                    <p>Classgrid is built specifically for academic institutions. We prioritize data privacy,
+                        institutional integrity, and secure access controls. All communications are handled
+                        confidentially and used solely to resolve your inquiry.</p>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="contact-section" id="s4">
+                <div class="footer-links">
+                    <a href="privacy">Privacy Policy</a>
+                    <a href="terms">Terms of Use</a>
+                    <a href="security">Security</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i
+            class="fas fa-arrow-up"></i></div>
+
+    <!-- CHATBOT -->
+    <div class="chatbot-fab">
+        <button class="chatbot-toggle" id="chatToggle" aria-label="Open AI assistant"><i
+                class="fas fa-robot"></i></button>
+    </div>
+    <div class="chatbot-panel" id="chatPanel">
+        <div class="chatbot-head">
+            <div class="chatbot-head-left">
+                <div class="chatbot-avatar"><i class="fas fa-robot"></i></div>
+                <div>
+                    <h4>Classgrid Assistant</h4>
+                    <p>● Online</p>
+                </div>
+            </div>
+            <button class="chatbot-close-btn" id="chatClose"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chatbot-msgs" id="chatMsgs">
+            <div class="msg bot">Hello! I'm the Classgrid AI assistant. I can help with onboarding, Pro upgrades,
+                technical issues, and general queries. What would you like to know?</div>
+        </div>
+        <div class="chatbot-input-row">
+            <input type="text" id="chatInput" placeholder="Ask anything about Classgrid…" autocomplete="off">
+            <button class="chatbot-send" id="chatSend"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        /* Hamburger (tablet only) */
+        const ham = document.getElementById('hamBtn'), sidebar = document.getElementById('sidebar'), overlay = document.getElementById('sidebarOverlay');
+        ham.addEventListener('click', () => { ham.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+        overlay.addEventListener('click', () => { ham.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+        /* Progress bar + back-to-top */
+        const progressBar = document.getElementById('progressBar'), backTop = document.getElementById('backTop');
+        window.addEventListener('scroll', () => {
+            const s = window.scrollY, d = document.documentElement.scrollHeight - window.innerHeight;
+            if (progressBar) progressBar.style.width = (s / d * 100) + '%';
+            backTop.classList.toggle('show', s > 300);
+        }, { passive: true });
+
+        /* Intersection observer for section fade-in */
+        const io = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } }); }, { threshold: 0.06, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.contact-section').forEach(el => io.observe(el));
+
+        /* GSAP animations (graceful on mobile) */
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from('.page-hero-inner h1', { duration: 1, y: 40, opacity: 0, ease: 'power4.out', delay: 0.1 });
+        gsap.from('.page-hero-inner p', { duration: 0.9, y: 30, opacity: 0, ease: 'power4.out', delay: 0.3 });
+        gsap.from('.page-hero-inner .hero-tag', { duration: 0.8, y: 20, opacity: 0, ease: 'power3.out', delay: 0.5 });
+        gsap.utils.toArray('.info-block').forEach((el, i) => { gsap.from(el, { scrollTrigger: { trigger: el, start: 'top 88%' }, duration: 0.6, y: 16, opacity: 0, ease: 'power3.out', delay: i * 0.05 }); });
+        gsap.from('.form-card', { scrollTrigger: { trigger: '.form-card', start: 'top 85%' }, duration: 0.8, x: -30, opacity: 0, ease: 'power3.out' });
+        gsap.from('.map-card', { scrollTrigger: { trigger: '.map-card', start: 'top 85%' }, duration: 0.8, y: 30, opacity: 0, ease: 'power3.out' });
+        gsap.from('.trust-block', { scrollTrigger: { trigger: '.trust-block', start: 'top 88%' }, duration: 0.7, opacity: 0, x: -20, ease: 'power3.out' });
+
+        /* Success banner */
+        if (window.location.search.includes('success=true')) document.getElementById('successBanner').classList.add('show');
+
+        /* WhatsApp */
+        function openWhatsApp() { window.open('https://wa.me/918149277038?text=' + encodeURIComponent('Hello! I have a question about Classgrid. Can you help?'), '_blank'); }
+
+        /* Contact form */
+        document.getElementById('contactForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn'), txt = document.getElementById('submitText');
+            btn.disabled = true; txt.textContent = 'Sending…';
+            const data = { name: document.getElementById('name').value, email: document.getElementById('email').value, organization: document.getElementById('organization').value, subject: document.getElementById('subject').value, message: document.getElementById('message').value, _subject: 'New Contact Message – Classgrid', _replyto: document.getElementById('email').value };
+            try {
+                const res = await fetch(this.action, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data) });
+                if (res.ok) { txt.innerHTML = '<i class="fas fa-check"></i> Sent!'; this.reset(); setTimeout(() => { txt.textContent = 'Send Message'; btn.disabled = false; }, 3000); }
+                else throw new Error('fail');
+            } catch { txt.textContent = 'Failed – try emailing directly'; setTimeout(() => { txt.textContent = 'Send Message'; btn.disabled = false; }, 3000); }
+        });
+
+        /* Chatbot */
+        const chatToggle = document.getElementById('chatToggle'), chatPanel = document.getElementById('chatPanel'), chatClose = document.getElementById('chatClose'), chatMsgs = document.getElementById('chatMsgs'), chatInput = document.getElementById('chatInput'), chatSend = document.getElementById('chatSend');
+        chatToggle.addEventListener('click', () => chatPanel.classList.toggle('open'));
+        chatClose.addEventListener('click', () => chatPanel.classList.remove('open'));
+        const bk = { pro: "To upgrade to Pro, use the Get Started page and click 'Upgrade to Pro'. You can complete the upgrade instantly via Razorpay.", attendance: "The Smart Attendance system is a Pro feature. Faculty starts a 4-minute session; students enter a code to mark attendance.", login: "For login issues, share your Organization Code, registered email, and a screenshot at support@classgrid.in.", faculty: "Free plan allows up to 5 faculty accounts. Additional accounts require a Pro upgrade.", students: "Students join classrooms via a Join Code shared by faculty or through admin approval.", contact: "Reach us at support@classgrid.in or WhatsApp +91 81492 77038.", hours: "Office hours: Mon–Fri 9 AM–6 PM, Sat 10 AM–2 PM, Sun closed.", location: "Sector 26, Pradhikaran, Nigdi, Pimpri-Chinchwad, Pune – 411044. Near Akurdi Railway Station.", price: "See current Pro pricing on the Get Started page — fetched live from our backend.", default: "I'm here to help! Ask about Pro upgrades, faculty accounts, attendance, login issues, pricing, or contact details." };
+        function getReply(m) { m = m.toLowerCase(); if (m.includes('pro') || m.includes('upgrade')) return bk.pro; if (m.includes('attend')) return bk.attendance; if (m.includes('login') || m.includes('password')) return bk.login; if (m.includes('faculty') || m.includes('teacher')) return bk.faculty; if (m.includes('student') || m.includes('join')) return bk.students; if (m.includes('contact') || m.includes('email') || m.includes('whatsapp')) return bk.contact; if (m.includes('hour') || m.includes('timing')) return bk.hours; if (m.includes('location') || m.includes('address')) return bk.location; if (m.includes('price') || m.includes('cost')) return bk.price; return bk.default; }
+        function addMsg(t, r) { const d = document.createElement('div'); d.className = 'msg ' + r; d.textContent = t; chatMsgs.appendChild(d); chatMsgs.scrollTop = chatMsgs.scrollHeight; }
+        function addTyping() { const d = document.createElement('div'); d.className = 'msg bot'; d.id = 'typing'; d.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>'; chatMsgs.appendChild(d); chatMsgs.scrollTop = chatMsgs.scrollHeight; return d; }
+        async function sendChat() { const msg = chatInput.value.trim(); if (!msg) return; addMsg(msg, 'user'); chatInput.value = ''; chatSend.disabled = true; const typing = addTyping(); try { const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) }); const data = await res.json(); typing.remove(); addMsg(data.reply || getReply(msg), 'bot'); } catch { await new Promise(r => setTimeout(r, 900)); typing.remove(); addMsg(getReply(msg), 'bot'); } finally { chatSend.disabled = false; chatInput.focus(); } }
+        chatSend.addEventListener('click', sendChat);
+        chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendChat(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') chatPanel.classList.remove('open'); });
+    </script>
+</body>
+
+</html>

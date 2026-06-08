@@ -1,0 +1,18 @@
+=== TESTING CHAT SYSTEM ===
+
+1. Logging in as teacher...
+   OK - got token
+
+2. Getting classrooms...
+   Using classroom: Engineering Chemistry (6995a49fb4b7ccddcf1c7489)
+
+3. Sending a test message...
+   OK - Message sent.
+
+4. Fetching messages...
+   OK - Fetched 2 messages.
+   SUCCESS: Found our sent message!
+   Content: "Automated test message 1771499632247"
+   Sender: Physics Faculty
+
+=== CHAT TEST COMPLETE ===

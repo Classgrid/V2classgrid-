@@ -1,0 +1,312 @@
+﻿commit 0690fcc8bf8b034dfee968f75f0b93af092a615b
+Author: Nikhil shinde <nikhilsubsun123@gmail.com>
+Date:   Fri Feb 27 14:10:31 2026 +0530
+
+    new
+
+diff --git a/public/manage-classroom.html b/public/manage-classroom.html
+index 9ab8e93..7a11b71 100644
+--- a/public/manage-classroom.html
++++ b/public/manage-classroom.html
+@@ -1774,8 +1774,8 @@
+                         <div class="sub-tabs">
+                             <button type="button" class="sub-tab on" onclick="switchUpTab('material')"
+                                 data-ut="material"><i class="fas fa-file-alt"></i> Material</button>
+-                            <button type="button" class="sub-tab" onclick="switchUpTab('quiz')" data-ut="quiz"><i
+-                                    class="fas fa-clipboard-check"></i> Quiz</button>
++                            <button type="button" class="sub-tab" onclick="switchUpTab('quiz')" data-ut="quiz"
++                                style="display:none;"><i class="fas fa-clipboard-check"></i> Quiz</button>
+                             <button type="button" class="sub-tab" onclick="switchUpTab('announce')"
+                                 data-ut="announce"><i class="fas fa-bullhorn"></i> Announcement</button>
+                         </div>
+
+commit 71f273d592695fde8321a415373c02c0f3ec252c
+Author: Nikhil shinde <nikhilsubsun123@gmail.com>
+Date:   Thu Feb 26 23:02:08 2026 +0530
+
+    new
+
+diff --git a/public/manage-classroom.html b/public/manage-classroom.html
+index 36c7a4f..9ab8e93 100644
+--- a/public/manage-classroom.html
++++ b/public/manage-classroom.html
+@@ -1876,13 +1876,18 @@
+         let token = localStorage.getItem('jwt_token');
+         let me = null, rooms = [], allReqs = [];
+         let isUploading = false; // Tracks if an upload is currently in progress
++        let activeUploadController = null;
+ 
+-        // Prevent user from accidentally leaving the page while uploading
++        // Cancel upload silently if user leaves the page
+         window.addEventListener('beforeunload', (e) => {
+-            if (isUploading) {
+-                e.preventDefault();
+-                e.returnValue = 'Upload in progress. If you leave, the upload will be cancelled.';
+-                return 'Upload in progress. If you leave, the upload will be cancelled.';
++            if (isUploading && activeUploadController) {
++                activeUploadController.abort();
++                if (Notification.permission === 'granted') {
++                    new Notification('Upload Cancelled', {
++                        body: 'Upload was cancelled because you left the page.',
++                        icon: '/Classgrid.png'
++                    });
++                }
+             }
+         });
+ 
+@@ -2241,7 +2246,9 @@
+                     pt.innerHTML = `<i class="fas fa-spinner fa-spin" style="color:var(--cyan);flex-shrink:0"></i><span>Uploading ${fileCount} file(s) in background...</span>`;
+                     w.appendChild(pt);
+ 
+-                    isUploading = true; // Set uploading flag to block page exit
++                    isUploading = true; // Set uploading flag
++                    activeUploadController = new AbortController();
++                    const signal = activeUploadController.signal;
+ 
+                     const uploadedData = [];
+ 
+@@ -2250,6 +2257,7 @@
+                     try {
+                         const tokenRes = await fetch(`/api/classrooms/${cid}/upload-urls`, {
+                             method: 'POST',
++                            signal,
+                             headers: {
+                                 'Authorization': `Bearer ${token}`,
+                                 'Content-Type': 'application/json'
+@@ -2268,6 +2276,7 @@
+                             // Direct PUT to signed URL — bypasses Supabase client project mismatch
+                             const uploadRes = await fetch(signedUrl, {
+                                 method: 'PUT',
++                                signal,
+                                 body: file,
+                                 headers: { 'Content-Type': file.type || 'application/octet-stream' }
+                             });
+@@ -2287,6 +2296,8 @@
+                     } catch (err) {
+                         pt.remove();
+                         isUploading = false; // Reset uploading flag
++                        activeUploadController = null;
++                        if (err.name === 'AbortError') return;
+                         toast(`❌ Upload failed: ${err.message}`, 'err');
+                         return;
+                     }
+@@ -2294,6 +2305,7 @@
+                     // Send metadata JSON to backend API
+                     fetch(`/api/classrooms/${cid}/content/materials`, {
+                         method: 'POST',
++                        signal,
+                         headers: {
+                             'Authorization': `Bearer ${token}`,
+                             'Content-Type': 'application/json'
+@@ -2309,15 +2321,19 @@
+ 
+                         // Show native browser notification
+                         if (Notification.permission === 'granted') {
+-                            new Notification('Upload Complete', {
+-                                body: `${uploadedData.length} file(s) successfully uploaded to your classroom!`,
++                            new Notification('Upload Successful 🎉', {
++                                body: 'Your files were uploaded successfully.',
+                                 icon: '/Classgrid.png' // Using QC Logo
+                             });
+                         }
+                         isUploading = false; // Reset uploading flag
++                        activeUploadController = null;
+                     }).catch(err => {
+                         pt.remove();
+                         isUploading = false; // Reset uploading flag
++                        activeUploadController = null;
++                        if (err.name === 'AbortError') return;
++
+                         const errMsg = '❌ Final update failed: ' + err.message;
+                         toast(errMsg, 'err');
+ 
+@@ -2348,20 +2364,33 @@
+                     toast('📤 Publishing...', 'ok');
+                     form.reset(); switchUpTab('material');
+                     isUploading = true;
++                    activeUploadController = new AbortController();
+ 
+                     const backendType = type === 'quiz' ? 'quizzes' : 'announcements';
+                     fetch(`/api/classrooms/${cid}/content/${backendType}`, {
+                         method: 'POST',
++                        signal: activeUploadController.signal,
+                         headers: { 'Authorization': `Bearer ${token}` },
+                         body: fd
+                     }).then(async r => {
+                         const d = await r.json();
+                         if (!r.ok) throw new Error(d.message || 'Upload failed');
+                         toast(`✅ Published successfully!`, 'ok');
++
++                        if (Notification.permission === 'granted') {
++                            new Notification('Upload Successful 🎉', {
++                                body: 'Your content was published successfully.',
++                                icon: '/Classgrid.png'
++                            });
++                        }
++
+                         isUploading = false;
++                        activeUploadController = null;
+                     }).catch(err => {
+-                        toast('❌ Publish failed: ' + err.message, 'err');
+                         isUploading = false;
++                        activeUploadController = null;
++                        if (err.name === 'AbortError') return;
++                        toast('❌ Publish failed: ' + err.message, 'err');
+                     });
+                 }
+             });
+
+commit 105c9ffc9b34e78650edbba1ad91aa6c76065ebe
+Author: Nikhil shinde <nikhilsubsun123@gmail.com>
+Date:   Thu Feb 26 22:49:11 2026 +0530
+
+    new
+
+diff --git a/public/manage-classroom.html b/public/manage-classroom.html
+index 6208b6b..36c7a4f 100644
+--- a/public/manage-classroom.html
++++ b/public/manage-classroom.html
+@@ -2136,29 +2136,52 @@
+             ['material', 'quiz', 'announce'].forEach(t => { const el = document.getElementById(`f-${t}`); if (el) el.style.display = t === type ? 'block' : 'none'; });
+             const inp = document.getElementById('upType'); if (inp) inp.value = type;
+         }
++        let selectedUploadFiles = [];
++
+         function initUpload() {
+             const form = document.getElementById('uploadForm'); if (!form) return;
+ 
+             // File list preview
+             const matFileInput = document.getElementById('matFile');
+             const fileListEl = document.getElementById('fileList');
++
++            window.removeSelectedFile = function (index) {
++                selectedUploadFiles.splice(index, 1);
++                renderFileList();
++            };
++
++            const renderFileList = () => {
++                if (!selectedUploadFiles.length) { fileListEl.style.display = 'none'; fileListEl.innerHTML = ''; return; }
++                fileListEl.style.display = 'block';
++                let html = `<div style="font-size:.78rem;font-weight:700;color:var(--t2);margin-bottom:.4rem">${selectedUploadFiles.length} file(s) selected:</div>`;
++                for (let i = 0; i < selectedUploadFiles.length; i++) {
++                    const f = selectedUploadFiles[i];
++                    const sizeMB = (f.size / 1024 / 1024).toFixed(1);
++                    const isTooBig = f.size > 40 * 1024 * 1024;
++                    html += `<div style="display:flex;align-items:center;gap:.5rem;padding:.35rem .6rem;margin-bottom:.25rem;border-radius:8px;background:var(--elevated);border:1px solid ${isTooBig ? 'var(--red)' : 'var(--border)'}">`;
++                    html += `<i class="fas ${f.type.includes('pdf') ? 'fa-file-pdf' : f.type.includes('image') ? 'fa-file-image' : 'fa-file'}" style="color:${isTooBig ? 'var(--red)' : 'var(--cyan)'}; flex-shrink:0"></i>`;
++                    html += `<span style="font-size:.78rem;color:var(--t1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span>`;
++                    html += `<span style="font-size:.7rem;color:${isTooBig ? 'var(--red)' : 'var(--t3)'};flex-shrink:0">${sizeMB} MB${isTooBig ? ' ⚠️ Too large!' : ''}</span>`;
++                    html += `<button type="button" class="btn btn-glass btn-sm" onclick="removeSelectedFile(${i})" style="padding:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--t3);flex-shrink:0" title="Remove file"><i class="fas fa-times"></i></button>`;
++                    html += `</div>`;
++                }
++                fileListEl.innerHTML = html;
++            };
++
+             if (matFileInput && fileListEl) {
+                 matFileInput.addEventListener('change', function () {
+                     const files = this.files;
+-                    if (!files || !files.length) { fileListEl.style.display = 'none'; fileListEl.innerHTML = ''; return; }
+-                    fileListEl.style.display = 'block';
+-                    let html = `<div style="font-size:.78rem;font-weight:700;color:var(--t2);margin-bottom:.4rem">${files.length} file(s) selected:</div>`;
+-                    for (let i = 0; i < files.length; i++) {
+-                        const f = files[i];
+-                        const sizeMB = (f.size / 1024 / 1024).toFixed(1);
+-                        const isTooBig = f.size > 40 * 1024 * 1024;
+-                        html += `<div style="display:flex;align-items:center;gap:.5rem;padding:.35rem .6rem;margin-bottom:.25rem;border-radius:8px;background:var(--elevated);border:1px solid ${isTooBig ? 'var(--red)' : 'var(--border)'}">`;
+-                        html += `<i class="fas ${f.type.includes('pdf') ? 'fa-file-pdf' : f.type.includes('image') ? 'fa-file-image' : 'fa-file'}" style="color:${isTooBig ? 'var(--red)' : 'var(--cyan)'}; flex-shrink:0"></i>`;
+-                        html += `<span style="font-size:.78rem;color:var(--t1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span>`;
+-                        html += `<span style="font-size:.7rem;color:${isTooBig ? 'var(--red)' : 'var(--t3)'};flex-shrink:0">${sizeMB} MB${isTooBig ? ' ⚠️ Too large!' : ''}</span>`;
+-                        html += `</div>`;
++                    if (files && files.length) {
++                        for (let i = 0; i < files.length; i++) {
++                            const newFile = files[i];
++                            // Check for exact duplicate name and size
++                            if (!selectedUploadFiles.some(f => f.name === newFile.name && f.size === newFile.size)) {
++                                selectedUploadFiles.push(newFile);
++                            }
++                        }
+                     }
+-                    fileListEl.innerHTML = html;
++                    renderFileList();
++                    matFileInput.value = '';
+                 });
+             }
+ 
+@@ -2186,12 +2209,12 @@
+ 
+                 if (type === 'material') {
+                     const title = document.getElementById('matTitle').value.trim(); const fi = document.getElementById('matFile');
+-                    if (!fi.files?.length) { toast('Select at least one file', 'err'); return; }
++                    if (!selectedUploadFiles.length) { toast('Select at least one file', 'err'); return; }
+ 
+                     // Validate file sizes
+-                    for (let i = 0; i < fi.files.length; i++) {
+-                        if (fi.files[i].size > 40 * 1024 * 1024) {
+-                            toast(`File "${fi.files[i].name}" exceeds 40MB limit`, 'err'); return;
++                    for (let i = 0; i < selectedUploadFiles.length; i++) {
++                        if (selectedUploadFiles[i].size > 40 * 1024 * 1024) {
++                            toast(`File "${selectedUploadFiles[i].name}" exceeds 40MB limit`, 'err'); return;
+                         }
+                     }
+ 
+@@ -2203,11 +2226,12 @@
+                     }
+ 
+                     // Extract files before resetting
+-                    const pendingFiles = Array.from(fi.files);
++                    const pendingFiles = [...selectedUploadFiles];
+                     const fileCount = pendingFiles.length;
+ 
+                     // Immediately reset form to allow background uploading
+                     form.reset();
++                    selectedUploadFiles = []; // clear queue
+                     switchUpTab('material');
+                     if (fileListEl) { fileListEl.style.display = 'none'; fileListEl.innerHTML = ''; }
+ 
+
+commit b9f78856d1aae888083805e37a488b1a4f79d468
+Author: Nikhil shinde <nikhilsubsun123@gmail.com>
+Date:   Thu Feb 26 19:07:35 2026 +0530
+
+    nee
+
+diff --git a/public/manage-classroom.html b/public/manage-classroom.html
+index 811aba7..6208b6b 100644
+--- a/public/manage-classroom.html
++++ b/public/manage-classroom.html
+@@ -1630,7 +1630,7 @@
+                 <a href="/" class="s-item"><i class="fas fa-home"></i> Home</a>
+                 <a href="/classroom" class="s-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                 <a href="/manage-classroom" class="s-item on"><i class="fas fa-school"></i> Manage Classrooms</a>
+-                <a href="/notes.html" class="s-item"><i class="fas fa-folder-open"></i> Student Notes</a>
++                <a href="/approved-notes.html" class="s-item"><i class="fas fa-folder-open"></i> Student Notes</a>
+                 <a href="/classgrid_assistant.html" class="s-item"><i class="fas fa-robot"></i> AI Assistant</a>
+                 <div class="s-lbl" style="margin-top:1.25rem">Quick Actions</div>
+                 <button class="s-item" onclick="switchToTab('create');closeSidebar()"><i class="fas fa-plus-circle"></i>
+
+commit f54b9577cc8925bce00e47aee50d1c64b73b5a57
+Author: Nikhil shinde <nikhilsubsun123@gmail.com>
+Date:   Thu Feb 26 12:32:59 2026 +0530
+
+    new
+
+diff --git a/public/manage-classroom.html b/public/manage-classroom.html
+index af5bc9d..811aba7 100644
+--- a/public/manage-classroom.html
++++ b/public/manage-classroom.html
+@@ -2011,6 +2011,15 @@
+                 const r = await api('/api/classrooms', { method: 'POST', body: JSON.stringify(body) });
+                 const d = await r.json(); if (!r.ok) throw new Error(d.message || 'Creation failed');
+                 toast('✅ Classroom created! Code: ' + (d.classroom?.classCode || 'N/A'), 'ok');
++
++                // Refresh user state (might have created an organization)
++                const meRes = await api('/api/auth/me');
++                if (meRes.ok) {
++                    const meData = await meRes.json();
++                    me = meData.user || meData;
++                    localStorage.setItem('user', JSON.stringify(me));
++                }
++
+                 document.getElementById('createForm').reset(); await loadRooms(); switchTab('classrooms');
+             } catch (err) { toast(err.message, 'err'); } finally { btn.disabled = false; btn.innerHTML = orig; }
+         }

@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Apply for Organization | Classgrid</title>
+    <meta name="description"
+        content="Bring your institution onto Classgrid. Apply to create your organization and manage faculty, classrooms, and students in one intelligent platform.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        /* ─── TOKENS ─────────────────────────────────── */
+        :root {
+            /* Dark tokens */
+            --bg: #07071a;
+            --surface: #0f0f28;
+            --card: #131330;
+            --elevated: #1a1a3a;
+            --border: rgba(100, 120, 255, .14);
+            --border-hi: rgba(100, 120, 255, .35);
+            --blue: #5a9cf8;
+            --purple: #8b6fff;
+            --indigo: #6366f1;
+            --gold: #f5a623;
+            --text: #dde0f2;
+            --sub: #9298c0;
+            --muted: #565d8a;
+            --error: #f87171;
+            --success: #34d399;
+            --grad: linear-gradient(135deg, #5a9cf8, #8b6fff);
+            --grad-btn: linear-gradient(135deg, #4a27c0 0%, #8b6fff 100%);
+            --shadow-card: 0 20px 60px rgba(0, 0, 0, .5);
+            --shadow-btn: 0 8px 28px rgba(139, 111, 255, .38);
+            --radius-card: 20px;
+            --radius-input: 11px;
+            --font-display: 'Bricolage Grotesque', sans-serif;
+            --font-body: 'Figtree', sans-serif;
+        }
+
+        [data-theme="light"] {
+            --bg: #f2f3fb;
+            --surface: #ffffff;
+            --card: #ffffff;
+            --elevated: #f6f7fd;
+            --border: rgba(80, 90, 200, .13);
+            --border-hi: rgba(80, 90, 200, .38);
+            --text: #1a1c38;
+            --sub: #4e5380;
+            --muted: #9298c0;
+            --error: #dc2626;
+            --success: #059669;
+            --shadow-card: 0 8px 40px rgba(80, 90, 200, .1);
+            --shadow-btn: 0 8px 24px rgba(100, 80, 255, .32);
+            --grad-btn: linear-gradient(135deg, #5a3dce 0%, #8b6fff 100%);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background .3s, color .3s;
+            line-height: 1.6;
+        }
+
+        /* ─── BACKGROUND ─────────────────────────────── */
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-orbs::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -10%;
+            width: 60%;
+            height: 80%;
+            background: radial-gradient(ellipse, rgba(90, 156, 248, .09) 0%, transparent 65%);
+            filter: blur(100px);
+            animation: orbFloat 12s ease-in-out infinite alternate;
+        }
+
+        .bg-orbs::after {
+            content: '';
+            position: absolute;
+            bottom: -15%;
+            right: -10%;
+            width: 55%;
+            height: 75%;
+            background: radial-gradient(ellipse, rgba(139, 111, 255, .09) 0%, transparent 65%);
+            filter: blur(90px);
+            animation: orbFloat 10s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes orbFloat {
+            from {
+                transform: translate(0, 0)
+            }
+
+            to {
+                transform: translate(30px, 20px)
+            }
+        }
+
+        [data-theme="light"] .bg-orbs::before {
+            background: radial-gradient(ellipse, rgba(90, 156, 248, .12) 0%, transparent 65%);
+        }
+
+        [data-theme="light"] .bg-orbs::after {
+            background: radial-gradient(ellipse, rgba(139, 111, 255, .12) 0%, transparent 65%);
+        }
+
+        /* ─── HEADER ─────────────────────────────────── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            background: rgba(7, 7, 26, .85);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border);
+            transition: background .3s;
+        }
+
+        [data-theme="light"] header {
+            background: rgba(242, 243, 251, .88);
+        }
+
+        nav {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: #fff;
+        }
+
+        [data-theme="light"] .brand {
+            color: var(--text);
+        }
+
+        .brand-logo-img {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #000;
+            object-fit: contain;
+            padding: 3px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(139, 111, 255, .4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .brand em {
+            font-style: normal;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .83rem;
+            font-weight: 500;
+            color: var(--sub);
+            text-decoration: none;
+            padding: .45rem .9rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all .2s;
+        }
+
+        .nav-back:hover {
+            color: var(--text);
+            border-color: var(--border-hi);
+            background: rgba(100, 120, 255, .06);
+        }
+
+        /* Theme toggle */
+        .theme-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: var(--elevated);
+            color: var(--sub);
+            font-size: .9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+        }
+
+        .theme-btn:hover {
+            color: var(--text);
+            border-color: var(--border-hi);
+        }
+
+        /* ─── MAIN ───────────────────────────────────── */
+        main {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            padding: 3rem 1.25rem 5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ─── HERO HEAD ──────────────────────────────── */
+        .apply-head {
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 2.5rem;
+            animation: fadeUp .6s ease both;
+        }
+
+        .apply-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(139, 111, 255, .12);
+            border: 1px solid rgba(139, 111, 255, .28);
+            color: #b49dff;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            border-radius: 50px;
+            padding: 5px 15px;
+            margin-bottom: 1.2rem;
+        }
+
+        [data-theme="light"] .apply-tag {
+            background: rgba(100, 80, 255, .08);
+            color: #6a4fd6;
+            border-color: rgba(100, 80, 255, .22);
+        }
+
+        .apply-head h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.12;
+            margin-bottom: .75rem;
+            letter-spacing: -.01em;
+        }
+
+        [data-theme="light"] .apply-head h1 {
+            color: #1a1c38;
+        }
+
+        .apply-head h1 span {
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .apply-head p {
+            color: var(--sub);
+            font-size: .96rem;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* Chips */
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .55rem;
+            justify-content: center;
+            margin-bottom: 2.5rem;
+            animation: fadeUp .65s .1s ease both;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 5px 13px;
+            font-size: .74rem;
+            color: var(--sub);
+            font-weight: 500;
+        }
+
+        [data-theme="light"] .chip {
+            background: rgba(80, 90, 200, .05);
+        }
+
+        .chip i {
+            color: var(--purple);
+            font-size: .72rem;
+        }
+
+        /* ─── TWO-COL LAYOUT ─────────────────────────── */
+        .apply-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 1.75rem;
+            width: 100%;
+            max-width: 1000px;
+            align-items: start;
+            animation: fadeUp .7s .15s ease both;
+        }
+
+        @media(max-width:820px) {
+            .apply-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .aside-col {
+                order: -1;
+            }
+        }
+
+        /* ─── FORM CARD ──────────────────────────────── */
+        .form-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 2.25rem 2.25rem 2rem;
+            position: relative;
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #5a9cf8, #8b6fff, #f5a623);
+            border-radius: var(--radius-card) var(--radius-card) 0 0;
+        }
+
+        /* Section labels */
+        .sec-label {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 1.25rem;
+        }
+
+        .sec-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .sec-label i {
+            color: var(--purple);
+            font-size: .78rem;
+        }
+
+        /* Rows */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media(max-width:500px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        /* Labels */
+        label {
+            display: block;
+            font-size: .81rem;
+            font-weight: 600;
+            color: var(--sub);
+            margin-bottom: .42rem;
+        }
+
+        label .req {
+            color: var(--error);
+            margin-left: 2px;
+        }
+
+        label .opt {
+            font-weight: 400;
+            color: var(--muted);
+            font-size: .75rem;
+        }
+
+        /* Inputs */
+        .inp-wrap {
+            position: relative;
+        }
+
+        .inp-wrap i.icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: .82rem;
+            pointer-events: none;
+            transition: color .2s;
+        }
+
+        .inp-wrap:has(input:focus) i.icon,
+        .inp-wrap:has(textarea:focus) i.icon {
+            color: var(--purple);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: .78rem 1rem .78rem 2.6rem;
+            background: var(--elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-input);
+            color: var(--text);
+            font-size: .91rem;
+            font-family: var(--font-body);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+            appearance: none;
+        }
+
+        textarea {
+            padding-left: 1rem;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(139, 111, 255, .15);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--muted);
+        }
+
+        input.error,
+        textarea.error {
+            border-color: var(--error);
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, .12);
+        }
+
+        .hint {
+            font-size: .72rem;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* ─── PHOTO UPLOAD ───────────────────────────── */
+        .photo-drop {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-input);
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 110px;
+        }
+
+        .photo-drop:hover,
+        .photo-drop.dragover {
+            border-color: var(--purple);
+            background: rgba(139, 111, 255, .06);
+        }
+
+        .photo-drop input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+        }
+
+        .photo-drop-icon {
+            font-size: 1.6rem;
+            color: var(--purple);
+            opacity: .7;
+        }
+
+        .photo-drop-label {
+            font-size: .82rem;
+            font-weight: 600;
+            color: var(--sub);
+        }
+
+        .photo-drop-sub {
+            font-size: .71rem;
+            color: var(--muted);
+        }
+
+        .photo-preview {
+            display: none;
+            width: 72px;
+            height: 72px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid var(--border-hi);
+        }
+
+        .photo-preview.show {
+            display: block;
+        }
+
+        .photo-remove {
+            display: none;
+            cursor: pointer;
+            font-size: .72rem;
+            color: var(--error);
+            background: rgba(248, 113, 113, .1);
+            border: 1px solid rgba(248, 113, 113, .2);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-family: var(--font-body);
+            font-weight: 600;
+        }
+
+        .photo-remove.show {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ─── SUBMIT ─────────────────────────────────── */
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--grad-btn);
+            color: #fff;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: .97rem;
+            letter-spacing: .2px;
+            border: none;
+            border-radius: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            transition: transform .22s, box-shadow .22s, opacity .22s;
+            box-shadow: var(--shadow-btn);
+            margin-top: 1.5rem;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 36px rgba(139, 111, 255, .5);
+        }
+
+        .submit-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 17px;
+            height: 17px;
+            border: 2.5px solid rgba(255, 255, 255, .3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .65s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ─── MESSAGES ───────────────────────────────── */
+        .msg-box {
+            display: none;
+            padding: .9rem 1.1rem;
+            border-radius: 10px;
+            font-size: .86rem;
+            margin-bottom: 1.2rem;
+            border-left: 4px solid transparent;
+            animation: fadeUp .3s ease both;
+        }
+
+        .msg-box i {
+            margin-right: 6px;
+        }
+
+        .msg-box.success {
+            display: block;
+            background: rgba(52, 211, 153, .09);
+            color: var(--success);
+            border-left-color: var(--success);
+        }
+
+        .msg-box.error {
+            display: block;
+            background: rgba(248, 113, 113, .09);
+            color: var(--error);
+            border-left-color: var(--error);
+        }
+
+        /* ─── ASIDE ──────────────────────────────────── */
+        .aside-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .aside-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.4rem 1.5rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .aside-card h3 {
+            font-family: var(--font-display);
+            font-size: .92rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .aside-card h3 i {
+            color: var(--purple);
+            font-size: .85rem;
+        }
+
+        .benefit-list {
+            display: flex;
+            flex-direction: column;
+            gap: .7rem;
+        }
+
+        .benefit {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .benefit-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: rgba(139, 111, 255, .12);
+            border: 1px solid rgba(139, 111, 255, .18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: .72rem;
+            color: var(--purple);
+        }
+
+        .benefit-text {
+            font-size: .8rem;
+            color: var(--sub);
+            line-height: 1.5;
+        }
+
+        .benefit-text strong {
+            display: block;
+            color: var(--text);
+            font-size: .82rem;
+            margin-bottom: 1px;
+        }
+
+        /* Steps */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--grad-btn);
+            color: #fff;
+            font-size: .68rem;
+            font-weight: 800;
+            font-family: var(--font-display);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            font-size: .8rem;
+            color: var(--sub);
+            line-height: 1.45;
+            padding-top: 3px;
+        }
+
+        /* Contact */
+        .contact-card {
+            background: linear-gradient(135deg, rgba(90, 156, 248, .1), rgba(139, 111, 255, .1));
+            border-color: rgba(139, 111, 255, .22);
+        }
+
+        .contact-card p {
+            font-size: .81rem;
+            color: var(--sub);
+            margin-bottom: .75rem;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--blue);
+            text-decoration: none;
+            border: 1px solid rgba(90, 156, 248, .28);
+            border-radius: 8px;
+            padding: .4rem .85rem;
+            transition: all .2s;
+        }
+
+        .contact-link:hover {
+            background: rgba(90, 156, 248, .1);
+            border-color: var(--blue);
+        }
+
+        /* Progress bar */
+        .progress-wrap {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: .72rem;
+            color: var(--muted);
+            margin-bottom: .4rem;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: var(--elevated);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--grad);
+            border-radius: 50px;
+            transition: width .4s ease;
+        }
+
+        /* ─── ANIMATIONS ─────────────────────────────── */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ─── FOOTER ─────────────────────────────────── */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: .78rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+        }
+
+        footer a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ─── RESPONSIVE ─────────────────────────────── */
+        @media(max-width:640px) {
+            main {
+                padding: 2rem .9rem 4rem;
+            }
+
+            .apply-head h1 {
+                font-size: 1.75rem;
+            }
+
+            .form-card {
+                padding: 1.5rem 1.25rem 1.5rem;
+            }
+        }
+
+        /* ─── PLAN BANNER ────────────────────────────── */
+        .plan-banner {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .85rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            font-size: .88rem;
+            animation: fadeUp .4s ease;
+        }
+
+        .plan-banner i {
+            font-size: 1.1rem;
+        }
+
+        .plan-banner.free {
+            background: rgba(0, 200, 83, .08);
+            border: 1px solid rgba(0, 200, 83, .25);
+            color: #00c853;
+        }
+
+        .plan-banner.pro {
+            background: linear-gradient(135deg, rgba(255, 183, 77, .1), rgba(255, 109, 0, .08));
+            border: 1px solid rgba(255, 183, 77, .3);
+            color: #ffa726;
+        }
+
+        .plan-banner .plan-change {
+            margin-left: auto;
+            font-size: .75rem;
+            color: var(--muted);
+            text-decoration: none;
+            border: 1px solid var(--border);
+            padding: .25rem .6rem;
+            border-radius: 6px;
+            transition: all .2s;
+        }
+
+        .plan-banner .plan-change:hover {
+            background: rgba(90, 156, 248, .1);
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        /* ─── PAYMENT MODAL ──────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0, 0, 0, .7);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: fadeUp .3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffa726, #ff6d00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 100, 100, .1);
+            border-color: rgba(255, 100, 100, .3);
+            color: #ff6b6b;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: .85rem;
+            padding: .45rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-meta-row .label {
+            color: var(--muted);
+        }
+
+        .modal-meta-row .value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .modal-loading {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: 1rem 0;
+            color: var(--muted);
+            font-size: .85rem;
+        }
+
+        .qr-wrap {
+            text-align: center;
+            margin: 1.25rem 0;
+        }
+
+        .qr-wrap img {
+            max-width: 200px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .qr-upi {
+            margin-top: .6rem;
+            font-size: .82rem;
+            color: var(--muted);
+            word-break: break-all;
+            white-space: normal;
+            padding: 0 10px;
+        }
+
+        .modal-body .form-group {
+            margin-top: 1rem;
+        }
+
+        .modal-body .form-group label {
+            display: block;
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: .35rem;
+        }
+
+        .modal-body .form-group input[type="text"],
+        .modal-body .form-group input[type="file"] {
+            width: 100%;
+            padding: .6rem .8rem;
+            background: var(--elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: .85rem;
+            box-sizing: border-box;
+        }
+
+        .modal-body .hint {
+            font-size: .72rem;
+            color: var(--muted);
+            margin-top: .25rem;
+        }
+
+        .btn-submit-payment {
+            width: 100%;
+            margin-top: 1.25rem;
+            padding: .75rem 1rem;
+            background: linear-gradient(135deg, #ffa726, #ff6d00);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: .88rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            transition: all .2s;
+        }
+
+        .btn-submit-payment:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255, 167, 38, .3);
+        }
+
+        .btn-submit-payment:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .modal-note {
+            margin-top: 1rem;
+            font-size: .75rem;
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .modal-success {
+            text-align: center;
+            padding: 1.5rem 0;
+        }
+
+        .modal-success i {
+            font-size: 2.5rem;
+            color: #00c853;
+            margin-bottom: .75rem;
+        }
+
+        .modal-success h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: .5rem;
+        }
+
+        .modal-success p {
+            font-size: .82rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-orbs"></div>
+
+    <!-- ─── NAVBAR ─────────────────────────────────── -->
+    <header>
+        <nav>
+            <a href="index" class="brand">
+                <img src="/Classgrid.png" alt="Classgrid Logo" class="brand-logo-img">
+                Class<em>grid</em>
+            </a>
+            <div class="nav-right">
+                <button class="theme-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <a href="index" class="nav-back">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ─── MAIN ───────────────────────────────────── -->
+    <main>
+
+        <!-- Plan Banner (populated by JS) -->
+        <div class="plan-banner" id="planBanner" style="display:none;"></div>
+
+        <!-- Hero -->
+        <div class="apply-head">
+            <div class="apply-tag"><i class="fas fa-building-columns"></i> For Institutions</div>
+            <h1>Bring Your Institution<br>to <span>Classgrid</span></h1>
+            <p id="heroSubtitle">Apply below. For the Free plan, our team will review your application and set up your
+                organisation within 24–48 hours — free of charge.</p>
+        </div>
+
+        <!-- Chips -->
+        <div class="chips">
+            <span class="chip"><i class="fas fa-check-circle"></i> Free to start</span>
+            <span class="chip"><i class="fas fa-users"></i> Manage faculty &amp; students</span>
+            <span class="chip"><i class="fas fa-shield-halved"></i> Private org code</span>
+            <span class="chip" id="approvalChip"><i class="fas fa-clock"></i> Approved within 48 hrs</span>
+            <span class="chip"><i class="fas fa-lock"></i> Secure &amp; private</span>
+        </div>
+
+        <!-- Layout -->
+        <div class="apply-layout">
+
+            <!-- ── FORM CARD ─────────────────────────── -->
+            <div class="form-card">
+
+                <!-- Progress -->
+                <div class="progress-wrap">
+                    <div class="progress-label">
+                        <span>Application Progress</span>
+                        <span id="progressPct">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <div id="msgBox" class="msg-box"></div>
+
+                <form id="applyForm" novalidate>
+
+                    <!-- ── Section 1: Institution ────────── -->
+                    <p class="sec-label"><i class="fas fa-building"></i> Institution Details</p>
+
+                    <div class="form-group">
+                        <label for="instituteName">Institute / College Name <span class="req">*</span></label>
+                        <div class="inp-wrap">
+                            <i class="icon fas fa-university"></i>
+                            <input type="text" id="instituteName" name="instituteName"
+                                placeholder="e.g. ABC Engineering College" required autocomplete="organization">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Full Address <span class="req">*</span></label>
+                        <textarea id="address" name="address" placeholder="Street, City, State, PIN Code" required
+                            style="padding-left:1rem;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="website">Official Website <span class="opt">(optional)</span></label>
+                        <div class="inp-wrap">
+                            <i class="icon fas fa-globe"></i>
+                            <input type="url" id="website" name="website" placeholder="https://yourinstitute.edu.in">
+                        </div>
+                        <p class="hint">Helps us verify your institution and display it in your profile.</p>
+                    </div>
+
+                    <!-- Logo Upload -->
+                    <div class="form-group">
+                        <label>Institution Logo <span class="req">*</span></label>
+                        <div class="photo-drop" id="photoDrop">
+                            <input type="file" id="logoFile" name="logoFile" accept="image/*">
+                            <img class="photo-preview" id="photoPreview" src="" alt="Logo preview">
+                            <i class="fas fa-cloud-arrow-up photo-drop-icon" id="dropIcon"></i>
+                            <span class="photo-drop-label" id="dropLabel">Click or drag &amp; drop your logo</span>
+                            <span class="photo-drop-sub" id="dropSub">PNG, JPG, WEBP — max 500 KB</span>
+                            <button type="button" class="photo-remove" id="photoRemove"><i class="fas fa-times"></i>
+                                Remove</button>
+                        </div>
+                        <p class="hint" id="fileSizeHint"></p>
+                    </div>
+
+                    <!-- ── Section 2: Admin ──────────────── -->
+                    <p class="sec-label" style="margin-top:1.6rem;"><i class="fas fa-user-tie"></i> Admin / Owner
+                        Details</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ownerName">Admin Full Name <span class="req">*</span></label>
+                            <div class="inp-wrap">
+                                <i class="icon fas fa-user"></i>
+                                <input type="text" id="ownerName" name="ownerName" placeholder="Your full name" required
+                                    autocomplete="name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number <span class="req">*</span></label>
+                            <div class="inp-wrap">
+                                <i class="icon fas fa-phone"></i>
+                                <input type="tel" id="phone" name="phone" placeholder="+91 9876543210" required
+                                    autocomplete="tel">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ownerEmail">Admin Email Address <span class="req">*</span></label>
+                        <div class="inp-wrap">
+                            <i class="icon fas fa-envelope"></i>
+                            <input type="email" id="ownerEmail" name="ownerEmail" placeholder="admin@yourinstitute.edu"
+                                required autocomplete="email">
+                        </div>
+                        <p class="hint">The org admin account will be created and linked to this email.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="designation">Your Designation <span class="opt">(optional)</span></label>
+                        <div class="inp-wrap">
+                            <i class="icon fas fa-id-badge"></i>
+                            <input type="text" id="designation" name="designation"
+                                placeholder="e.g. Principal, IT Head, Registrar">
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <i class="fas fa-rocket"></i>
+                        <span id="submitText">Submit Application</span>
+                    </button>
+
+                </form>
+            </div>
+
+            <!-- ── ASIDE ──────────────────────────────── -->
+            <div class="aside-col">
+
+                <!-- Benefits -->
+                <div class="aside-card">
+                    <h3><i class="fas fa-star"></i> What You Get</h3>
+                    <div class="benefit-list">
+                        <div class="benefit">
+                            <div class="benefit-icon"><i class="fas fa-key"></i></div>
+                            <div class="benefit-text"><strong>Private Org Code</strong>Faculty &amp; students join your
+                                org securely via a unique code only you control.</div>
+                        </div>
+                        <div class="benefit">
+                            <div class="benefit-icon"><i class="fas fa-chalkboard-user"></i></div>
+                            <div class="benefit-text"><strong>Classroom Management</strong>Create classrooms, assign
+                                faculty, and monitor attendance — all in one place.</div>
+                        </div>
+                        <div class="benefit">
+                            <div class="benefit-icon"><i class="fas fa-chart-line"></i></div>
+                            <div class="benefit-text"><strong>Actionable Analytics</strong>Attendance heatmaps,
+                                performance trends, and exportable reports.</div>
+                        </div>
+                        <div class="benefit">
+                            <div class="benefit-icon"><i class="fas fa-shield-halved"></i></div>
+                            <div class="benefit-text"><strong>Enterprise Privacy</strong>Your data stays within your
+                                org. We don't share or sell any information.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steps -->
+                <div class="aside-card">
+                    <h3><i class="fas fa-list-check"></i> How It Works</h3>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-num">1</div>
+                            <div class="step-text">Submit this form with your institution &amp; admin details.</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">2</div>
+                            <div class="step-text">Our team reviews &amp; approves your application within 48 hrs.</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">3</div>
+                            <div class="step-text">You receive your admin credentials &amp; unique org code via email.
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-num">4</div>
+                            <div class="step-text">Start adding faculty, classrooms, and students immediately.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="aside-card contact-card">
+                    <h3><i class="fas fa-circle-question"></i> Need Help?</h3>
+                    <p>Have questions before applying? Our team is happy to walk you through onboarding.</p>
+                    <a href="contact" class="contact-link"><i class="fas fa-envelope"></i> Contact Us</a>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ─── FOOTER ─────────────────────────────────── -->
+    <footer>
+        <span>Questions? <a href="contact">Contact us</a> &nbsp;·&nbsp; <a href="privacy">Privacy Policy</a>
+            &nbsp;·&nbsp; &copy; 2026 Classgrid</span>
+    </footer>
+
+    <!-- ─── PRO APPLICATION + PAYMENT MODAL ───────────────── -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-crown" style="color:#a855f7;margin-right:6px;"></i> Pro Plan — Payment</h3>
+                <button class="modal-close" id="closePaymentModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-loading" id="payModalLoading" style="display:none;">
+                    <div class="spinner"></div>
+                    <span>Processing your application…</span>
+                </div>
+                <div id="payModalContent" style="display:none;">
+                    <div style="text-align:center;padding:1.5rem 0;">
+                        <i class="fas fa-circle-check"
+                            style="font-size:2.5rem;color:#00c853;margin-bottom:1rem;display:block;"></i>
+                        <h4 style="font-size:1.1rem;margin-bottom:0.75rem;">🎉 Payment Successful!</h4>
+                        <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;margin-bottom:1.25rem;">
+                            Your <strong>Pro Plan</strong> has been activated. Your organization is being set up
+                            automatically.
+                        </p>
+                    </div>
+
+                    <div
+                        style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);border-radius:12px;padding:1.25rem;margin:0.5rem 0;">
+                        <p style="font-size:0.88rem;font-weight:600;margin-bottom:0.75rem;"><i class="fas fa-envelope"
+                                style="color:#a855f7;margin-right:6px;"></i> Check your email!</p>
+                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;margin-bottom:0.5rem;">1. You'll
+                            receive an email with your <strong>Organization Codes</strong> and <strong>Admin Activation
+                                Link</strong>.</p>
+                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;margin-bottom:0.5rem;">2. Click
+                            the activation link to set your password.</p>
+                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;">3. Log in to your
+                            <strong>Organization Admin Dashboard</strong> — Pro features are already active!
+                        </p>
+                    </div>
+
+                    <p class="modal-note" style="margin-top:1rem;"><i class="fas fa-shield-halved"
+                            style="color:#a855f7;margin-right:4px;"></i>
+                        No manual approval needed — your organization is live!</p>
+                </div>
+
+                <div id="paySuccessContent" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── SCRIPTS ────────────────────────────────── -->
+    <script>
+        /* ── Theme toggle ─────────────────────── */
+        const html = document.documentElement;
+        const themeBtn = document.getElementById('themeBtn');
+        const themeIcon = document.getElementById('themeIcon');
+
+        function setTheme(t) {
+            html.setAttribute('data-theme', t);
+            themeIcon.className = t === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            localStorage.setItem('cg-theme', t);
+        }
+
+        themeBtn.addEventListener('click', () => {
+            setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        });
+
+        const saved = localStorage.getItem('cg-theme');
+        if (saved) setTheme(saved);
+        else if (window.matchMedia('(prefers-color-scheme: light)').matches) setTheme('light');
+
+        /* ── Plan Detection ───────────────────── */
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedPlan = (urlParams.get('plan') || 'FREE').toUpperCase();
+        const isPro = selectedPlan === 'PRO';
+        let currentApplicationId = null;
+
+        // Show plan banner
+        const planBanner = document.getElementById('planBanner');
+        if (isPro) {
+            planBanner.className = 'plan-banner pro';
+            planBanner.innerHTML = '<i class="fas fa-crown"></i> Buying <strong>Pro Plan</strong> — ₹100/month · 150 students <a href="org-apply.html?plan=FREE" class="plan-change">Switch to Free</a>';
+            planBanner.style.display = 'flex';
+            document.getElementById('heroSubtitle').textContent = 'After completing payment, your Pro plan will be activated instantly. Once the payment is confirmed, you will receive an activation email with instructions to set up your administrator account and access the Classgrid dashboard.';
+            const apprChip = document.getElementById('approvalChip');
+            if (apprChip) apprChip.innerHTML = '<i class="fas fa-bolt" style="color:var(--yellow)"></i> Instant Auto-Approval';
+            // Change submit button text for PRO
+            document.getElementById('submitText').textContent = 'Proceed to Payment ₹100';
+            document.getElementById('submitBtn').querySelector('i').className = 'fas fa-arrow-right';
+        } else {
+            planBanner.className = 'plan-banner free';
+            planBanner.innerHTML = '<i class="fas fa-check-circle"></i> Applying for <strong>Free Plan</strong> — ₹0/month · 60 students <a href="org-apply.html?plan=PRO" class="plan-change">Switch to Pro</a>';
+            planBanner.style.display = 'flex';
+        }
+
+        /* ── Logo upload ──────────────────────── */
+        const photoDrop = document.getElementById('photoDrop');
+        const logoFile = document.getElementById('logoFile');
+        const photoPreview = document.getElementById('photoPreview');
+        const dropIcon = document.getElementById('dropIcon');
+        const dropLabel = document.getElementById('dropLabel');
+        const dropSub = document.getElementById('dropSub');
+        const photoRemove = document.getElementById('photoRemove');
+        const fileSizeHint = document.getElementById('fileSizeHint');
+
+        const MAX_BYTES = 500 * 1024;
+
+        function handleFile(file) {
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                fileSizeHint.textContent = 'Please upload an image file.';
+                fileSizeHint.style.color = 'var(--error)';
+                logoFile.value = ''; // Clear invalid file
+                updateProgress();
+                return;
+            }
+            if (file.size > MAX_BYTES) {
+                fileSizeHint.textContent = `File too large (${(file.size / 1024).toFixed(0)} KB). Max allowed: 500 KB.`;
+                fileSizeHint.style.color = 'var(--error)';
+                logoFile.value = ''; // Clear invalid file
+                updateProgress();
+                return;
+            }
+            fileSizeHint.textContent = `✓ ${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+            fileSizeHint.style.color = 'var(--success)';
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                photoPreview.src = e.target.result;
+                photoPreview.classList.add('show');
+                dropIcon.style.display = 'none';
+                dropLabel.style.display = 'none';
+                dropSub.style.display = 'none';
+                photoRemove.classList.add('show');
+                updateProgress();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        logoFile.addEventListener('change', () => handleFile(logoFile.files[0]));
+
+        photoDrop.addEventListener('dragover', e => { e.preventDefault(); photoDrop.classList.add('dragover'); });
+        photoDrop.addEventListener('dragleave', () => photoDrop.classList.remove('dragover'));
+        photoDrop.addEventListener('drop', e => {
+            e.preventDefault(); photoDrop.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) { logoFile.files = e.dataTransfer.files; handleFile(file); }
+        });
+
+        photoRemove.addEventListener('click', e => {
+            e.stopPropagation();
+            logoFile.value = '';
+            photoPreview.src = '';
+            photoPreview.classList.remove('show');
+            dropIcon.style.display = '';
+            dropLabel.style.display = '';
+            dropSub.style.display = '';
+            photoRemove.classList.remove('show');
+            fileSizeHint.textContent = '';
+            updateProgress();
+        });
+
+        /* ── Progress tracker ─────────────────── */
+        const REQUIRED_IDS = ['instituteName', 'address', 'logoFile', 'ownerName', 'phone', 'ownerEmail'];
+        const OPTIONAL_IDS = ['website', 'designation'];
+        const ALL_IDS = [...REQUIRED_IDS, ...OPTIONAL_IDS];
+        const progressFill = document.getElementById('progressFill');
+        const progressPct = document.getElementById('progressPct');
+
+        function updateProgress() {
+            let filled = 0;
+            REQUIRED_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (el.type === 'file') { if (el.files && el.files.length) filled++; }
+                else if (el.value.trim()) filled++;
+            });
+            const pct = Math.round((filled / REQUIRED_IDS.length) * 100);
+            progressFill.style.width = pct + '%';
+            progressPct.textContent = pct + '%';
+        }
+
+        ALL_IDS.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', updateProgress);
+        });
+        logoFile.addEventListener('change', updateProgress);
+
+        /* ── Form submit ──────────────────────── */
+        function getApiBase() {
+            return window.location.origin.includes('localhost') ? 'http://localhost:3000/api' : '/api';
+        }
+
+        const form = document.getElementById('applyForm');
+        const btn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const msgBox = document.getElementById('msgBox');
+
+        function showMsg(text, type) {
+            msgBox.className = `msg-box ${type}`;
+            msgBox.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${text}`;
+            msgBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function markError(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('error');
+        }
+        function clearErrors() {
+            ALL_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('error');
+            });
+            photoDrop.style.borderColor = '';
+        }
+
+        /* ── Collect & validate form data ─────── */
+        function getFormData() {
+            return {
+                institute_name: document.getElementById('instituteName').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                owner_name: document.getElementById('ownerName').value.trim(),
+                owner_email: document.getElementById('ownerEmail').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                website: document.getElementById('website').value.trim(),
+                designation: document.getElementById('designation').value.trim(),
+                file: logoFile.files[0]
+            };
+        }
+
+        function validateForm() {
+            clearErrors();
+            const d = getFormData();
+            let missing = [];
+
+            if (!d.institute_name) { markError('instituteName'); missing.push('Institute Name'); }
+            if (!d.address) { markError('address'); missing.push('Address'); }
+            if (!d.owner_name) { markError('ownerName'); missing.push('Admin Name'); }
+            if (!d.phone) { markError('phone'); missing.push('Phone'); }
+            if (!d.owner_email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.owner_email)) {
+                markError('ownerEmail'); missing.push('Valid Email');
+            }
+            if (!d.file) {
+                photoDrop.style.borderColor = 'var(--error)';
+                missing.push('Institution Logo');
+            }
+
+            return missing;
+        }
+
+        async function readFileAsBase64(file) {
+            if (!file) return '';
+            return new Promise(resolve => {
+                const r = new FileReader();
+                r.onload = () => resolve(r.result);
+                r.readAsDataURL(file);
+            });
+        }
+
+        /* ── Submit to backend (combined for both plans) */
+        async function submitApplication(extraPaymentData = {}) {
+            const d = getFormData();
+            const logo_base64 = await readFileAsBase64(d.file);
+
+            const payload = {
+                institute_name: d.institute_name,
+                address: d.address,
+                owner_name: d.owner_name,
+                owner_email: d.owner_email,
+                phone: d.phone,
+                website: d.website || '',
+                designation: d.designation || '',
+                logo_base64,
+                planRequested: selectedPlan,
+                ...extraPaymentData
+            };
+
+            const res = await fetch(`${getApiBase()}/organization/apply`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            return { ok: res.ok, data };
+        }
+
+        /* ── Form submit handler ──────────────── */
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            msgBox.className = 'msg-box';
+
+            const missingFields = validateForm();
+            if (missingFields.length > 0) {
+                showMsg(`Please fill in required fields correctly: <strong>${missingFields.join(', ')}</strong>`, 'error');
+                return;
+            }
+
+            if (isPro) {
+                // PRO: Submit application (payment happens later from dashboard via Razorpay Checkout)
+                openPaymentModal();
+                return;
+            }
+
+            // FREE: Submit directly
+            btn.disabled = true;
+            submitText.innerHTML = '<div class="spinner"></div> Submitting…';
+
+            try {
+                const { ok, data } = await submitApplication();
+                if (ok) {
+                    showMsg('🎉 Application submitted! Our team will review it and contact you within 24–48 hours.', 'success');
+                    form.reset();
+                    resetFormUI();
+                    btn.innerHTML = '<i class="fas fa-check"></i> Submitted!';
+                } else {
+                    showMsg(data.message || 'Submission failed. Please try again.', 'error');
+                    btn.disabled = false;
+                    submitText.textContent = 'Submit Application';
+                }
+            } catch {
+                showMsg('Network error. Please check your connection and try again.', 'error');
+                btn.disabled = false;
+                submitText.textContent = 'Submit Application';
+            }
+        });
+
+        function resetFormUI() {
+            photoPreview.classList.remove('show');
+            photoPreview.src = '';
+            dropIcon.style.display = '';
+            dropLabel.style.display = '';
+            dropSub.style.display = '';
+            photoRemove.classList.remove('show');
+            fileSizeHint.textContent = '';
+            progressFill.style.width = '0%';
+            progressPct.textContent = '0%';
+        }
+
+        /* ── PRO Application Modal ── */
+        const paymentModal = document.getElementById('paymentModal');
+        const payModalLoading = document.getElementById('payModalLoading');
+        const payModalContent = document.getElementById('payModalContent');
+
+        document.getElementById('closePaymentModal').addEventListener('click', () => {
+            paymentModal.classList.remove('open');
+            document.body.style.overflow = '';
+        });
+
+        paymentModal.addEventListener('click', e => {
+            if (e.target === paymentModal) {
+                paymentModal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        });
+
+        async function openPaymentModal() {
+            paymentModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            payModalLoading.style.display = 'flex';
+            payModalContent.style.display = 'none';
+
+            try {
+                // Validate form before proceeding
+                const missingFields = validateForm();
+                if (missingFields.length > 0) {
+                    payModalLoading.style.display = 'none';
+                    paymentModal.classList.remove('open');
+                    document.body.style.overflow = '';
+                    showMsg(`Please fill in required fields: <strong>${missingFields.join(', ')}</strong>`, 'error');
+                    return;
+                }
+
+                // Collect form data (NO submitApplication call — form data goes directly to payment endpoint)
+                const d = getFormData();
+                const logo_base64 = await readFileAsBase64(d.file);
+
+                const payload = {
+                    institute_name: d.institute_name,
+                    address: d.address,
+                    owner_name: d.owner_name,
+                    owner_email: d.owner_email,
+                    phone: d.phone,
+                    website: d.website || '',
+                    designation: d.designation || '',
+                    logo_base64,
+                };
+
+                // Step 1: Create Razorpay order + store form data in temp collection
+                const API_BASE = window.location.origin;
+                const orderRes = await fetch(`${API_BASE}/api/payments/create-order-for-application`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                const orderData = await orderRes.json();
+
+                if (!orderRes.ok) {
+                    payModalLoading.style.display = 'none';
+                    paymentModal.classList.remove('open');
+                    document.body.style.overflow = '';
+                    showMsg(orderData.message || 'Failed to create payment order.', 'error');
+                    return;
+                }
+
+                payModalLoading.style.display = 'none';
+
+                // Step 2: Open Razorpay Checkout
+                const rzpOptions = {
+                    key: orderData.keyId,
+                    amount: orderData.amount,
+                    currency: orderData.currency || 'INR',
+                    name: 'Classgrid',
+                    description: 'Pro Plan — 31 Days',
+                    order_id: orderData.orderId,
+                    handler: function (response) {
+                        // Payment successful! Webhook will auto-create the org.
+                        payModalContent.style.display = 'block';
+                        form.reset(); resetFormUI();
+                        showMsg('🎉 Payment successful! Check your email for activation link & org codes.', 'success');
+                        btn.innerHTML = '<i class="fas fa-check"></i> Paid & Submitted!';
+                        btn.disabled = true;
+                    },
+                    prefill: {
+                        name: d.owner_name,
+                        email: d.owner_email,
+                        contact: d.phone,
+                    },
+                    theme: {
+                        color: '#a855f7',
+                        backdrop_color: 'rgba(0,0,0,0.85)'
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            // User closed Razorpay without paying — nothing was saved to DB
+                            paymentModal.classList.remove('open');
+                            document.body.style.overflow = '';
+                            showMsg('⚠️ Payment cancelled. No record was saved — fill the form again when ready.', 'info');
+                            btn.disabled = false;
+                            submitText.textContent = 'Proceed to Payment ₹100';
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(rzpOptions);
+                rzp.on('payment.failed', function (response) {
+                    paymentModal.classList.remove('open');
+                    document.body.style.overflow = '';
+                    showMsg(response.error?.description || 'Payment failed. Please try again.', 'error');
+                    btn.disabled = false;
+                    submitText.textContent = 'Proceed to Payment ₹100';
+                });
+                rzp.open();
+
+            } catch {
+                payModalLoading.style.display = 'none';
+                paymentModal.classList.remove('open');
+                document.body.style.overflow = '';
+                showMsg('Network error. Please check your connection and try again.', 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>

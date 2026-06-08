@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- Primary SEO -->
+    <title>Reviews | Classgrid – What Users Say</title>
+    <meta name="description"
+        content="Read reviews and testimonials from students, faculty, and institutions using the Classgrid AI-powered classroom platform." />
+    <meta name="keywords"
+        content="Classgrid reviews, classroom platform reviews, AI LMS testimonials, education platform feedback" />
+    <meta name="author" content="Nikhil Shinde" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://classgrid.in/review" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Reviews – Classgrid | What Users Say" />
+    <meta property="og:description"
+        content="Discover what students, faculty, and institutions say about the Classgrid platform." />
+    <meta property="og:url" content="https://classgrid.in/review" />
+    <meta property="og:image" content="https://classgrid.in/images/classgrid-preview.png" />
+    <meta property="og:site_name" content="Classgrid" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --surface-2: #141414;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hi: rgba(255, 255, 255, 0.16);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --muted: #888888;
+            --dim: #444444;
+            --sidebar-w: 240px;
+        }
+
+        /* ===== LIGHT MODE ===== */
+        body.light {
+            --bg: #ffffff;
+            --surface: #f5f5f5;
+            --surface-2: #ececec;
+            --border: rgba(0, 0, 0, 0.08);
+            --border-hi: rgba(0, 0, 0, 0.16);
+            --text: #0f0f0f;
+            --muted: #555555;
+            --dim: #aaaaaa;
+        }
+
+        body.light .sidebar {
+            background: #fff;
+        }
+
+        body.light .logo-box::after {
+            background: #fff;
+        }
+
+        body.light .page-hero {
+            background: #fff;
+        }
+
+        body.light .ham {
+            background: #f0f0f0;
+        }
+
+        body.light .back-top {
+            background: #f0f0f0;
+            border-color: rgba(0, 0, 0, 0.12);
+            color: #0f0f0f;
+        }
+
+        body.light .back-top:hover {
+            background: #e5e5e5;
+        }
+
+        body.light .review-text {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        body.light .review-item {
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light .review-item:first-child {
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light .review-num-badge {
+            background: rgba(0, 0, 0, 0.04);
+            color: #888;
+        }
+
+        body.light .page-badge {
+            background: rgba(0, 0, 0, 0.04);
+            color: #666;
+        }
+
+        body.light .stat-label {
+            color: #999;
+        }
+
+        body.light .block-header {
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light .sidebar-divider {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light .sidebar-badge {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light .reading-progress-bar {
+            /* keeps gradient */
+        }
+
+        body.light .form-group input,
+        body.light .form-group textarea {
+            background: #fff;
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #0f0f0f;
+        }
+
+        body.light .form-group input:focus,
+        body.light .form-group textarea:focus {
+            background: #fafafa;
+        }
+
+        body.light .form-group input::placeholder,
+        body.light .form-group textarea::placeholder {
+            color: #bbb;
+        }
+
+        body.light .reviews-toolbar span {
+            color: #888;
+        }
+
+        body.light .refresh-btn {
+            background: rgba(0, 0, 0, 0.04);
+            color: #666;
+        }
+
+        body.light .review-field-label {
+            color: var(--blue);
+        }
+
+        body.light .nav-item.active {
+            background: rgba(74, 144, 245, 0.08);
+            color: #1a6de8;
+        }
+
+        body.light .nav-item.active i {
+            color: #1a6de8;
+        }
+
+        body.light .stats-bar {
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light .stat-item+.stat-item {
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: #000;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1.5rem 1.4rem 1.3rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 9.5px;
+            background: var(--grad-bp);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            border-radius: 7px;
+            z-index: 0;
+        }
+
+        .logo-box img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .brand-name em {
+            font-style: normal;
+        }
+
+        .sidebar-section {
+            padding: 1.2rem 1rem 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dim);
+            padding: 0 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 1px;
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(128, 128, 128, 0.1);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(74, 144, 245, 0.12);
+            color: var(--blue);
+        }
+
+        .nav-item.active i {
+            color: var(--blue-light);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.6rem 1rem;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-size: 0.73rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .sidebar-badge strong {
+            color: var(--muted);
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.76rem;
+        }
+
+        /* ===== HAMBURGER ===== */
+        .ham {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 200;
+            flex-direction: column;
+            gap: 5px;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            cursor: pointer;
+        }
+
+        .ham span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.28s ease;
+        }
+
+        .ham.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .ham.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .ham.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* ===== READING PROGRESS ===== */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 2px;
+            z-index: 200;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: var(--grad-bp);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+        }
+
+        /* Hero */
+        .page-hero {
+            padding: 3.5rem 4rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            background: #000;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 144, 245, 0.6);
+            }
+
+            50% {
+                box-shadow: 0 0 0 5px rgba(74, 144, 245, 0);
+            }
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-title span {
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .page-hero-inner {
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            gap: 0;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            padding: 1.25rem 2rem 1.25rem 0;
+            margin-right: 2rem;
+        }
+
+        .stat-item+.stat-item {
+            border-left: 1px solid var(--border);
+            padding-left: 2rem;
+            margin-right: 0;
+        }
+
+        .stat-value {
+            font-family: 'DM Mono', monospace;
+            font-size: 1.6rem;
+            font-weight: 500;
+            color: var(--text);
+            display: block;
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            color: var(--dim);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        /* ===== CONTENT WRAP ===== */
+        .content-wrap {
+            padding: 3rem 4rem 5rem;
+            max-width: 860px;
+        }
+
+        /* ===== FORM SECTION ===== */
+        .form-block {
+            margin-bottom: 3.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .form-block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .block-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .block-num {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .block-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #4a90f5, #8b6fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Form fields */
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .field-req {
+            color: #8b6fff;
+            font-weight: 400;
+            margin-left: 2px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 400;
+            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            outline: none;
+            line-height: 1.6;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--dim);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: rgba(74, 144, 245, 0.4);
+            background: var(--surface-2);
+            box-shadow: 0 0 0 3px rgba(74, 144, 245, 0.08);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .char-counter {
+            position: absolute;
+            bottom: -20px;
+            right: 0;
+            font-size: 0.72rem;
+            color: var(--dim);
+            font-family: 'DM Mono', monospace;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.75rem;
+            background: var(--grad-bp);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            letter-spacing: 0.01em;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.88;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(74, 144, 245, 0.2);
+        }
+
+        .submit-btn:active {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Messages */
+        .message {
+            margin-top: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .message.show {
+            display: flex;
+        }
+
+        .success-message {
+            background: rgba(34, 197, 94, 0.07);
+            border: 1px solid rgba(34, 197, 94, 0.18);
+            color: #4ade80;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.07);
+            border: 1px solid rgba(239, 68, 68, 0.18);
+            color: #f87171;
+        }
+
+        /* ===== REVIEWS SECTION ===== */
+        .reviews-block {
+            margin-bottom: 3.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .reviews-block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reviews-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.9rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(128, 128, 128, 0.1);
+            border-color: var(--border-hi);
+            color: var(--text);
+        }
+
+        /* Reviews list */
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .review-item {
+            padding: 1.75rem 0;
+            border-bottom: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .review-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .review-item:first-child {
+            border-top: 1px solid var(--border);
+        }
+
+        .review-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .reviewer-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--grad-bp);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .reviewer-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        .reviewer-college {
+            font-size: 0.82rem;
+            color: var(--blue);
+            font-weight: 500;
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .reviewer-college::before {
+            content: 'College';
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--dim);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 1px 6px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .review-num-badge {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--muted);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            flex-shrink: 0;
+        }
+
+        .review-field-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--blue);
+            margin-bottom: 0.4rem;
+            margin-top: 1rem;
+        }
+
+        .review-field-label:first-of-type {
+            margin-top: 0;
+        }
+
+        .review-text {
+            font-size: 0.9rem;
+            color: var(--text);
+            opacity: 0.8;
+            line-height: 1.85;
+            font-weight: 400;
+            word-wrap: break-word;
+        }
+
+        /* Loading */
+        .loading-state {
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--border);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 0.825rem;
+            color: var(--dim);
+        }
+
+        .empty-state {
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 1.75rem;
+            color: var(--dim);
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-text {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* ===== PILL THEME TOGGLE ===== */
+        .theme-pill {
+            position: fixed;
+            top: 1rem;
+            right: 1.5rem;
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            background: var(--surface);
+            border: 1.5px solid var(--border-hi);
+            border-radius: 50px;
+            padding: 3px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+            gap: 0;
+        }
+
+        .theme-pill-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0.4rem 0.85rem;
+            border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--muted);
+            transition: all 0.3s ease;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .theme-pill-option i {
+            font-size: 0.72rem;
+        }
+
+        /* Active state — dark mode active by default */
+        .theme-pill-option.active {
+            background: var(--surface-2);
+            color: var(--text);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Light mode overrides */
+        body.light .theme-pill {
+            background: #f0f0f0;
+            border-color: rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light .theme-pill-option {
+            color: #999;
+        }
+
+        body.light .theme-pill-option.active {
+            background: #fff;
+            color: #222;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .theme-pill:hover {
+            border-color: var(--blue);
+        }
+
+        /* Smooth transitions */
+        body,
+        .sidebar,
+        .page-hero,
+        .main,
+        .form-card,
+        .review-card,
+        .review-item,
+        .theme-pill,
+        .ham,
+        .back-top {
+            transition: background 0.6s ease, background-color 0.6s ease,
+                color 0.5s ease, border-color 0.5s ease,
+                box-shadow 0.5s ease;
+        }
+
+        /* ===== STAR RATING ===== */
+        .star-rating {
+            display: flex;
+            gap: 0.35rem;
+            margin-top: 0.25rem;
+        }
+
+        .star {
+            font-size: 2rem;
+            color: var(--dim);
+            cursor: pointer;
+            transition: color 0.15s ease, transform 0.15s ease;
+            line-height: 1;
+        }
+
+        .star.active,
+        .star.hover {
+            color: #f5a623;
+        }
+
+        .star:hover {
+            transform: scale(1.15);
+        }
+
+        /* ===== BACK TO TOP ===== */
+        .back-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            background: #111;
+            border: 1px solid var(--border-hi);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 50;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        .back-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-top:hover {
+            background: #1a1a1a;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .reading-progress {
+                left: 0;
+            }
+
+            .ham {
+                display: flex;
+            }
+
+            .content-wrap {
+                padding: 2rem 1.5rem 3rem;
+            }
+
+            .page-hero {
+                padding: 4rem 1.5rem 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-wrap {
+                padding: 1.5rem 1.2rem 3rem;
+            }
+
+            .page-hero {
+                padding: 3.5rem 1.2rem 1.5rem;
+            }
+
+            .stat-item {
+                padding: 1rem 1rem 1rem 0;
+                margin-right: 1rem;
+            }
+
+            .stat-item+.stat-item {
+                padding-left: 1rem;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="reading-progress">
+        <div class="reading-progress-bar" id="progressBar"></div>
+    </div>
+    <button class="ham" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <a href="index" class="sidebar-logo">
+            <div class="logo-box"><img src="/Classgrid.png" alt="Classgrid"></div>
+            <span class="brand-name">Class<em>grid</em></span>
+        </a>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Navigation</div>
+            <a href="index" class="nav-item"><i class="fas fa-house"></i> Home</a>
+
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Community</div>
+            <a href="reviews" class="nav-item active"><i class="fas fa-star"></i> Reviews</a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-badge">
+                <strong>Share your story</strong>
+                Your feedback shapes the Classgrid platform for everyone.
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+        <!-- Page hero -->
+        <div class="page-hero">
+            <div class="page-hero-inner">
+                <div class="page-badge"><span class="badge-dot"></span> Community</div>
+                <h1 class="page-title">User <span>Reviews</span></h1>
+                <div class="page-meta">
+                    <span>Science Education Platform</span>
+                    <span>Classgrid</span>
+                </div>
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span class="stat-value" id="reviewCount">—</span>
+                        <span class="stat-label">Total Reviews</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">Soon</span>
+                        <span class="stat-label">Avg Rating</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content-wrap">
+
+            <!-- FORM BLOCK -->
+            <div class="form-block" id="formBlock">
+                <div class="block-header">
+                    <div class="block-num">01</div>
+                    <div class="block-title">Post a Review</div>
+                </div>
+
+                <form id="reviewForm">
+                    <div class="form-group">
+                        <label>Full Name <span class="field-req">*</span></label>
+                        <input type="text" id="name" name="name" required placeholder="Your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label>College / Institution <span class="field-req">*</span></label>
+                        <input type="text" id="college" name="college" required
+                            placeholder="Where do you study or work?">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 2rem;">
+                        <label>How did Classgrid help you? <span class="field-req">*</span></label>
+                        <textarea id="helped" name="helped" required
+                            placeholder="Share your experience with Classgrid…"></textarea>
+                        <div class="char-counter"><span id="helpedCount">0</span> / 500</div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 2rem;">
+                        <label>Rating <span class="field-req">*</span></label>
+                        <div class="star-rating" id="starRating">
+                            <span class="star" data-val="1">★</span>
+                            <span class="star" data-val="2">★</span>
+                            <span class="star" data-val="3">★</span>
+                            <span class="star" data-val="4">★</span>
+                            <span class="star" data-val="5">★</span>
+                        </div>
+                        <input type="hidden" id="rating" name="rating" value="0">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 2rem;">
+                        <label>Suggestion <span
+                                style="color:var(--dim); font-weight:400; text-transform:none; letter-spacing:0;">(optional)</span></label>
+                        <textarea id="suggestion" name="suggestion"
+                            placeholder="Ideas to make Classgrid even better…"></textarea>
+                        <div class="char-counter"><span id="suggestionCount">0</span> / 500</div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span>Submit Review</span>
+                    </button>
+
+                    <div class="message success-message" id="successMessage">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Your review is live — thank you!</span>
+                    </div>
+                    <div class="message error-message" id="errorMessage">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="errorText">Something went wrong. Please try again.</span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- REVIEWS BLOCK -->
+            <div class="reviews-block" id="reviewsBlock">
+                <div class="block-header">
+                    <div class="block-num">02</div>
+                    <div class="block-title">Community Reviews</div>
+                </div>
+
+                <div class="reviews-toolbar">
+                    <span style="font-size:0.82rem; color:var(--muted);">What our users are saying</span>
+                    <button class="refresh-btn" onclick="loadReviews()">
+                        <i class="fas fa-arrows-rotate" style="font-size:0.7rem;"></i> Refresh
+                    </button>
+                </div>
+
+                <div class="reviews-list" id="reviewsList">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Loading reviews…</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Pill theme toggle -->
+    <div class="theme-pill" id="themePill">
+        <div class="theme-pill-option" data-mode="dark" id="optDark">
+            <i class="fas fa-moon"></i> Dark
+        </div>
+        <div class="theme-pill-option" data-mode="light" id="optLight">
+            <i class="fas fa-sun"></i> Light
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp }
+            from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmM3HWu-tvBoeS0ogfivcmFurJgOjm594",
+            authDomain: "classgrid-review-f169b.firebaseapp.com",
+            projectId: "classgrid-review-f169b",
+            storageBucket: "classgrid-review-f169b.firebasestorage.app",
+            messagingSenderId: "858123471532",
+            appId: "1:858123471532:web:47e05016257dbd9e51ad09"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const reviewForm = document.getElementById('reviewForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const reviewsList = document.getElementById('reviewsList');
+
+        // Char counters
+        ['helped', 'suggestion'].forEach(id => {
+            const ta = document.getElementById(id);
+            const counter = document.getElementById(id === 'helped' ? 'helpedCount' : 'suggestionCount');
+            ta.addEventListener('input', () => {
+                if (ta.value.length > 500) ta.value = ta.value.slice(0, 500);
+                counter.textContent = ta.value.length;
+            });
+        });
+
+        // Star rating
+        const stars = document.querySelectorAll('.star');
+        let selectedRating = 0;
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.val);
+                document.getElementById('rating').value = selectedRating;
+                stars.forEach(s => s.classList.toggle('active', parseInt(s.dataset.val) <= selectedRating));
+            });
+            star.addEventListener('mouseover', () => {
+                stars.forEach(s => s.classList.toggle('hover', parseInt(s.dataset.val) <= parseInt(star.dataset.val)));
+            });
+            star.addEventListener('mouseout', () => {
+                stars.forEach(s => s.classList.remove('hover'));
+            });
+        });
+
+        // Submit
+        reviewForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const college = document.getElementById('college').value.trim();
+            const helped = document.getElementById('helped').value.trim();
+            const suggestion = document.getElementById('suggestion').value.trim();
+            const rating = parseInt(document.getElementById('rating').value);
+
+            if (!name || !college || !helped) { showErr('Please fill in all required fields.'); return; }
+            if (!rating) { showErr('Please select a star rating.'); return; }
+
+            submitBtn.disabled = true;
+            submitBtn.querySelector('span').textContent = 'Submitting…';
+            hide();
+
+            try {
+                await addDoc(collection(db, 'reviews'), {
+                    name,
+                    college,
+                    helped,
+                    suggestion,
+                    rating,
+                    approved: true,
+                    createdAt: serverTimestamp()
+                });
+                reviewForm.reset();
+                selectedRating = 0;
+                stars.forEach(s => s.classList.remove('active'));
+                document.getElementById('rating').value = 0;
+                document.getElementById('helpedCount').textContent = 0;
+                document.getElementById('suggestionCount').textContent = 0;
+                successMessage.classList.add('show');
+                await loadReviews();
+                // Smooth scroll to reviews section
+                setTimeout(() => {
+                    document.getElementById('reviewsBlock').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+                setTimeout(() => successMessage.classList.remove('show'), 5000);
+            } catch (err) {
+                showErr('Failed to post: ' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.querySelector('span').textContent = 'Submit Review';
+            }
+        });
+
+        function showErr(msg) { errorText.textContent = msg; errorMessage.classList.add('show'); setTimeout(() => errorMessage.classList.remove('show'), 5000); }
+        function hide() { successMessage.classList.remove('show'); errorMessage.classList.remove('show'); }
+
+        function initials(name) { return name.split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase(); }
+        function esc(t) { return t.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m])); }
+
+        window.loadReviews = async function () {
+            reviewsList.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><div class="loading-text">Loading reviews…</div></div>`;
+            try {
+                const q = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));
+                const snap = await getDocs(q);
+
+                if (snap.empty) {
+                    document.getElementById('reviewCount').textContent = '0';
+                    reviewsList.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fas fa-inbox"></i></div><div class="empty-text">No reviews yet — be the first to share your experience.</div></div>`;
+                    return;
+                }
+
+                document.getElementById('reviewCount').textContent = snap.size;
+                let num = snap.size;
+                let html = '';
+
+                snap.forEach(doc => {
+                    const r = doc.data();
+                    const n = r.name || 'Anonymous';
+                    const c = r.college || '';
+                    const h = r.helped || '';
+                    const sug = r.suggestion || '';
+                    const rat = r.rating || 0;
+                    const starsHtml = '★'.repeat(rat) + '<span style="color:var(--dim);">' + '★'.repeat(5 - rat) + '</span>';
+
+                    html += `
+                    <div class="review-item">
+                        <div class="review-item-header">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">${esc(initials(n))}</div>
+                                <div>
+                                    <div class="reviewer-name">${esc(n)}</div>
+                                    ${c ? `<div class="reviewer-college">${esc(c)}</div>` : ''}
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:0.75rem; flex-shrink:0;">
+                                ${rat ? `<span style="color:#f5a623; font-size:1.1rem; letter-spacing:2px; line-height:1;">${starsHtml}</span>` : ''}
+                                <span class="review-num-badge">#${num}</span>
+                            </div>
+                        </div>
+                        <div class="review-field-label">How Classgrid helped</div>
+                        <p class="review-text">${esc(h)}</p>
+                        ${sug ? `<div class="review-field-label">Suggestion</div><p class="review-text">${esc(sug)}</p>` : ''}
+                    </div>`;
+                    num--;
+                });
+
+                reviewsList.innerHTML = html;
+
+                // Stagger-animate items
+                const io = new IntersectionObserver(entries => {
+                    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+                }, { threshold: 0.05 });
+                reviewsList.querySelectorAll('.review-item').forEach((el, i) => {
+                    el.style.transitionDelay = (i * 0.04) + 's';
+                    io.observe(el);
+                });
+            } catch (err) {
+                reviewsList.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fas fa-triangle-exclamation"></i></div><div class="empty-text">Failed to load reviews: ${err.message}</div></div>`;
+            }
+        };
+
+        loadReviews();
+    </script>
+
+    <script>
+        // Theme toggle
+        const savedTheme = localStorage.getItem('cg-theme');
+        if (savedTheme === 'light') document.body.classList.add('light');
+        updatePillActive();
+
+        function updatePillActive() {
+            const isLight = document.body.classList.contains('light');
+            document.getElementById('optDark').classList.toggle('active', !isLight);
+            document.getElementById('optLight').classList.toggle('active', isLight);
+        }
+
+        document.getElementById('optDark').addEventListener('click', () => {
+            document.body.classList.remove('light');
+            localStorage.setItem('cg-theme', 'dark');
+            updatePillActive();
+        });
+        document.getElementById('optLight').addEventListener('click', () => {
+            document.body.classList.add('light');
+            localStorage.setItem('cg-theme', 'light');
+            updatePillActive();
+        });
+
+        // Hamburger
+        const ham = document.getElementById('hamBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        ham.addEventListener('click', () => {
+            ham.classList.toggle('open');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+        overlay.addEventListener('click', () => {
+            ham.classList.remove('open');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+
+        // Reading progress + back-to-top
+        const progressBar = document.getElementById('progressBar');
+        const backTop = document.getElementById('backTop');
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docH = document.documentElement.scrollHeight - window.innerHeight;
+            progressBar.style.width = (scrollTop / docH * 100) + '%';
+            backTop.classList.toggle('show', scrollTop > 300);
+        }, { passive: true });
+
+        // IntersectionObserver for blocks
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.form-block, .reviews-block').forEach(el => io.observe(el));
+    </script>
+
+</body>
+
+</html>

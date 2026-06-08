@@ -1,0 +1,15 @@
+main open: line 125, depth=0
+section <div class="page-section" id="section-faculty">: line 267, depth=1
+section <div class="page-section" id="section-students">: line 321, depth=1
+section <div class="page-section" id="section-classrooms">: line 392, depth=1
+section <div class="page-section" id="section-notes">: line 436, depth=1
+section <div class="page-section" id="section-announcements">: line 517, depth=1
+section <div class="page-section" id="section-analytics">: line 606, depth=1
+section <div class="page-section" id="section-attendance">: line 803, depth=0
+section <div class="page-section" id="section-billing">: line 925, depth=-1
+section <div class="page-section" id="section-organization">: line 999, depth=-1
+section <div class="page-section" id="section-security">: line 1043, depth=-1
+section <div class="page-section" id="section-sandbox">: line 1105, depth=-2
+section <div class="page-section" id="section-auditlog">: line 1172, depth=-2
+main closed: line 1229, depth=-3
+Final depth: -3

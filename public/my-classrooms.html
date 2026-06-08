@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        /* Auth Guard � runs BEFORE CSS/content to prevent any flash of protected content */
+        (function () {
+            var t = null; var hasUrlToken = window.location.search.indexOf('token=') !== -1;
+            if (t || hasUrlToken) {
+                window.addEventListener('pageshow', function (e) { if (e.persisted && !null) window.location.replace('/login.html'); });
+                window.addEventListener('storage', function (e) { if (e.key === 'jwt_token' && !e.newValue) window.location.replace('/login.html'); });
+                return;
+            }
+            var _cs = document.createElement('style'); _cs.id = '_ag'; _cs.textContent = 'body>*:not(script):not(style){visibility:hidden!important}'; document.head.appendChild(_cs);
+            var _cb = location.origin.includes('localhost') ? 'http://localhost:3000' : '';
+            var _tok = localStorage.getItem('jwt_token'); var _hdrs = { 'Cache-Control': 'no-store' }; if (_tok && _tok !== 'null' && _tok !== 'undefined') { _hdrs['Authorization'] = 'Bearer ' + _tok; } fetch(_cb + '/api/auth/me', { credentials: 'include', cache: 'no-store', headers: _hdrs })
+                .then(function (r) { if (r.ok) return r.json().then(function (u) { window._cookieAuthUser = u; var e = document.getElementById('_ag'); if (e) e.remove(); }); throw 0; })
+                .catch(function () { window.location.replace('/login.html'); });
+        })();
+    </script>
+    <script src="/app-state.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>My Classrooms | Classgrid</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --surface2: #141414;
+            --border: rgba(255, 255, 255, 0.07);
+            --border-hi: rgba(255, 255, 255, 0.15);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --muted: #888888;
+            --dim: #444444;
+            --sidebar-w: 240px;
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f97316;
+            --cyan: #4a90f5;
+            --cyan-dim: rgba(74, 144, 245, 0.1);
+            --silver: #aaaaaa;
+            --text-dim: #666666;
+            --glass-bg: #0f0f0f;
+            --glass-border: rgba(255, 255, 255, 0.07);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* -- READING PROGRESS -- */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 300;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: var(--grad-bp);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* -- COSMOS (kept for compat, hidden) -- */
+        .cosmos {
+            display: none;
+        }
+
+        /* -- NAVBAR -- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 200;
+            background: #000;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            gap: 1rem;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .nav-brand img {
+            border-radius: 6px;
+        }
+
+        .nav-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .nav-pill {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .btn-icon,
+        .nav-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.4rem 0.8rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-icon:hover,
+        .nav-icon-btn:hover {
+            background: rgba(74, 144, 245, 0.08);
+            border-color: rgba(74, 144, 245, 0.3);
+            color: var(--blue-light);
+        }
+
+        .nav-icon-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .nav-icon-label {
+            font-size: 0.75rem;
+        }
+
+        /* -- NAVBAR MOBILE -- */
+        @media (max-width: 640px) {
+            .navbar {
+                padding: 0 0.75rem;
+            }
+
+            .nav-brand span {
+                display: none;
+            }
+
+            .nav-icon-btn span {
+                display: none;
+            }
+
+            .main-content {
+                padding-top: 5rem;
+            }
+
+            /* Fix: Align "Join with Class Code" section to left on mobile */
+            .join-section {
+                align-items: flex-start;
+                padding-left: 0;
+            }
+
+            .join-section .form-group {
+                align-items: flex-start;
+                width: 100%;
+            }
+
+            .join-section .form-input {
+                width: 100%;
+            }
+
+            /* Hide the user pill � too wide on phones */
+            .nav-pill {
+                display: none;
+            }
+
+            /* Compact icon-only buttons */
+            .nav-icon-btn {
+                width: 38px;
+                height: 38px;
+                padding: 0;
+                justify-content: center;
+                border-radius: 10px;
+                flex-shrink: 0;
+            }
+
+            /* Keep brand compact but visible */
+            .nav-brand {
+                font-size: 0;
+                /* hide "Classgrid" text */
+                gap: 0;
+            }
+
+            .nav-brand img {
+                margin-right: 0 !important;
+                height: 32px !important;
+            }
+        }
+
+        /* -- CONTAINER -- */
+        .container {
+            margin-top: 60px;
+            padding: 3rem 4rem 5rem;
+            max-width: 1100px;
+        }
+
+        /* -- PAGE TITLE -- */
+        .page-title {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            color: #fff;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+        }
+
+        .page-title span {
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+            color: var(--muted);
+            max-width: 560px;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        /* -- SECTION ANIMATION -- */
+        .sec {
+            opacity: 0;
+            transform: translateY(20px);
+            transition:
+                opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            margin-bottom: 3rem;
+        }
+
+        .sec.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* -- JOIN SECTION -- */
+        .join-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .join-section .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.45rem;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            padding: 0.75rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: rgba(74, 144, 245, 0.5);
+            box-shadow: 0 0 0 3px rgba(74, 144, 245, 0.08);
+        }
+
+        /* -- BUTTONS -- */
+        .btn {
+            padding: 0.75rem 1.4rem;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--grad-bp);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(74, 144, 245, 0.2);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .btn-glass:hover {
+            background: rgba(74, 144, 245, 0.08);
+            border-color: rgba(74, 144, 245, 0.3);
+            color: var(--blue-light);
+        }
+
+        .btn-sm {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        /* -- TABS -- */
+        .tab-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .tab-btn.active {
+            color: var(--blue-light);
+            background: rgba(74, 144, 245, 0.1);
+        }
+
+        .tab-btn .badge {
+            background: var(--orange);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* -- CLASSROOM GRID & CARDS -- */
+        .classroom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .cc {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: border-color 0.2s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cc:hover {
+            border-color: var(--border-hi);
+            transform: translateY(-2px);
+        }
+
+        .cc-subject {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(74, 144, 245, 0.08);
+            border: 1px solid rgba(74, 144, 245, 0.2);
+            border-radius: 50px;
+            padding: 3px 12px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--blue-light);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.7rem;
+        }
+
+        .cc-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .cc-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .cc-teacher {
+            font-size: 0.78rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cc-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--dim);
+        }
+
+        .cc-stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .cc-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        /* -- STATUS BADGES -- */
+        .status-badge {
+            font-size: 0.68rem;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-weight: 700;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .status-approved {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+
+        .status-pending {
+            background: rgba(249, 115, 22, 0.08);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            color: #fdba74;
+        }
+
+        /* -- EMPTY STATE -- */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--dim);
+        }
+
+        .empty-state .ei {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+            display: block;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 1rem;
+            color: var(--muted);
+            margin-bottom: 0.35rem;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .empty-state p {
+            font-size: 0.82rem;
+            color: var(--dim);
+        }
+
+        /* -- GENERIC CARD -- */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #fff;
+        }
+
+        .card-title i {
+            color: var(--blue-light);
+        }
+
+        /* -- TOAST -- */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            font-size: 0.875rem;
+        }
+
+        .toast.success {
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+
+        .toast.error {
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* -- SKELETON LOADING -- */
+        @keyframes shimmer {
+            0% {
+                background-position: -600px 0
+            }
+
+            100% {
+                background-position: 600px 0
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, .03) 0%,
+                    rgba(255, 255, 255, .08) 40%,
+                    rgba(255, 255, 255, .03) 80%);
+            background-size: 600px 100%;
+            animation: shimmer 1.4s infinite linear;
+            border-radius: 8px;
+        }
+
+        .skeleton-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .skeleton-line {
+            height: 12px;
+            border-radius: 6px;
+        }
+
+        .skeleton-line.w-40 {
+            width: 40%
+        }
+
+        .skeleton-line.w-60 {
+            width: 60%
+        }
+
+        .skeleton-line.w-80 {
+            width: 80%
+        }
+
+        .skeleton-line.w-full {
+            width: 100%
+        }
+
+        .skeleton-line.h-20 {
+            height: 20px
+        }
+
+        /* -- RESPONSIVE -- */
+        @media (max-width: 768px) {
+            .classroom-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .join-section {
+                flex-direction: column;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cosmos"></div>
+    <nav class="navbar">
+        <a href="/" class="nav-brand"><img src="/Classgrid.png" alt="Classgrid Logo"
+                style="height:28px; width:auto; margin-right:8px;"> Classgrid</a>
+        <div class="nav-right">
+            <div class="nav-pill"><i class="fas fa-user-graduate"></i> <span id="navName">Student</span></div>
+            <a href="/classroom" class="nav-icon-btn" title="Dashboard">
+                <i class="fas fa-th-large"></i>
+                <span class="nav-icon-label">Dashboard</span>
+            </a>
+            <a href="/my-classrooms" class="nav-icon-btn" title="My Classrooms">
+                <i class="fas fa-school"></i>
+                <span class="nav-icon-label">Classes</span>
+            </a>
+            <button class="nav-icon-btn danger" onclick="logout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="nav-icon-label">Logout</span>
+            </button>
+        </div>
+    </nav>
+    <div class="container">
+        <h1 class="page-title"><span>My Classrooms</span></h1>
+        <p class="page-subtitle">Join classrooms, access materials, and chat with your class.</p>
+
+        <!-- Join by Code -->
+        <div class="join-section">
+            <div class="form-group"><label class="form-label">Join with Class Code</label><input class="form-input"
+                    id="joinCode" placeholder="e.g., YQCX515807" style="text-transform:uppercase"></div>
+            <button class="btn btn-primary" onclick="joinByCode()" id="joinBtn"><i class="fas fa-door-open"></i> Join
+                Classroom</button>
+        </div>
+
+        <!-- Tabs -->
+        <div
+            style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; padding-bottom: 0.5rem;">
+            <div class="tab-nav" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                <button class="tab-btn active" onclick="switchTab(this,'my')"><i class="fas fa-book-open"></i> My
+                    Classrooms</button>
+                <button class="tab-btn" onclick="switchTab(this,'pending')"><i class="fas fa-hourglass-half"></i>
+                    Pending
+                    <span class="badge" id="pendingBadge" style="display:none">0</span></button>
+                <button class="tab-btn" onclick="switchTab(this,'discover')"><i class="fas fa-compass"></i>
+                    Discover</button>
+            </div>
+            <button onclick="loadMyClassrooms()" class="btn-icon-small" title="Refresh Classrooms"
+                style="background:transparent; border:none; color:var(--muted); cursor:pointer; padding:6px; border-radius:6px;"><i
+                    class="fas fa-sync-alt"></i></button>
+        </div>
+
+        <div class="tab-content active" id="tab-my">
+            <div class="classroom-grid" id="myGrid"></div>
+        </div>
+        <div class="tab-content" id="tab-pending">
+            <div class="classroom-grid" id="pendingGrid"></div>
+        </div>
+        <div class="tab-content" id="tab-discover">
+            <div style="margin-bottom:1rem"><input class="form-input" id="searchInput"
+                    placeholder="Search classrooms..." oninput="loadDiscover()" style="max-width:350px"></div>
+            <div class="classroom-grid" id="discoverGrid"></div>
+        </div>
+    </div>
+    <div id="toast" style="display:none"></div>
+    <script>
+        let token = localStorage.getItem('jwt_token');
+        let currentUser = null;
+
+        async function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tokenParam = urlParams.get('token');
+            if (tokenParam) {
+                token = tokenParam;
+
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            if (!token) { location.href = '/login'; return; }
+
+            // Show skeleton immediately so page has height and is scrollable
+            showSkeletonGrids();
+
+            try {
+                const res = await apiFetch('/api/auth/me');
+                const data = await res.json();
+                currentUser = data.user || data;
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                document.getElementById('navName').textContent = currentUser.name;
+
+                // Guard: no org ? show join-by-code prompt instead of calling APIs that will 403
+                if (!currentUser.organization) {
+                    document.getElementById('myGrid').innerHTML = '<div class="empty-state"><h3>Join a Classroom First</h3><p>Enter a class code above to join your first classroom and get connected to an organization.</p></div>';
+                    document.getElementById('pendingGrid').innerHTML = '<div class="empty-state"><h3>No pending requests</h3></div>';
+                    return;
+                }
+
+                await loadMyClassrooms();
+            } catch { location.href = '/login'; }
+        }
+
+        function apiFetch(url, o = {}) { return fetch(url, { ...o, headers: { 'Content-Type': 'application/json', ...(o.headers || {}) } }); }
+        async function logout() { try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch (e) { } if (window.AppState) { window.AppState.clearAll(); } else { localStorage.removeItem('jwt_token'); sessionStorage.clear(); } window.location.replace('/login.html'); }
+        function switchTab(btn, name) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + name).classList.add('active');
+            btn.classList.add('active');
+            if (name === 'discover') loadDiscover();
+        }
+
+        async function loadMyClassrooms() {
+            // Guard: no org
+            if (!currentUser?.organization) {
+                document.getElementById('myGrid').innerHTML = '<div class="empty-state"><h3>Join a Classroom First</h3><p>Enter a class code above to join your first classroom.</p></div>';
+                return;
+            }
+            // Show skeleton while fetching
+            document.getElementById('myGrid').innerHTML = skeletonCard() + skeletonCard() + skeletonCard();
+            const res = await apiFetch('/api/classrooms');
+            const data = await res.json();
+            const all = data.classrooms || [];
+            const approved = all.filter(c => c.membershipStatus === 'approved');
+            const pending = all.filter(c => c.membershipStatus === 'pending');
+            document.getElementById('myGrid').innerHTML = approved.length ? approved.map(c => classroomCard(c, 'approved')).join('') : '<div class="empty-state"><h3>No classrooms yet</h3><p>Join a classroom using a class code or browse available classrooms.</p></div>';
+            document.getElementById('pendingGrid').innerHTML = pending.length ? pending.map(c => classroomCard(c, 'pending')).join('') : '<div class="empty-state"><h3>No pending requests</h3></div>';
+            const pb = document.getElementById('pendingBadge');
+            pb.textContent = pending.length; pb.style.display = pending.length > 0 ? 'inline' : 'none';
+        }
+
+        function classroomCard(c, status) {
+            const teacherName = c.teacher?.name || 'Teacher';
+            const teacherImg = c.teacher?.profilePicture
+                ? `<img src="${esc(c.teacher.profilePicture)}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,212,255,0.5)">`
+                : `<i class="fas fa-user-tie"></i>`;
+
+            return `<div class="cc">
+        <span class="status-badge status-${status}">${status === 'approved' ? '? Approved' : '? Pending'}</span>
+        <span class="cc-subject">${esc(c.subject || c.subjectSlug)}</span>
+        <div class="cc-name">${esc(c.name)}</div>
+        <div class="cc-desc">${esc(c.description || 'No description')}</div>
+        <div class="cc-teacher" style="display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:1rem">${teacherImg} ${esc(teacherName)}</div>
+        <div class="cc-stats"><span><i class="fas fa-users"></i> ${c.memberCount || 0}</span><span><i class="fas fa-calendar"></i> ${timeAgo(c.createdAt)}</span></div>
+        ${status === 'approved' ? `<div class="cc-actions">
+            <a href="/view-classroom.html?id=${c._id}" class="btn btn-primary btn-sm"><i class="fas fa-arrow-right"></i> Open</a>
+            <a href="/classroom-chat?id=${c._id}" class="btn btn-glass btn-sm"><i class="fas fa-comments"></i> Chat</a>
+        </div>` : ''}
+    </div>`;
+        }
+
+        async function loadDiscover() {
+            const grid = document.getElementById('discoverGrid');
+            // Guard: no org ? can't discover org classrooms
+            if (!currentUser?.organization) {
+                grid.innerHTML = '<div class="empty-state"><h3>Organization Required</h3><p>Join a classroom via class code first to connect to an organization, then you can browse available classrooms.</p></div>';
+                return;
+            }
+            const search = document.getElementById('searchInput').value;
+            const res = await apiFetch(`/api/classrooms/discover?search=${encodeURIComponent(search)}`);
+            const data = await res.json();
+            const cls = data.classrooms || [];
+            grid.innerHTML = cls.length ? cls.map(c => {
+                const st = c.membershipStatus;
+                const tImg = c.teacher?.profilePicture
+                    ? `<img src="${esc(c.teacher.profilePicture)}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,212,255,0.5)">`
+                    : `<i class="fas fa-user-tie"></i>`;
+
+                return `<div class="cc">
+            ${st ? `<span class="status-badge status-${st}">${st === 'approved' ? '? Member' : '? Pending'}</span>` : ''}
+            <span class="cc-subject">${esc(c.subject)}</span>
+            <div class="cc-name">${esc(c.name)}</div>
+            <div class="cc-desc">${esc(c.description || '')}</div>
+            <div class="cc-teacher" style="display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:1rem">${tImg} ${esc(c.teacher?.name)}</div>
+            <div class="cc-stats"><span><i class="fas fa-users"></i> ${c.memberCount || 0}</span></div>
+            <div class="cc-actions">
+                ${!st ? `<button class="btn btn-primary btn-sm" onclick="joinById('${c._id}')"><i class="fas fa-plus"></i> Request to Join</button>` : `<span style="font-size:.78rem;color:var(--silver);padding:.4rem">${st === 'approved' ? 'Already a member' : 'Request pending'}</span>`}
+            </div>
+        </div>`;
+            }).join('') : '<div class="empty-state"><h3>No classrooms found</h3></div>';
+        }
+
+        async function joinByCode() {
+            const code = document.getElementById('joinCode').value.trim().toUpperCase();
+            if (!code) { showToast('Enter a class code', 'error'); return; }
+            const btn = document.getElementById('joinBtn');
+            btn.disabled = true;
+            try {
+                const res = await apiFetch('/api/classrooms/join-by-code', { method: 'POST', body: JSON.stringify({ classCode: code }) });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Validation error');
+                showToast(data.message, 'success');
+                document.getElementById('joinCode').value = '';
+
+                // Refresh user state to get new organization
+                const meRes = await apiFetch('/api/auth/me');
+                if (meRes.ok) {
+                    const meData = await meRes.json();
+                    currentUser = meData.user || meData;
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                }
+
+                await loadMyClassrooms();
+            } catch (e) {
+                showToast(e.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function joinById(id) {
+            try {
+                const res = await apiFetch(`/api/classrooms/${id}/join`, { method: 'POST', body: '{}' });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message);
+                showToast(data.message, 'success');
+                await loadMyClassrooms(); loadDiscover();
+            } catch (e) { showToast(e.message, 'error'); }
+        }
+
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.className = 'toast ' + type;
+            t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}" style="color:var(--${type === 'success' ? 'green' : 'red'})"></i> ${msg}`;
+            t.style.display = 'flex';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        function timeAgo(d) {
+            if (!d) return ''; const ms = Date.now() - new Date(d).getTime(), m = Math.floor(ms / 60000), h = Math.floor(ms / 3600000), dy = Math.floor(ms / 86400000);
+            if (m < 1) return 'Just now'; if (m < 60) return m + 'm ago'; if (h < 24) return h + 'h ago'; if (dy < 7) return dy + 'd ago';
+            return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        }
+        function esc(s) { if (!s) return ''; return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+        function skeletonCard() {
+            return `<div class="skeleton-card">
+                <div class="skeleton skeleton-line w-40"></div>
+                <div class="skeleton skeleton-line h-20 w-80"></div>
+                <div class="skeleton skeleton-line w-full"></div>
+                <div class="skeleton skeleton-line w-60"></div>
+                <div style="margin-top:auto;display:flex;gap:.5rem">
+                    <div class="skeleton skeleton-line" style="width:80px;height:32px;border-radius:6px"></div>
+                    <div class="skeleton skeleton-line" style="width:64px;height:32px;border-radius:6px"></div>
+                </div>
+            </div>`;
+        }
+
+        function showSkeletonGrids() {
+            const myGrid = document.getElementById('myGrid');
+            const pendingGrid = document.getElementById('pendingGrid');
+            if (myGrid) myGrid.innerHTML = skeletonCard() + skeletonCard() + skeletonCard();
+            if (pendingGrid) pendingGrid.innerHTML = '<div class="empty-state"><h3 style="opacity:.4">Loading...</h3></div>';
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+
+</html>

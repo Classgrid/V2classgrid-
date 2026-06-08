@@ -1,0 +1,1236 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <script>
+        /* Auth Guard — runs BEFORE CSS/content to prevent any flash of protected content */
+        (function () {
+            var t = null; var hasUrlToken = window.location.search.indexOf('token=') !== -1;
+            if (t || hasUrlToken) {
+                window.addEventListener('pageshow', function (e) { if (e.persisted && !null) window.location.replace('/login.html'); });
+                window.addEventListener('storage', function (e) { if (e.key === 'jwt_token' && !e.newValue) window.location.replace('/login.html'); });
+                return;
+            }
+            var _cs = document.createElement('style'); _cs.id = '_ag'; _cs.textContent = 'body>*:not(script):not(style){visibility:hidden!important}'; document.head.appendChild(_cs);
+            var _cb = location.origin.includes('localhost') ? 'http://localhost:3000' : '';
+            var _tok = localStorage.getItem('jwt_token'); var _hdrs = { 'Cache-Control': 'no-store' }; if (_tok && _tok !== 'null' && _tok !== 'undefined') { _hdrs['Authorization'] = 'Bearer ' + _tok; } fetch(_cb + '/api/auth/me', { credentials: 'include', cache: 'no-store', headers: _hdrs })
+                .then(function (r) { if (r.ok) return r.json().then(function (u) { window._cookieAuthUser = u; var e = document.getElementById('_ag'); if (e) e.remove(); }); throw 0; })
+                .catch(function () { window.location.replace('/login.html'); });
+        })();
+    </script>
+    <script src="/app-state.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Attendance Detail | Classgrid</title>
+    <meta name="description" content="Detailed attendance data for a classroom session on Classgrid.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        /* ── THEME VARIABLES ── */
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --surface2: #191919;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hi: rgba(255, 255, 255, 0.16);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --text-body: rgba(255, 255, 255, 0.92);
+            --muted: #888888;
+            --dim: #444444;
+            --green: #00c896;
+            --red: #ff4757;
+            --orange: #ff9f43;
+            --table-row-hover: rgba(255, 255, 255, 0.03);
+        }
+
+        [data-theme="light"] {
+            --bg: #f8f9fc;
+            --surface: #ffffff;
+            --surface2: #f0f2f5;
+            --border: rgba(0, 0, 0, 0.08);
+            --border-hi: rgba(0, 0, 0, 0.14);
+            --blue: #3b7ddd;
+            --blue-light: #3b7ddd;
+            --grad-bp: linear-gradient(135deg, #3b7ddd 0%, #7c5cfc 100%);
+            --text: #1a1a2e;
+            --text-body: #2d2d3f;
+            --muted: #6e7591;
+            --dim: #b0b7c8;
+            --green: #05a77b;
+            --red: #e53e3e;
+            --orange: #dd8a2e;
+            --table-row-hover: rgba(0, 0, 0, 0.02);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            text-decoration: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            transition: all .2s;
+        }
+
+        .back-btn:hover {
+            color: var(--text);
+            border-color: var(--blue)
+        }
+
+        .topbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none
+        }
+
+        .topbar-logo img {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            border: 1.5px solid rgba(74, 144, 245, .25)
+        }
+
+        .topbar-logo span {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: .88rem;
+            color: var(--text)
+        }
+
+        .topbar-logo em {
+            font-style: normal;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 14px;
+            transition: all .2s;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text);
+            border-color: var(--blue)
+        }
+
+        /* ── CONTENT ── */
+        .wrap {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 24px 20px 60px
+        }
+
+        /* Hero header */
+        .att-hero {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px 24px 24px;
+            margin-bottom: 16px;
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .att-hero .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(0, 200, 150, .08);
+            border: 1px solid rgba(0, 200, 150, .2);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--green);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .att-hero .page-badge.expired {
+            background: rgba(255, 159, 67, .08);
+            border-color: rgba(255, 159, 67, .2);
+            color: var(--orange);
+        }
+
+        .att-hero .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor
+        }
+
+        .att-hero h1 {
+            font-size: clamp(1.3rem, 3.5vw, 1.75rem);
+            font-weight: 800;
+            letter-spacing: -.5px;
+            color: var(--text);
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .att-hero h1 span {
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        .att-hero .meta {
+            font-size: .82rem;
+            color: var(--muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .att-hero .meta i {
+            margin-right: 4px;
+            font-size: .75rem
+        }
+
+        /* Summary cards */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+            animation: fadeUp 0.5s ease .1s both
+        }
+
+        .sum-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .25s ease;
+            user-select: none;
+        }
+
+        .sum-card:hover {
+            border-color: var(--border-hi);
+            transform: translateY(-2px);
+        }
+
+        .sum-card.active-filter {
+            transform: translateY(-2px);
+        }
+
+        .sum-card.active-filter.filter-total {
+            border-color: var(--blue);
+            box-shadow: 0 0 12px rgba(74, 144, 245, .15);
+        }
+
+        .sum-card.active-filter.filter-present {
+            border-color: var(--green);
+            box-shadow: 0 0 12px rgba(0, 200, 150, .15);
+        }
+
+        .sum-card.active-filter.filter-absent {
+            border-color: var(--red);
+            box-shadow: 0 0 12px rgba(255, 71, 87, .15);
+        }
+
+        .sum-val {
+            font-family: 'Sora', sans-serif;
+            font-size: 30px;
+            font-weight: 900
+        }
+
+        .sum-val.total {
+            color: var(--blue)
+        }
+
+        .sum-val.present {
+            color: var(--green)
+        }
+
+        .sum-val.absent {
+            color: var(--red)
+        }
+
+        .sum-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: 4px
+        }
+
+        /* Search */
+        .search-bar {
+            margin-bottom: 16px;
+            animation: fadeUp 0.5s ease .15s both
+        }
+
+        .search-bar input {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 16px 11px 38px;
+            font-size: 13px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--blue)
+        }
+
+        .search-bar input::placeholder {
+            color: var(--dim)
+        }
+
+        .search-wrap {
+            position: relative
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--dim);
+            font-size: 13px
+        }
+
+        /* Table */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            animation: fadeUp 0.5s ease .2s both;
+        }
+
+        .att-table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        .att-table thead th {
+            font-family: 'Sora', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--dim);
+            padding: 13px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface2);
+        }
+
+        .att-table tbody td {
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+            color: var(--text-body);
+        }
+
+        .att-table tbody tr:last-child td {
+            border-bottom: none
+        }
+
+        .att-table tbody tr:hover {
+            background: var(--table-row-hover)
+        }
+
+        .att-table .prn-col {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            color: var(--blue);
+            white-space: nowrap;
+            font-size: 12px;
+            letter-spacing: .3px
+        }
+
+        .att-table .name-col {
+            font-weight: 600;
+            color: var(--text)
+        }
+
+        .att-table .email-col {
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        .status-present {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--green);
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        .status-absent {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--red);
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        .sec-flag-warning {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--orange);
+            background: rgba(255, 159, 67, 0.1);
+            border: 1px solid rgba(255, 159, 67, 0.2);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: help;
+        }
+
+        .sec-flag-ok {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--green);
+            background: rgba(0, 200, 150, 0.1);
+            border: 1px solid rgba(0, 200, 150, 0.2);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Empty */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--muted)
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            opacity: .25;
+            margin-bottom: 12px;
+            display: block
+        }
+
+        .empty-state h4 {
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text)
+        }
+
+        .empty-state p {
+            font-size: 13px
+        }
+
+        /* Loading spinner */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted)
+        }
+
+        .loading i {
+            font-size: 22px
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @media(max-width:600px) {
+            .summary {
+                grid-template-columns: 1fr 1fr 1fr
+            }
+
+            .sum-val {
+                font-size: 22px
+            }
+
+            .att-table thead th,
+            .att-table tbody td {
+                padding: 10px 10px;
+                font-size: 12px
+            }
+
+            .att-hero {
+                padding: 20px 16px
+            }
+
+            .att-hero h1 {
+                font-size: 1.15rem
+            }
+
+            .wrap {
+                padding: 16px 12px 40px
+            }
+        }
+
+        @media(max-width:420px) {
+
+            .email-col,
+            .email-head {
+                display: none
+            }
+        }
+
+        /* ── TABS ── */
+        .att-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 6px;
+            animation: fadeUp 0.45s ease .08s both;
+        }
+
+        .att-tab {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .att-tab:hover {
+            color: var(--text);
+            background: var(--surface2);
+        }
+
+        .att-tab.active {
+            background: var(--blue);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(74, 144, 245, .25);
+        }
+
+        .att-tab i {
+            font-size: 12px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ── INFO CARDS (How It Works tab) ── */
+        .info-section {
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .info-section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text);
+            margin: 20px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-section-title:first-child {
+            margin-top: 0;
+        }
+
+        .info-section-title i {
+            color: var(--blue);
+            font-size: 14px;
+        }
+
+        .info-flow {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .flow-step {
+            flex: 1;
+            min-width: 140px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            position: relative;
+        }
+
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--dim);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .flow-step:last-child::after {
+            display: none;
+        }
+
+        .flow-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--blue);
+            color: #fff;
+            font-family: 'Sora', sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .flow-step h5 {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .flow-step p {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .flag-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
+        }
+
+        .flag-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all .2s;
+        }
+
+        .flag-card:hover {
+            border-color: var(--border-hi);
+            transform: translateY(-2px);
+        }
+
+        .flag-card .flag-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .flag-card .flag-icon.warn {
+            background: rgba(255, 159, 67, 0.12);
+            color: var(--orange);
+        }
+
+        .flag-card .flag-icon.danger {
+            background: rgba(255, 71, 87, 0.12);
+            color: var(--red);
+        }
+
+        .flag-card .flag-icon.safe {
+            background: rgba(0, 200, 150, 0.12);
+            color: var(--green);
+        }
+
+        .flag-card h5 {
+            font-family: 'Sora', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .flag-card p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .flag-card .flag-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .flag-tag.blocked {
+            background: rgba(255, 71, 87, 0.12);
+            color: var(--red);
+        }
+
+        .flag-tag.flagged {
+            background: rgba(255, 159, 67, 0.12);
+            color: var(--orange);
+        }
+
+        .flag-tag.clean {
+            background: rgba(0, 200, 150, 0.12);
+            color: var(--green);
+        }
+
+        .security-note {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .security-note i {
+            color: var(--blue);
+            font-size: 16px;
+            margin-top: 2px;
+        }
+
+        .security-note p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .security-note strong {
+            color: var(--text);
+        }
+
+        @media(max-width:600px) {
+            .info-flow {
+                flex-direction: column;
+            }
+
+            .flow-step::after {
+                display: none;
+            }
+
+            .flag-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <a class="back-btn" id="backBtn" href="/classroom"><i class="fas fa-arrow-left"></i> Back</a>
+            <a class="topbar-logo" href="/classroom">
+                <img src="/Classgrid.png" alt="Classgrid">
+                <span>Class<em>grid</em></span>
+            </a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    <!-- Main content -->
+    <div class="wrap">
+        <div class="att-hero" id="attHero">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i></div>
+        </div>
+
+        <div class="summary" id="attSummary" style="display:none">
+            <div class="sum-card" id="filterAll" onclick="setFilter('all')">
+                <div class="sum-val total" id="sumTotal">0</div>
+                <div class="sum-label">Total Students</div>
+            </div>
+            <div class="sum-card" id="filterPresent" onclick="setFilter('present')">
+                <div class="sum-val present" id="sumPresent">0</div>
+                <div class="sum-label">Present</div>
+            </div>
+            <div class="sum-card" id="filterAbsent" onclick="setFilter('absent')">
+                <div class="sum-val absent" id="sumAbsent">0</div>
+                <div class="sum-label">Absent</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="att-tabs" id="attTabs" style="display:none">
+            <button class="att-tab active" onclick="switchTab('data')" id="tabData">
+                <i class="fas fa-users"></i> Student Data
+            </button>
+            <button class="att-tab" onclick="switchTab('info')" id="tabInfo">
+                <i class="fas fa-shield-alt"></i> How It Works
+            </button>
+        </div>
+
+        <!-- Tab 1: Student Data (existing content) -->
+        <div class="tab-content active" id="tabContentData">
+            <div class="search-bar" id="searchBar" style="display:none">
+                <div class="search-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search by PRN, Name, or Email…"
+                        oninput="filterTable()">
+                </div>
+            </div>
+            <div id="tableWrap"></div>
+        </div>
+
+        <!-- Tab 2: How It Works -->
+        <div class="tab-content" id="tabContentInfo">
+            <div class="info-section">
+                <div class="info-section-title"><i class="fas fa-route"></i> Attendance Flow</div>
+                <div class="info-flow">
+                    <div class="flow-step">
+                        <div class="flow-num">1</div>
+                        <h5>Teacher Starts</h5>
+                        <p>Enters a secret code, GPS location is captured automatically</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-num">2</div>
+                        <h5>Students Notified</h5>
+                        <p>Email + in-app notification sent to all enrolled students</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-num">3</div>
+                        <h5>Student Marks</h5>
+                        <p>Enters code on phone. GPS + device fingerprint sent automatically</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-num">4</div>
+                        <h5>6 Security Checks</h5>
+                        <p>Code, GPS, time, device, paste, multi-account — all verified</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-num" style="background:var(--green)">✓</div>
+                        <h5>Result</h5>
+                        <p>Present ✅, Flagged ⚠️, or Blocked ❌</p>
+                    </div>
+                </div>
+
+                <div class="info-section-title"><i class="fas fa-flag"></i> Flag Reasons Explained</div>
+                <div class="flag-grid">
+                    <div class="flag-card">
+                        <div class="flag-icon warn"><i class="fas fa-paste"></i></div>
+                        <h5>Pasted Code</h5>
+                        <p>Student pasted the attendance code instead of typing it. This suggests someone shared the
+                            code via text message.</p>
+                        <span class="flag-tag flagged">⚠ Flagged</span>
+                    </div>
+                    <div class="flag-card">
+                        <div class="flag-icon warn"><i class="fas fa-map-marker-alt"></i></div>
+                        <h5>Not in Classroom (GPS)</h5>
+                        <p>Student's GPS location is farther than the allowed radius from the teacher's location. They
+                            may not be physically present.</p>
+                        <span class="flag-tag flagged">⚠ Flagged</span>
+                    </div>
+                    <div class="flag-card">
+                        <div class="flag-icon warn"><i class="fas fa-location-arrow"></i></div>
+                        <h5>GPS Denied</h5>
+                        <p>Student did not share their GPS location. Location permission was denied or unavailable on
+                            their device.</p>
+                        <span class="flag-tag flagged">⚠ Flagged</span>
+                    </div>
+                    <div class="flag-card">
+                        <div class="flag-icon warn"><i class="fas fa-mobile-alt"></i></div>
+                        <h5>Wrong Device</h5>
+                        <p>Student used a different device than their previously registered one. Could indicate someone
+                            else is marking for them.</p>
+                        <span class="flag-tag flagged">⚠ Flagged</span>
+                    </div>
+                    <div class="flag-card">
+                        <div class="flag-icon danger"><i class="fas fa-user-friends"></i></div>
+                        <h5>Cross-Account Device Abuse</h5>
+                        <p>Two or more student accounts tried to mark attendance from the same phone. Clear proxy
+                            attempt — second student is completely blocked.</p>
+                        <span class="flag-tag blocked">✕ Blocked</span>
+                    </div>
+                    <div class="flag-card">
+                        <div class="flag-icon safe"><i class="fas fa-shield-alt"></i></div>
+                        <h5>Secure (No Flags)</h5>
+                        <p>All 6 security checks passed. Student typed the code, was within GPS range, and used their
+                            own device.</p>
+                        <span class="flag-tag clean">✓ Clean</span>
+                    </div>
+                </div>
+
+                <div class="info-section-title"><i class="fas fa-lock"></i> Security Layers</div>
+                <div class="flag-grid">
+                    <div class="flag-card">
+                        <div class="flag-icon safe"><i class="fas fa-key"></i></div>
+                        <h5>Encrypted Code</h5>
+                        <p>Attendance code is hashed with bcrypt. Even the database never stores it in plain text.</p>
+                    </div>
+                    <div class="flag-card">
+                        <div class="flag-icon safe"><i class="fas fa-fingerprint"></i></div>
+                        <h5>Session Token</h5>
+                        <p>Each session gets a unique UUID token. Prevents API replay attacks and unauthorized marking.
+                        </p>
+                    </div>
+                    <div class="flag-card">
+                        <div class="flag-icon safe"><i class="fas fa-clock"></i></div>
+                        <h5>Time Window</h5>
+                        <p>Sessions expire after the duration you set (30s–10min). Server clock is used — students can't
+                            fake time.</p>
+                    </div>
+                    <div class="flag-card">
+                        <div class="flag-icon safe"><i class="fas fa-database"></i></div>
+                        <h5>One Mark Per Student</h5>
+                        <p>Database-level unique index prevents any student from marking twice in the same session.</p>
+                    </div>
+                </div>
+
+                <div class="security-note">
+                    <i class="fas fa-info-circle"></i>
+                    <p><strong>Important:</strong> Flagged students are still marked as <strong>Present</strong> — they
+                        are NOT marked absent. The flag is a warning for faculty review. Only the faculty can manually
+                        change a student's status using the override feature.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Theme ───────────────
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon();
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon();
+        });
+
+        function updateThemeIcon() {
+            const icon = document.querySelector('#themeToggle i');
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        // ── Data ────────────────
+        const TK = localStorage.getItem('jwt_token');
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000' : window.location.origin;
+        const params = new URLSearchParams(window.location.search);
+        const SESSION_ID = params.get('sessionId');
+        const CLASSROOM_ID = params.get('classroomId');
+
+        if (CLASSROOM_ID) {
+            document.getElementById('backBtn').href = `/view-classroom.html?id=${CLASSROOM_ID}#attendance`;
+        }
+
+        let ALL_STUDENTS = [];
+        let activeFilter = 'all';
+
+        function esc(s) { return s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : ''; }
+
+        async function loadDetail() {
+            const hero = document.getElementById('attHero');
+            if (!SESSION_ID || !TK) {
+                hero.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h4>Missing session ID or not logged in.</h4><p>Please go back and try again.</p></div>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/api/attendance/session/${SESSION_ID}/detail`, {
+                    headers: { 'Authorization': `Bearer ${TK}` }, credentials: 'include'
+                });
+                if (!res.ok) {
+                    const d = await res.json().catch(() => ({}));
+                    throw new Error(d.message || 'Failed to load session');
+                }
+                const data = await res.json();
+                renderData(data);
+            } catch (e) {
+                hero.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h4>${esc(e.message)}</h4><p>Could not load attendance data.</p></div>`;
+            }
+        }
+
+        function renderData(data) {
+            const { session, classroom, summary, students } = data;
+            ALL_STUDENTS = students;
+
+            // Update back link
+            if (classroom.id) {
+                document.getElementById('backBtn').href = `/view-classroom.html?id=${classroom.id}#attendance`;
+            }
+
+            // Header
+            const d = new Date(session.createdAt);
+            const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            const timeStr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const isActive = session.status === 'active';
+            const badgeClass = isActive ? '' : ' expired';
+            const badgeText = isActive ? 'Active' : 'Completed';
+
+            document.getElementById('attHero').innerHTML = `
+                <div class="page-badge${badgeClass}"><span class="badge-dot"></span>${badgeText}</div>
+                <h1>${esc(classroom.name)} — <span>${dateStr}</span></h1>
+                <div class="meta">
+                    <span><i class="fas fa-clock"></i>${timeStr}</span>
+                    ${classroom.subject ? `<span><i class="fas fa-book"></i>${esc(classroom.subject)}</span>` : ''}
+                    <span><i class="fas fa-users"></i>${summary.total} students</span>
+                </div>
+            `;
+
+            document.title = `${classroom.name} — ${dateStr} | Classgrid`;
+
+            // Summary
+            document.getElementById('sumTotal').textContent = summary.total;
+            document.getElementById('sumPresent').textContent = summary.present;
+            document.getElementById('sumAbsent').textContent = summary.absent;
+            document.getElementById('attSummary').style.display = '';
+            document.getElementById('searchBar').style.display = '';
+            document.getElementById('attTabs').style.display = '';
+
+            renderTable(students);
+        }
+
+        function renderTable(list) {
+            const wrap = document.getElementById('tableWrap');
+            if (!list.length) {
+                wrap.innerHTML = '<div class="table-card"><div class="empty-state"><i class="fas fa-users"></i><h4>No students found</h4><p>No matching results.</p></div></div>';
+                return;
+            }
+
+            const reasonMap = {
+                "paste_detected": "Pasted Code",
+                "gps_far": "Not in Classroom (GPS)",
+                "gps_not_provided": "GPS Denied",
+                "device_mismatch": "Wrong Device Used",
+                "multiple_accounts_same_device": "Cross-Account Device Abuse"
+            };
+
+            const formatReason = (r) => reasonMap[r] || r.replace(/_/g, ' ');
+
+            wrap.innerHTML = `<div class="table-card"><table class="att-table">
+                <thead><tr>
+                    <th>PRN / Roll No</th>
+                    <th>Name</th>
+                    <th class="email-head">Email</th>
+                    <th>Status</th>
+                    <th>Security Flag</th>
+                </tr></thead>
+                <tbody>${list.map(s => {
+                let flagHtml = '';
+                const isPresent = s.status === 'present' || s.status === 'present_suspicious';
+
+                if (isPresent) {
+                    if (s.suspicious) {
+                        const formattedReasons = (s.suspicionReasons || []).map(formatReason);
+                        const reasonsText = formattedReasons.length
+                            ? formattedReasons.join(' • ')
+                            : 'Flagged';
+                        flagHtml = `<span class="sec-flag-warning" title="${esc(reasonsText)}"><i class="fas fa-exclamation-triangle"></i> flagged</span><div style="font-size:10px; color:var(--orange); max-width:140px; word-break:break-word; margin-top:4px; line-height:1.3; font-weight:600;">${esc(reasonsText)}</div>`;
+                    } else {
+                        flagHtml = '<span class="sec-flag-ok"><i class="fas fa-shield-check"></i> secure</span>';
+                    }
+                } else {
+                    flagHtml = '<span style="color:var(--dim)">—</span>';
+                }
+
+                return `<tr>
+                    <td class="prn-col">${esc(s.prn)}</td>
+                    <td class="name-col">${esc(s.name)}</td>
+                    <td class="email-col">${esc(s.email)}</td>
+                    <td>${isPresent
+                        ? '<span class="status-present"><i class="fas fa-check-circle"></i> Present</span>'
+                        : '<span class="status-absent"><i class="fas fa-times-circle"></i> Absent</span>'
+                    }</td>
+                    <td>${flagHtml}</td>
+                </tr>`}).join('')}</tbody>
+            </table></div>`;
+        }
+
+        function setFilter(type) {
+            // Toggle off if clicking the same filter
+            if (activeFilter === type && type !== 'all') {
+                activeFilter = 'all';
+            } else {
+                activeFilter = type;
+            }
+            updateFilterUI();
+            filterTable();
+        }
+
+        function updateFilterUI() {
+            const cards = {
+                all: document.getElementById('filterAll'),
+                present: document.getElementById('filterPresent'),
+                absent: document.getElementById('filterAbsent')
+            };
+            Object.entries(cards).forEach(([key, el]) => {
+                el.classList.remove('active-filter', 'filter-total', 'filter-present', 'filter-absent');
+                if (activeFilter === key) {
+                    el.classList.add('active-filter');
+                    if (key === 'all') el.classList.add('filter-total');
+                    else if (key === 'present') el.classList.add('filter-present');
+                    else el.classList.add('filter-absent');
+                }
+            });
+        }
+
+        function filterTable() {
+            const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+            let filtered = ALL_STUDENTS;
+
+            // Apply status filter
+            if (activeFilter === 'present') {
+                filtered = filtered.filter(s => s.status !== 'absent');
+            } else if (activeFilter === 'absent') {
+                filtered = filtered.filter(s => s.status === 'absent');
+            }
+
+            // Apply search filter
+            if (q) {
+                filtered = filtered.filter(s =>
+                    (s.prn || '').toLowerCase().includes(q) ||
+                    (s.name || '').toLowerCase().includes(q) ||
+                    (s.email || '').toLowerCase().includes(q)
+                );
+            }
+
+            renderTable(filtered);
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tabData').classList.toggle('active', tab === 'data');
+            document.getElementById('tabInfo').classList.toggle('active', tab === 'info');
+            document.getElementById('tabContentData').classList.toggle('active', tab === 'data');
+            document.getElementById('tabContentInfo').classList.toggle('active', tab === 'info');
+            // Show/hide summary cards and search only for data tab
+            document.getElementById('attSummary').style.display = tab === 'data' ? '' : 'none';
+        }
+
+        loadDetail();
+    </script>
+</body>
+
+</html>

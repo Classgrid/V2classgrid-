@@ -1,0 +1,8 @@
+C:\Users\nikhi\OneDrive\Documents\Classgrid\classgrid_platform\public\js\org-admin.js:1669
+function openEditAnnouncementModal(id) {
+^
+
+SyntaxError: Identifier 'openEditAnnouncementModal' has already been declared
+    at checkSyntax (node:internal/main/check_syntax:72:5)
+
+Node.js v24.11.1

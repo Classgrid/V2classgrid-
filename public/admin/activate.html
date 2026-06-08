@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfszXMsAAAAAGeNSmNtsKs_VRxaH4vy8r-rs7fM"></script>
+    <script>window.RECAPTCHA_SITE_KEY = "6LfszXMsAAAAAGeNSmNtsKs_VRxaH4vy8r-rs7fM";</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Classgrid | Activate Admin Account</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hi: rgba(255, 255, 255, 0.16);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --muted: #888888;
+            --dim: #444444;
+            --error: #c62828;
+            --error-light: #ff5252;
+            --success: #2e7d32;
+            --success-light: #4caf50;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at top center, rgba(74, 144, 245, 0.05) 0%, transparent 50%);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            text-decoration: none;
+        }
+
+        .logo-box {
+            width: 44px;
+            height: 44px;
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 9.5px;
+            background: var(--grad-bp);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            border-radius: 7px;
+            z-index: 0;
+        }
+
+        .logo-box img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .brand-name em {
+            font-style: normal;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .brand-subtitle {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 400;
+            color: var(--muted);
+            font-size: 0.85rem;
+            display: block;
+        }
+
+        /* Load State */
+        #loaderState {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .page-loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--blue-light);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        /* State: error screen */
+        .state-screen {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .state-screen.visible {
+            display: block;
+        }
+
+        .state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .state-icon.error {
+            color: var(--error-light);
+        }
+
+        .state-icon.success {
+            color: var(--success-light);
+        }
+
+        .state-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .state-msg {
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* Form */
+        #activateForm {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        #activateForm.visible {
+            display: block;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtitle {
+            color: var(--muted);
+            font-size: 0.92rem;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 0.875rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.95rem 1rem 0.95rem 2.8rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text);
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: rgba(74, 144, 245, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 2px rgba(74, 144, 245, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .password-toggle:hover {
+            color: #fff;
+        }
+
+        .password-hint {
+            font-size: 0.8rem;
+            color: var(--dim);
+            margin-top: 0.4rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.95rem;
+            background: var(--grad-bp);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(74, 144, 245, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .submit-btn:disabled {
+            background: var(--dim);
+            color: var(--muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alt-btn {
+            display: inline-flex;
+            width: 100%;
+            padding: 0.95rem;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .alt-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border-hi);
+        }
+
+        .loading-sm {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Message toast */
+        .message-container {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .message {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            animation: slideDown 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.error {
+            border-left: 3px solid var(--error-light);
+        }
+
+        .message.success {
+            border-left: 3px solid var(--success-light);
+        }
+
+        /* strength meter */
+        .strength-bar {
+            height: 3px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .strength-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s, background 0.3s;
+            width: 0%;
+        }
+
+        /* Rate-limit countdown badge */
+        .countdown-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #fca5a5;
+            letter-spacing: 0.5px;
+        }
+
+        .countdown-badge i {
+            font-size: 0.78rem;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 2.5rem 1.5rem;
+                border-radius: 0;
+                border: none;
+                border-top: 1px solid var(--border);
+                border-bottom: 1px solid var(--border);
+                box-shadow: none;
+                background: var(--bg);
+            }
+
+            body {
+                align-items: flex-start;
+                background-image: none;
+            }
+
+            .message-container {
+                top: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="message-container" id="messageContainer"></div>
+
+    <div class="card">
+        <a href="/" class="logo-section">
+            <div class="logo-box"><img src="/Classgrid.png" alt="Classgrid"></div>
+            <div>
+                <div class="brand-name">Class<em>grid</em></div>
+                <span class="brand-subtitle">Organization Admin Portal</span>
+            </div>
+        </a>
+
+        <!-- Loading state -->
+        <div id="loaderState">
+            <div class="page-loader"></div>
+            <p style="color: var(--muted); font-size: 0.95rem;">Validating activation link...</p>
+        </div>
+
+        <!-- Error state (invalid/expired token) -->
+        <div class="state-screen" id="errorState">
+            <div class="state-icon error"><i class="fas fa-link-slash"></i></div>
+            <h2 class="state-title">Invalid Activation Link</h2>
+            <p class="state-msg" id="errorStateMsg">This activation link is invalid or has expired.</p>
+            <a href="/admin/login" class="alt-btn">
+                Request New Activation Email
+            </a>
+        </div>
+
+        <!-- Success state -->
+        <div class="state-screen" id="successState">
+            <div class="state-icon success"><i class="fas fa-check-circle"></i></div>
+            <h2 class="state-title">Account Activated!</h2>
+            <p class="state-msg">Your admin account is now active. Redirecting you to your dashboard…</p>
+        </div>
+
+        <!-- Activation form -->
+        <form id="activateForm" autocomplete="off">
+            <h2 class="form-title">Activate Account</h2>
+            <p class="form-subtitle">Set a secure password to complete your Organization Admin account setup.</p>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Set Password</label>
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="password" class="form-input" placeholder="Create a secure password"
+                        required>
+                    <button type="button" class="password-toggle" id="togglePassword"
+                        aria-label="Toggle password visibility"><i class="fas fa-eye"></i></button>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-bar-fill" id="strengthFill"></div>
+                </div>
+                <div class="password-hint">Minimum 8 characters</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="confirmPassword">Confirm Password</label>
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="Repeat your password"
+                        required>
+                    <button type="button" class="password-toggle" id="toggleConfirm"
+                        aria-label="Toggle password visibility"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="activateBtn">
+                <span id="activateBtnText">Activate My Account</span>
+                <i class="fas fa-arrow-right" id="activateBtnIcon"></i>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE = (() => {
+            const o = window.location.origin;
+            if (o.includes('localhost')) return 'http://localhost:3000/api';
+            if (o.includes('classgrid.in') || o.includes('classgrid.in')) return '/api';
+            return o + '/api';
+        })();
+
+        const params = new URLSearchParams(window.location.search);
+        const TOKEN = params.get('token');
+
+        const loaderState = document.getElementById('loaderState');
+        const form = document.getElementById('activateForm');
+        const errorState = document.getElementById('errorState');
+        const successState = document.getElementById('successState');
+
+        const activateBtn = document.getElementById('activateBtn');
+        const activateBtnText = document.getElementById('activateBtnText');
+        const activateBtnIcon = document.getElementById('activateBtnIcon');
+
+        const messageContainer = document.getElementById('messageContainer');
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('confirmPassword');
+        const strengthFill = document.getElementById('strengthFill');
+
+        function showMessage(text, type = 'error') {
+            const m = document.createElement('div');
+            m.className = `message ${type}`;
+            const icons = { error: 'fa-exclamation-circle', success: 'fa-check-circle' };
+            m.innerHTML = `<i class="fas ${icons[type] || 'fa-info-circle'}"></i><span>${text}</span>`;
+            messageContainer.appendChild(m);
+            setTimeout(() => {
+                m.style.transition = 'opacity 0.4s';
+                m.style.opacity = '0';
+                setTimeout(() => m.remove(), 400);
+            }, 5000);
+        }
+
+        let _countdownTimer = null;
+
+        function startRateLimitCountdown(seconds) {
+            if (_countdownTimer) clearInterval(_countdownTimer);
+            // Clear old messages
+            messageContainer.innerHTML = '';
+
+            let remaining = seconds;
+
+            function fmt(s) {
+                const m = Math.floor(s / 60);
+                const sec = s % 60;
+                return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+            }
+
+            const banner = document.createElement('div');
+            banner.className = 'message error';
+            banner.innerHTML = `<i class="fas fa-exclamation-circle"></i>
+                <span>Too many attempts. Please wait before trying again.<br>
+                <span class="countdown-badge"><i class="fas fa-clock"></i> Try again in <span id="cdTimer">${fmt(remaining)}</span></span>
+                </span>`;
+            messageContainer.appendChild(banner);
+
+            activateBtn.disabled = true;
+
+            _countdownTimer = setInterval(() => {
+                remaining--;
+                const timerEl = document.getElementById('cdTimer');
+                if (remaining <= 0) {
+                    clearInterval(_countdownTimer);
+                    _countdownTimer = null;
+                    banner.remove();
+                    showMessage('You can try again now.', 'error');
+                    activateBtn.disabled = false;
+                    activateBtnIcon.style.display = 'inline-block';
+                    activateBtnText.textContent = 'Activate My Account';
+                } else if (timerEl) {
+                    timerEl.textContent = fmt(remaining);
+                }
+            }, 1000);
+        }
+
+        function showState(which, msg = '') {
+            loaderState.style.display = 'none';
+            form.classList.remove('visible');
+            errorState.classList.remove('visible');
+            successState.classList.remove('visible');
+
+            if (which === 'error') {
+                if (msg) document.getElementById('errorStateMsg').textContent = msg;
+                errorState.classList.add('visible');
+            } else if (which === 'success') {
+                successState.classList.add('visible');
+            } else {
+                form.classList.add('visible');
+            }
+        }
+
+        // Validate token on load
+        async function validateToken() {
+            if (!TOKEN) {
+                showState('error', 'No activation token found. Please use the link from your email.');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/validate-activation-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: TOKEN })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.valid) {
+                    showState('form');
+                } else {
+                    showState('error', data.message || 'This activation link is invalid or has expired.');
+                }
+            } catch (err) {
+                showState('error', 'Unable to connect to the server. Please check your connection and refresh.');
+            }
+        }
+
+        // Init page
+        validateToken();
+
+        // Password strength meter
+        passwordInput.addEventListener('input', () => {
+            const pw = passwordInput.value;
+            let strength = 0;
+            if (pw.length >= 8) strength++;
+            if (/[A-Z]/.test(pw)) strength++;
+            if (/[0-9]/.test(pw)) strength++;
+            if (/[^a-zA-Z0-9]/.test(pw)) strength++;
+
+            const pct = (strength / 4) * 100;
+            const colors = ['rgba(255,255,255,0.1)', '#ff5252', '#fb8c00', '#4caf50', '#2e7d32'];
+            strengthFill.style.width = pct + '%';
+            strengthFill.style.background = colors[strength] || 'rgba(255,255,255,0.1)';
+        });
+
+        // Toggle password visibility
+        function setupToggle(inputEl, btnEl) {
+            btnEl.addEventListener('click', () => {
+                const show = inputEl.type === 'password';
+                inputEl.type = show ? 'text' : 'password';
+                btnEl.innerHTML = show ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+            });
+        }
+        setupToggle(passwordInput, document.getElementById('togglePassword'));
+        setupToggle(confirmInput, document.getElementById('toggleConfirm'));
+
+        // Submit Activation
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = passwordInput.value;
+            const confirm = confirmInput.value;
+
+            if (!password || password.length < 8) {
+                showMessage('Password must be at least 8 characters.');
+                return;
+            }
+            if (password !== confirm) {
+                showMessage('Passwords do not match.');
+                return;
+            }
+
+            activateBtn.disabled = true;
+            activateBtnIcon.style.display = 'none';
+            activateBtnText.innerHTML = '<div class="loading-sm"></div> &nbsp;Activating...';
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/activate-admin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: TOKEN, password })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.token) {
+                    // Auto login successful — store BOTH token and user
+                    localStorage.setItem('jwt_token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    showState('success');
+
+                    // Clean URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+
+                    const orgName = data.user?.organization?.name
+                        ? encodeURIComponent(data.user.organization.name.replace(/\s+/g, '-').toLowerCase())
+                        : 'dashboard';
+
+                    // Redirect directly to the org dashboard
+                    setTimeout(() => {
+                        window.location.replace(`/org/${orgName}/admin`);
+                    }, 1200);
+                } else if (res.status === 429 && data.retryAfterSeconds) {
+                    startRateLimitCountdown(data.retryAfterSeconds);
+                } else {
+                    showMessage(data.message || 'Activation failed. Please try again.');
+                    activateBtn.disabled = false;
+                    activateBtnIcon.style.display = 'inline-block';
+                    activateBtnText.textContent = 'Activate My Account';
+                }
+            } catch {
+                showMessage('Unable to connect to server. Please try again.');
+                activateBtn.disabled = false;
+                activateBtnIcon.style.display = 'inline-block';
+                activateBtnText.textContent = 'Activate My Account';
+            }
+        });
+
+        // Block typical inspection shortcuts slightly but don't obsess over it
+        document.addEventListener('contextmenu', e => {
+            if (e.target.tagName !== 'INPUT') e.preventDefault();
+        });
+    </script>
+</body>
+
+</html>

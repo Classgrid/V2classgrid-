@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Access · Classgrid</title>
+    <!-- No meta description — keep this page off crawlers -->
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #030508;
+            --surface: #090d18;
+            --border: rgba(0, 212, 255, 0.12);
+            --border-hi: rgba(0, 212, 255, 0.35);
+            --cyan: #00d4ff;
+            --cyan-dim: rgba(0, 212, 255, 0.08);
+            --red: #ef4444;
+            --green: #10b981;
+            --t1: #f1f5f9;
+            --t2: #94a3b8;
+            --t3: #475569;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--t1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle background glow */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 500px;
+            background: radial-gradient(ellipse, rgba(0, 212, 255, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .box {
+            width: 100%;
+            max-width: 380px;
+            padding: 2.5rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top accent line */
+        .box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-area img {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 0.75rem;
+        }
+
+        .logo-area h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--t1);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-area p {
+            font-size: 0.72rem;
+            color: var(--t3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.77rem;
+            font-weight: 600;
+            color: var(--t3);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 0.4rem;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--t3);
+            font-size: 0.82rem;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.2rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--t1);
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        input::placeholder {
+            color: var(--t3);
+        }
+
+        .eye-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--t3);
+            cursor: pointer;
+            padding: 4px 6px;
+            font-size: 0.82rem;
+            transition: color 0.2s;
+        }
+
+        .eye-btn:hover {
+            color: var(--t1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.85rem;
+            margin-top: 1.25rem;
+            background: linear-gradient(135deg, #0a4f6e, var(--cyan));
+            color: #000;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(0, 212, 255, 0.35);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .msg {
+            display: none;
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            border-left: 3px solid var(--red);
+            background: rgba(239, 68, 68, 0.07);
+            color: #fca5a5;
+        }
+
+        .msg.success {
+            border-color: var(--green);
+            background: rgba(16, 185, 129, 0.07);
+            color: #6ee7b7;
+        }
+
+        .msg.show {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lock-icon {
+            font-size: 0.72rem;
+            color: var(--t3);
+            text-align: center;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+        <div class="logo-area">
+            <img src="/Classgrid.png"
+                alt="Classgrid">
+            <h1>Classgrid</h1>
+            <p>System Access</p>
+        </div>
+
+        <form id="loginForm" novalidate>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <div class="input-wrap">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="admin@classgrid.in" autocomplete="email" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="••••••••••" autocomplete="current-password"
+                        required>
+                    <button type="button" class="eye-btn" id="eyeBtn"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <i class="fas fa-shield-halved"></i>
+                <span id="btnText">Enter</span>
+            </button>
+
+            <div class="msg" id="msg"></div>
+        </form>
+
+        <p class="lock-icon">
+            <i class="fas fa-lock"></i> Restricted access — authorised personnel only
+        </p>
+    </div>
+
+    <script>
+        // ── helpers ──
+        function getApiBase() {
+            return window.location.origin.includes('localhost') ? 'http://localhost:3000/api' : '/api';
+        }
+
+        function showMsg(text, type = 'error') {
+            const el = document.getElementById('msg');
+            el.className = `msg show ${type}`;
+            el.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${text}`;
+        }
+
+        // ── eye toggle ──
+        document.getElementById('eyeBtn').addEventListener('click', () => {
+            const pw = document.getElementById('password');
+            const icon = document.querySelector('#eyeBtn i');
+            if (pw.type === 'password') {
+                pw.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                pw.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        });
+
+        // ── login ──
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+
+            if (!email || !password) { showMsg('All fields required.'); return; }
+
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span>';
+
+            try {
+                const res = await fetch(`${getApiBase()}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showMsg(data.message || 'Invalid credentials.');
+                    btn.disabled = false;
+                    btnText.textContent = 'Enter';
+                    return;
+                }
+
+                // Enforce super_admin role — reject anything else
+                const role = data.user && data.user.role;
+                if (role !== 'super_admin') {
+                    showMsg('Access denied. This portal is for super admins only.');
+                    btn.disabled = false;
+                    btnText.textContent = 'Enter';
+                    return;
+                }
+
+                // Store token & user
+                if (data.token) {
+                    
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                }
+
+                showMsg('Access granted. Redirecting…', 'success');
+                setTimeout(() => {
+                    window.location.href = '/super-admin-dashboard';
+                }, 800);
+
+            } catch {
+                showMsg('Network error. Please try again.');
+                btn.disabled = false;
+                btnText.textContent = 'Enter';
+            }
+        });
+
+        // ── auto-redirect if already logged in as super_admin ──
+        (function checkExisting() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user') || 'null');
+                const token = null;
+                if (user && token && user.role === 'super_admin') {
+                    window.location.replace('/super-admin-dashboard');
+                }
+            } catch { }
+        })();
+    </script>
+
+</body>
+
+</html>

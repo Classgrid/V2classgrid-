@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Enter Organization Code | Classgrid</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0d1117 0%, #1a237e 100%);
+            padding: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #1a237e;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .logo span {
+            color: #3949ab;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+
+        .icon-wrap {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e8eaf6, #c5cae9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 1.8rem;
+            color: #3949ab;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0d1117;
+            margin-bottom: 8px;
+        }
+
+        p.desc {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 14px 14px 44px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3949ab;
+            box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9e9e9e;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #1a237e;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #283593;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.3);
+        }
+
+        .btn:disabled {
+            background: #9e9e9e;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .msg {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .msg.err {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+            display: block;
+        }
+
+        .msg.ok {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+            display: block;
+        }
+
+        .logout-link {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #9e9e9e;
+        }
+
+        .logout-link a {
+            color: #3949ab;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .logout-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="logo">Class<span>grid</span></div>
+        <p class="subtitle">Learning Management Platform</p>
+
+        <div class="icon-wrap"><i class="fas fa-building"></i></div>
+        <h2>Enter Organization Code</h2>
+        <p class="desc">Your account is not yet linked to an organization.<br>Enter your institution's code to continue.
+        </p>
+
+        <div class="form-group">
+            <label for="orgCodeInput">Organization Code</label>
+            <div class="input-wrap">
+                <span class="input-icon"><i class="fas fa-key"></i></span>
+                <input type="text" id="orgCodeInput" placeholder="e.g. ABC123" maxlength="20" autocomplete="off">
+            </div>
+        </div>
+
+        <button class="btn" id="submitBtn" onclick="submitCode()">
+            <i class="fas fa-arrow-right"></i> Connect Organization
+        </button>
+
+        <div class="msg" id="msgBox"></div>
+
+        <div class="logout-link">
+            Wrong account? <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </div>
+
+    <script>
+        // Step 1: Store token from URL if present (OAuth redirect)
+        const params = new URLSearchParams(location.search);
+        const urlToken = params.get('token');
+        if (urlToken) {
+            localStorage.setItem('jwt_token', urlToken);
+            // Clean URL
+            history.replaceState({}, '', '/enter-org-code.html');
+        }
+
+        const TK = localStorage.getItem('jwt_token');
+
+        // If no token at all, redirect to login
+        if (!TK) { location.href = '/login.html'; }
+
+        function showMsg(text, type) {
+            const el = document.getElementById('msgBox');
+            el.textContent = text;
+            el.className = 'msg ' + type;
+        }
+
+        async function submitCode() {
+            const code = document.getElementById('orgCodeInput').value.trim().toUpperCase();
+            if (!code) { showMsg('Please enter your organization code.', 'err'); return; }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+
+            try {
+                const r = await fetch('/api/org/verify-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, role: 'faculty' })
+                });
+                const data = await r.json();
+
+                if (!r.ok) {
+                    showMsg(data.message || 'Invalid code. Please try again.', 'err');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-arrow-right"></i> Connect Organization';
+                    return;
+                }
+
+                showMsg('Organization linked successfully! Redirecting...', 'ok');
+
+                // Update stored user with new organization_id
+                try {
+                    const meRes = await fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${TK}` }, credentials: 'include' });
+                    const me = await meRes.json();
+                    localStorage.setItem('user', JSON.stringify(me));
+                } catch (e) { }
+
+                setTimeout(() => { location.href = '/my-classrooms'; }, 1200);
+
+            } catch (e) {
+                showMsg('Network error. Please try again.', 'err');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-arrow-right"></i> Connect Organization';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('user');
+            location.href = '/login.html';
+        }
+
+        // Allow Enter key
+        document.getElementById('orgCodeInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') submitCode();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,346 @@
+/* ============================================
+   MOBILE NAV & RESPONSIVE FIXES
+   Shared across all Classgrid pages
+   ============================================ */
+
+/* --- Nav icon buttons with labels --- */
+.nav-icon-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 4px 6px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, .08));
+    background: transparent;
+    color: var(--silver, #94a3b8);
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nav-icon-btn i {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.nav-icon-btn .nav-icon-label {
+    font-size: 0.55rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: rgba(148, 163, 184, 0.8);
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.nav-icon-btn:hover,
+.nav-icon-btn:active {
+    border-color: var(--cyan, #00d4ff);
+    color: var(--cyan, #00d4ff);
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.nav-icon-btn:hover .nav-icon-label,
+.nav-icon-btn:active .nav-icon-label {
+    color: var(--cyan, #00d4ff);
+}
+
+.nav-icon-btn.danger:hover,
+.nav-icon-btn.danger:active {
+    border-color: var(--red, #ef4444);
+    color: var(--red, #ef4444);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.nav-icon-btn.danger:hover .nav-icon-label {
+    color: var(--red, #ef4444);
+}
+
+/* --- Global responsive overrides --- */
+@media (max-width: 768px) {
+
+    /* Prevent horizontal scroll */
+    html,
+    body {
+        overflow-x: hidden !important;
+        max-width: 100vw;
+    }
+
+    /* Navbar mobile fix */
+    .navbar {
+        padding: 0 12px !important;
+        height: 56px !important;
+        gap: 0.4rem;
+    }
+
+    .nav-left {
+        min-width: 0;
+        flex-shrink: 1;
+        overflow: hidden;
+    }
+
+    /* Hide breadcrumb on small screens */
+    .breadcrumb-sep,
+    .nav-left>span:not(.nav-brand):not(.bh) {
+        display: none !important;
+    }
+
+    .nav-brand {
+        font-size: 1rem !important;
+        gap: 0.4rem !important;
+    }
+
+    .nav-brand .logo-icon,
+    .nav-brand i {
+        font-size: 1.1rem !important;
+    }
+
+    /* Nav-right mobile */
+    .nav-right {
+        gap: 0.35rem !important;
+        flex-shrink: 0;
+    }
+
+    /* Hide pill on very small screens */
+    .nav-pill {
+        display: none !important;
+    }
+
+    /* Nav icon buttons */
+    .nav-icon-btn {
+        min-width: 40px;
+        min-height: 40px;
+        padding: 3px 5px;
+        border-radius: 8px;
+    }
+
+    .nav-icon-btn i {
+        font-size: 0.9rem;
+    }
+
+    .nav-icon-btn .nav-icon-label {
+        font-size: 0.5rem;
+    }
+
+    /* Legacy btn-icon override (for pages not yet updated) */
+    .btn-icon {
+        min-width: 40px !important;
+        min-height: 40px !important;
+    }
+
+    .nav-actions {
+        gap: 0.3rem !important;
+    }
+
+    /* Content spacing under fixed navbar */
+    .container {
+        margin-top: 68px !important;
+        padding: 1rem !important;
+    }
+
+    .layout {
+        margin-top: 68px !important;
+        padding: 1rem !important;
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    /* Hide sidebar on mobile */
+    /* Show sidebar on mobile */
+    .sidebar {
+        display: flex !important;
+        width: 100% !important;
+        flex-direction: column !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .profile-glass {
+        width: 100% !important;
+        padding: 1.2rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    .sidebar .nav-menu {
+        /* Optional: layout nav menu as grid on mobile */
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 0.5rem !important;
+        width: 100% !important;
+    }
+
+    /* Profile font adjustments */
+    .profile-name {
+        font-size: 1rem !important;
+    }
+
+    .profile-email {
+        font-size: 0.75rem !important;
+    }
+
+    .meta-value {
+        font-size: 1rem !important;
+    }
+
+    .avatar-ring {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    /* Cards */
+    .classroom-grid,
+    .stats-row,
+    .subjects-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .stat-card {
+        padding: 0.8rem !important;
+    }
+
+    .stat-value {
+        font-size: 1.2rem !important;
+    }
+
+    /* Tab nav scrollable */
+    .tab-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap !important;
+        padding-bottom: 0.5rem !important;
+        scrollbar-width: none;
+    }
+
+    .tab-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab-btn {
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-size: 0.8rem !important;
+        padding: 0.5rem 0.7rem !important;
+    }
+
+    /* Cards proper spacing */
+    .card {
+        padding: 1rem !important;
+        margin-bottom: 0.8rem !important;
+    }
+
+    .cc,
+    .classroom-card {
+        padding: 1rem !important;
+    }
+
+    /* Ensure actions wrap */
+    .cc-actions,
+    .welcome-actions {
+        flex-wrap: wrap !important;
+        gap: 0.4rem !important;
+    }
+
+    /* Status badge doesn't overlap content */
+    .status-badge {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        display: inline-block !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* Toast */
+    .toast {
+        left: 1rem !important;
+        right: 1rem !important;
+        bottom: 1rem !important;
+        max-width: none !important;
+    }
+
+    /* Page title */
+    .page-title {
+        font-size: 1.4rem !important;
+    }
+
+    .welcome-name {
+        font-size: 1.3rem !important;
+    }
+
+    /* Form inputs */
+    .form-input,
+    .form-select,
+    .form-textarea {
+        font-size: 16px !important;
+        /* Prevents iOS auto-zoom */
+    }
+
+    /* Join section */
+    .join-section {
+        flex-direction: column !important;
+        padding: 1rem !important;
+        gap: 0.8rem !important;
+    }
+
+    /* Modal */
+    .modal,
+    .modal-content {
+        width: 95% !important;
+        max-width: none !important;
+        margin: 1rem !important;
+    }
+
+    /* AI widget */
+    .ai-widget {
+        bottom: 1rem !important;
+        right: 1rem !important;
+    }
+
+    .ai-button {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 1.2rem !important;
+    }
+
+    .ai-label {
+        display: none !important;
+    }
+}
+
+/* Extra small screens (iPhone SE, etc.) */
+@media (max-width: 375px) {
+    .navbar {
+        padding: 0 8px !important;
+    }
+
+    .nav-brand {
+        font-size: 0.9rem !important;
+    }
+
+    .nav-icon-btn {
+        min-width: 36px;
+        min-height: 36px;
+        padding: 2px 4px;
+    }
+
+    .nav-icon-btn i {
+        font-size: 0.85rem;
+    }
+
+    .nav-icon-btn .nav-icon-label {
+        font-size: 0.45rem;
+    }
+
+    .container {
+        padding: 0.75rem !important;
+    }
+
+    .page-title {
+        font-size: 1.2rem !important;
+    }
+}

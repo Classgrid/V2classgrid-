@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        /* Auth Guard — runs BEFORE CSS/content to prevent any flash of protected content */
+        (function () {
+            var t = null; var hasUrlToken = window.location.search.indexOf('token=') !== -1;
+            if (t || hasUrlToken) {
+                window.addEventListener('pageshow', function (e) { if (e.persisted && !null) window.location.replace('/login.html'); });
+                window.addEventListener('storage', function (e) { if (e.key === 'jwt_token' && !e.newValue) window.location.replace('/login.html'); });
+                return;
+            }
+            var _cs = document.createElement('style'); _cs.id = '_ag'; _cs.textContent = 'body>*:not(script):not(style){visibility:hidden!important}'; document.head.appendChild(_cs);
+            var _cb = location.origin.includes('localhost') ? 'http://localhost:3000' : '';
+            var _tok = localStorage.getItem('jwt_token'); var _hdrs = { 'Cache-Control': 'no-store' }; if (_tok && _tok !== 'null' && _tok !== 'undefined') { _hdrs['Authorization'] = 'Bearer ' + _tok; } fetch(_cb + '/api/auth/me', { credentials: 'include', cache: 'no-store', headers: _hdrs })
+                .then(function (r) { if (r.ok) return r.json().then(function (u) { window._cookieAuthUser = u; var e = document.getElementById('_ag'); if (e) e.remove(); }); throw 0; })
+                .catch(function () { window.location.replace('/login.html'); });
+        })();
+    </script>
+    <script src="/app-state.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Upload Notes | Classgrid</title>
+    <meta name="description" content="Upload and browse classroom notes shared within your organization on Classgrid.">
+    <link rel="icon" href="/Classgrid.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --surface2: #141414;
+            --border: rgba(255, 255, 255, 0.07);
+            --border-hi: rgba(255, 255, 255, 0.15);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --muted: #888888;
+            --dim: #444444;
+            --sidebar-w: 240px;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* ── READING PROGRESS ── */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 2px;
+            z-index: 300;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: var(--grad-bp);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: #000;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 200;
+            overflow-y: auto;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1.5rem 1.4rem 1.3rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 9.5px;
+            background: var(--grad-bp);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            border-radius: 7px;
+            z-index: 0;
+        }
+
+        .logo-box img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .brand-name em {
+            font-style: normal;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-section {
+            padding: 1.2rem 1rem 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dim);
+            padding: 0 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 1px;
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(74, 144, 245, 0.1);
+            color: #fff;
+        }
+
+        .nav-item.active i {
+            color: var(--blue-light);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.6rem 1rem;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-size: 0.73rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .sidebar-badge strong {
+            color: #aaa;
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.76rem;
+        }
+
+        /* ── HAMBURGER ── */
+        .ham {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 300;
+            flex-direction: column;
+            gap: 5px;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            cursor: pointer;
+        }
+
+        .ham span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.28s ease;
+        }
+
+        .ham.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .ham.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .ham.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 199;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* ── MAIN ── */
+        .main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+        }
+
+        /* ── AUTH GATE ── */
+        .auth-gate {
+            display: none;
+            text-align: center;
+            padding: 10rem 2rem 4rem;
+        }
+
+        .auth-gate i {
+            font-size: 3rem;
+            color: var(--blue);
+            margin-bottom: 1.2rem;
+            display: block;
+        }
+
+        .auth-gate h2 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-gate p {
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-gate a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.8rem 2rem;
+            background: var(--grad-bp);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        .auth-gate a:hover {
+            opacity: 0.9;
+        }
+
+        /* ── PAGE HERO ── */
+        .page-hero {
+            padding: 4rem 4rem 3rem;
+            border-bottom: 1px solid var(--border);
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(74, 144, 245, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue);
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            color: #fff;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+        }
+
+        .page-title span {
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+            color: var(--muted);
+            max-width: 560px;
+            line-height: 1.8;
+        }
+
+        .page-hero-inner {
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── CONTENT ── */
+        .content-wrap {
+            padding: 3rem 4rem 5rem;
+            max-width: 1100px;
+        }
+
+        /* ── SECTION ── */
+        .sec {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            margin-bottom: 3rem;
+        }
+
+        .sec.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.3px;
+        }
+
+        .section-desc {
+            font-size: 0.875rem;
+            color: var(--muted);
+            line-height: 1.75;
+            margin-bottom: 1.8rem;
+        }
+
+        /* ── TWO COL ── */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* ── FORM CARD ── */
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .form-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-card .sub {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 1.6rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.45rem;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            padding: 0.75rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: rgba(74, 144, 245, 0.5);
+            box-shadow: 0 0 0 3px rgba(74, 144, 245, 0.08);
+        }
+
+        .form-group input[type="file"] {
+            padding: 0.6rem 0.8rem;
+            cursor: pointer;
+        }
+
+        .form-group select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            padding: 0.75rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .form-group select:focus {
+            border-color: rgba(74, 144, 245, 0.5);
+            box-shadow: 0 0 0 3px rgba(74, 144, 245, 0.08);
+        }
+
+        .form-group select option {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .form-group input[type="file"]::file-selector-button {
+            padding: 0.35rem 1rem;
+            background: var(--grad-bp);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 0.75rem;
+            font-size: 0.78rem;
+        }
+
+        .btn-upload {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--grad-bp);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 4px 20px rgba(74, 144, 245, 0.2);
+        }
+
+        .btn-upload:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-upload:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upload-msg {
+            margin-top: 0.75rem;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            display: none;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .upload-msg.show {
+            display: flex;
+        }
+
+        .upload-msg.success {
+            background: rgba(34, 197, 94, 0.08);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .upload-msg.error {
+            background: rgba(239, 68, 68, 0.08);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* ── NOTES LIST ── */
+        .notes-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            max-height: 640px;
+            overflow-y: auto;
+        }
+
+        .notes-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .notes-panel::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .notes-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .notes-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notes-header h3 i {
+            color: var(--blue-light);
+            font-size: 0.9rem;
+        }
+
+        .notes-count {
+            font-size: 0.75rem;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 3px 10px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+        }
+
+        .note-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 0.6rem;
+            transition: border-color 0.2s;
+        }
+
+        .note-item:hover {
+            border-color: var(--border-hi);
+        }
+
+        .note-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .note-item-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.25rem;
+        }
+
+        .note-item-desc {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .note-item-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.72rem;
+            color: var(--dim);
+            flex-wrap: wrap;
+            margin-bottom: 0.6rem;
+        }
+
+        .note-item-meta i {
+            color: var(--blue);
+            margin-right: 3px;
+        }
+
+        .note-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .note-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+        }
+
+        .note-btn-preview {
+            background: rgba(74, 144, 245, 0.1);
+            border: 1px solid rgba(74, 144, 245, 0.2);
+            color: var(--blue-light);
+        }
+
+        .note-btn-preview:hover {
+            background: rgba(74, 144, 245, 0.2);
+        }
+
+        .note-btn-download {
+            background: var(--grad-bp);
+            color: #fff;
+        }
+
+        .note-btn-download:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .notes-empty {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--dim);
+        }
+
+        .notes-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.6rem;
+            display: block;
+            color: var(--muted);
+            opacity: 0.4;
+        }
+
+        .notes-empty p {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 0.4rem;
+        }
+
+        /* ── STATUS & TYPE BADGES ── */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .status-badge.pending {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.25);
+        }
+
+        .status-badge.approved {
+            background: rgba(34, 197, 94, 0.12);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .status-badge.rejected {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 0.68rem;
+            font-weight: 600;
+        }
+
+        .type-badge.self_made {
+            background: rgba(34, 197, 94, 0.10);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .type-badge.teacher {
+            background: rgba(74, 144, 245, 0.10);
+            color: #7eb8ff;
+            border: 1px solid rgba(74, 144, 245, 0.2);
+        }
+
+        .type-badge.university {
+            background: rgba(168, 85, 247, 0.10);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .type-badge.buyed {
+            background: rgba(251, 191, 36, 0.10);
+            color: #fde68a;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        /* ── APPROVAL MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .approval-modal {
+            background: #0d0d0d;
+            border: 1px solid var(--border-hi);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 480px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close-x {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 34px;
+            height: 34px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close-x:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--grad-bp);
+            border-radius: 14px;
+            animation: modalPulse 2s ease-in-out infinite;
+        }
+
+        .modal-icon i {
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        @keyframes modalPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(74, 144, 245, 0.4);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 12px rgba(74, 144, 245, 0);
+            }
+        }
+
+        .modal-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.6rem;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .modal-message {
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-size: 0.88rem;
+        }
+
+        .modal-info-box {
+            background: rgba(74, 144, 245, 0.05);
+            border: 1px solid rgba(74, 144, 245, 0.15);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .modal-info-title {
+            color: var(--blue-light);
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .modal-info-list {
+            list-style: none;
+            color: var(--muted);
+        }
+
+        .modal-info-list li {
+            padding: 0.35rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .modal-info-list li i {
+            color: var(--blue-light);
+            margin-top: 3px;
+            flex-shrink: 0;
+            font-size: 0.7rem;
+        }
+
+        .modal-timeline {
+            background: rgba(139, 111, 255, 0.06);
+            border: 1px solid rgba(139, 111, 255, 0.15);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-timeline-label {
+            color: #c4b5fd;
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .modal-timeline-time {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-family: 'Sora', sans-serif;
+            margin-bottom: 0.2rem;
+        }
+
+        .modal-timeline-note {
+            color: var(--muted);
+            font-size: 0.78rem;
+        }
+
+        .modal-close-btn {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--grad-bp);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .modal-close-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* ── BACK TO TOP ── */
+        .back-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            background: #111;
+            border: 1px solid var(--border-hi);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            z-index: 50;
+            font-size: 0.8rem;
+            border-radius: 8px;
+        }
+
+        .back-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-top:hover {
+            background: #1a1a1a;
+        }
+
+        /* ── FOOTER LINKS ── */
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem 1.2rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-links a {
+            font-size: 0.76rem;
+            color: var(--dim);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--muted);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .reading-progress {
+                left: 0;
+            }
+
+            .ham {
+                display: flex;
+            }
+
+            .content-wrap {
+                padding: 2rem 1.5rem 4rem;
+            }
+
+            .page-hero {
+                padding: 4.5rem 1.5rem 2rem;
+            }
+
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-wrap {
+                padding: 1.5rem 1.2rem 3rem;
+            }
+
+            .page-hero {
+                padding: 4rem 1.2rem 1.5rem;
+            }
+        }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="reading-progress">
+        <div class="reading-progress-bar" id="progressBar"></div>
+    </div>
+    <button class="ham" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- APPROVAL MODAL -->
+    <div class="modal-overlay" id="approvalModal">
+        <div class="approval-modal">
+            <button class="modal-close-x" onclick="closeApprovalModal()" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="modal-title">Upload Successful!</h2>
+
+            <div class="modal-timeline">
+                <div class="modal-timeline-label">
+                    <i class="fas fa-clock"></i> Review Timeline
+                </div>
+                <div class="modal-timeline-time">Pending Review</div>
+                <div class="modal-timeline-note">Your notes are pending review by your organization admin</div>
+            </div>
+
+            <p class="modal-message">
+                Your notes will be available to your organization once approved by your organization admin.
+            </p>
+
+            <div class="modal-info-box">
+                <div class="modal-info-title">
+                    <i class="fas fa-shield-halved"></i> Verification Process
+                </div>
+                <ul class="modal-info-list">
+                    <li><i class="fas fa-check"></i><span>Your organization admin will review your content for quality
+                            and
+                            relevance</span></li>
+                    <li><i class="fas fa-xmark"></i><span>Inappropriate or off-topic content will not be approved</span>
+                    </li>
+                    <li><i class="fas fa-star"></i><span>High-quality educational material is prioritized</span></li>
+                    <li><i class="fas fa-building-columns"></i><span>Approved notes are visible only within your
+                            organization</span></li>
+                </ul>
+            </div>
+
+            <button class="modal-close-btn" onclick="closeApprovalModal()">Got It!</button>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <a href="index" class="sidebar-logo">
+            <div class="logo-box"><img src="/Classgrid.png" alt="Classgrid"></div>
+            <span class="brand-name">Class<em>grid</em></span>
+        </a>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Platform</div>
+            <a href="/classroom" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/notes.html" class="nav-item active"><i class="fas fa-cloud-upload-alt"></i> Upload Notes</a>
+            <a href="/approved-notes.html" class="nav-item"><i class="fas fa-book-open"></i> Student Notes</a>
+            <a href="/my-classrooms" class="nav-item"><i class="fas fa-chalkboard"></i> My Classrooms</a>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Navigation</div>
+            <a href="index" class="nav-item"><i class="fas fa-house"></i> Home</a>
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <!-- AUTH GATE -->
+        <div class="auth-gate" id="authGate">
+            <i class="fas fa-lock"></i>
+            <h2>Authentication Required</h2>
+            <p>Please log in to upload and view notes shared within your organization.</p>
+            <a href="/login"><i class="fas fa-sign-in-alt"></i> Log In</a>
+        </div>
+
+        <!-- MAIN CONTENT (hidden until auth) -->
+        <div id="mainPage" style="display:none;">
+
+            <!-- HERO -->
+            <div class="page-hero">
+                <div class="page-hero-inner">
+                    <div class="page-badge"><span class="badge-dot"></span>Upload Notes</div>
+                    <h1 class="page-title">Upload <span>Notes</span></h1>
+                    <p class="page-subtitle">Upload study materials for your classmates. All uploads go through a review
+                        process before being published to your organization.</p>
+                </div>
+            </div>
+
+            <div class="content-wrap">
+
+                <!-- SECTION: UPLOAD -->
+                <div class="sec" id="s1">
+                    <div class="section-label">01</div>
+                    <div class="section-title">Upload a Note</div>
+                    <p class="section-desc">Upload a PDF and your organization admin will review it for quality. Once
+                        approved, notes are visible to all members of your organization.</p>
+
+                    <div class="two-col">
+
+                        <!-- LEFT: UPLOAD FORM -->
+                        <div class="form-card">
+                            <h3><i class="fas fa-cloud-upload-alt"
+                                    style="color:var(--blue-light);margin-right:6px;"></i> Upload Note</h3>
+                            <p class="sub">PDF files only, max 25MB. All fields with * are required.</p>
+
+                            <form id="uploadForm">
+                                <div class="form-group">
+                                    <label for="noteTitle">Title *</label>
+                                    <input type="text" id="noteTitle" required
+                                        placeholder="e.g., Calculus Chapter 5 Summary" maxlength="200">
+                                </div>
+                                <div class="form-group">
+                                    <label for="noteDesc">Description</label>
+                                    <textarea id="noteDesc"
+                                        placeholder="Brief description of what the notes cover (topics, key concepts…)"
+                                        maxlength="500"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="noteType">Note Type *</label>
+                                    <select id="noteType" required>
+                                        <option value="self_made">🟢 Self Made</option>
+                                        <option value="teacher">🟢 Teacher Notes</option>
+                                        <option value="university">🟣 University</option>
+                                        <option value="buyed">🟡 Buyed</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="noteFile">PDF File *</label>
+                                    <input type="file" id="noteFile" accept=".pdf" required>
+                                </div>
+                                <button type="submit" class="btn-upload" id="uploadBtn" disabled>
+                                    <i class="fas fa-upload"></i>
+                                    <span id="uploadBtnText">Upload Note</span>
+                                </button>
+                                <div class="upload-msg" id="uploadMsg">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span id="uploadMsgText"></span>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- RIGHT: MY SUBMISSIONS -->
+                        <div class="notes-panel">
+                            <div class="notes-header">
+                                <h3><i class="fas fa-clipboard-list"></i> My Submissions</h3>
+                                <span class="notes-count" id="notesCount">0</span>
+                            </div>
+                            <div id="notesList">
+                                <div class="notes-empty">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <div>Loading…</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+            </div><!-- /content-wrap -->
+        </div><!-- /mainPage -->
+    </main>
+
+    <div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        const API = '/api';
+
+        function getToken() { return localStorage.getItem('jwt_token'); }
+        function authHeaders() {
+            const t = getToken();
+            return t ? { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+        }
+
+        // ── Sidebar toggle ──
+        const ham = document.getElementById('hamBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        ham.addEventListener('click', () => { ham.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+        overlay.addEventListener('click', () => { ham.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+        // ── Reading progress + back to top ──
+        const progressBar = document.getElementById('progressBar');
+        const backTop = document.getElementById('backTop');
+        window.addEventListener('scroll', () => {
+            const s = window.scrollY;
+            const d = document.documentElement.scrollHeight - window.innerHeight;
+            if (d > 0) progressBar.style.width = (s / d * 100) + '%';
+            backTop.classList.toggle('show', s > 300);
+        }, { passive: true });
+
+        // ── Section observer ──
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+        }, { threshold: 0.06, rootMargin: '0px 0px -40px 0px' });
+
+        // ── Modal ──
+        const approvalModal = document.getElementById('approvalModal');
+        window.closeApprovalModal = function () {
+            approvalModal.classList.remove('show');
+            document.body.style.overflow = '';
+        };
+        function showApprovalModal() {
+            approvalModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        approvalModal.addEventListener('click', e => { if (e.target === approvalModal) closeApprovalModal(); });
+
+        // ── Auth Check ──
+        function notesInit() {
+            const token = getToken();
+            if (!token) {
+                document.getElementById('authGate').style.display = 'block';
+                return;
+            }
+            document.getElementById('mainPage').style.display = 'block';
+            document.getElementById('uploadBtn').disabled = false;
+
+            // Observe sections
+            document.querySelectorAll('.sec').forEach(el => io.observe(el));
+
+            // GSAP
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.from('.page-hero-inner h1', { duration: 1, y: 40, opacity: 0, ease: 'power4.out', delay: 0.1 });
+            gsap.from('.page-hero-inner p', { duration: 0.9, y: 30, opacity: 0, ease: 'power4.out', delay: 0.3 });
+            gsap.from('.form-card', {
+                scrollTrigger: { trigger: '.form-card', start: 'top 85%' },
+                duration: 0.8, x: -30, opacity: 0, ease: 'power3.out'
+            });
+            gsap.from('.notes-panel', {
+                scrollTrigger: { trigger: '.notes-panel', start: 'top 85%' },
+                duration: 0.8, x: 30, opacity: 0, ease: 'power3.out'
+            });
+
+            loadNotes();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', notesInit);
+        } else {
+            notesInit();
+        }
+
+        // ── Load My Submissions ──
+        async function loadNotes() {
+            const list = document.getElementById('notesList');
+            list.innerHTML = '<div class="notes-empty"><i class="fas fa-spinner fa-spin"></i><div>Loading your submissions…</div></div>';
+
+            try {
+                // Check user org — try both fields + classroom membership
+                let hasOrg = false;
+                const meRes = await fetch(`${API}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${getToken()}` }, credentials: 'include'
+                });
+                if (meRes.ok) {
+                    const meData = await meRes.json();
+                    const user = meData.user || meData;
+                    hasOrg = !!(user.organization_id || user.organization);
+                }
+
+                // Fallback: check classroom membership
+                if (!hasOrg) {
+                    try {
+                        const clsRes = await fetch(`${API}/classrooms/my`, {
+                            headers: { 'Authorization': `Bearer ${getToken()}` }, credentials: 'include'
+                        });
+                        if (clsRes.ok) {
+                            const clsData = await clsRes.json();
+                            hasOrg = (clsData.classrooms && clsData.classrooms.length > 0);
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+
+                if (!hasOrg) {
+                    list.innerHTML = `
+                        <div class="notes-empty">
+                            <i class="fas fa-link"></i>
+                            <div>Join a Classroom First</div>
+                            <p>Enter a class code on the <a href="/my-classrooms" style="color:var(--blue-light)">My Classrooms</a> page to get connected to an organization.</p>
+                        </div>`;
+                    document.getElementById('notesCount').textContent = '0';
+                    const uploadBtn = document.getElementById('uploadBtn');
+                    if (uploadBtn) uploadBtn.disabled = true;
+                    return;
+                }
+
+                const res = await fetch(`${API}/notes/my-notes`, {
+                    headers: { 'Authorization': `Bearer ${getToken()}` }, credentials: 'include'
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.detail || errData.message || 'Failed to load notes');
+                }
+
+                const data = await res.json();
+                const notes = data.notes || [];
+
+                document.getElementById('notesCount').textContent = `${data.total || 0}`;
+
+                if (notes.length === 0) {
+                    list.innerHTML = `
+                        <div class="notes-empty">
+                            <i class="fas fa-folder-open"></i>
+                            <div>No submissions yet</div>
+                            <p>Upload your first note using the form!</p>
+                        </div>`;
+                    return;
+                }
+
+                const TYPE_LABELS = {
+                    self_made: '🟢 Self Made',
+                    teacher: '🟢 Teacher Notes',
+                    university: '🟣 University',
+                    buyed: '🟡 Buyed'
+                };
+                const STATUS_ICONS = {
+                    pending: '⏳',
+                    approved: '✅',
+                    rejected: '❌'
+                };
+
+                list.innerHTML = notes.map(n => {
+                    const date = new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const status = n.status || 'pending';
+                    const noteType = n.note_type || 'self_made';
+                    return `
+                    <div class="note-item">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+                            <span class="status-badge ${status}">${STATUS_ICONS[status] || ''} ${status}</span>
+                            <span class="type-badge ${noteType}">${TYPE_LABELS[noteType] || noteType}</span>
+                        </div>
+                        <div class="note-item-title">${esc(n.title)}</div>
+                        ${n.description ? `<div class="note-item-desc">${esc(n.description)}</div>` : ''}
+                        <div class="note-item-meta">
+                            <span><i class="fas fa-calendar"></i>${date}</span>
+                        </div>
+                        ${status === 'approved' ? `
+                        <div class="note-item-actions">
+                            <a href="${n.file_url}" target="_blank" class="note-btn note-btn-preview">
+                                <i class="fas fa-eye"></i> Preview
+                            </a>
+                        </div>` : ''}
+                    </div>`;
+                }).join('');
+            } catch (err) {
+                console.error('Load notes error:', err);
+                list.innerHTML = `
+                    <div class="notes-empty">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>Failed to load submissions</div>
+                    </div>`;
+            }
+        }
+
+        // ── Upload Form ──
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('noteTitle').value.trim();
+            const description = document.getElementById('noteDesc').value.trim();
+            const note_type = document.getElementById('noteType').value;
+            const fileInput = document.getElementById('noteFile');
+            const file = fileInput.files[0];
+
+            if (!title || !file) return showMsg('Title and PDF file are required', true);
+            if (!file.type.includes('pdf')) return showMsg('Only PDF files are allowed', true);
+            if (file.size > 25 * 1024 * 1024) return showMsg('File must be under 25MB', true);
+
+            const btn = document.getElementById('uploadBtn');
+            const btnText = document.getElementById('uploadBtnText');
+            btn.disabled = true;
+            btnText.textContent = 'Uploading…';
+            hideMsg();
+
+            try {
+                const token = getToken();
+
+                // Step 1: Get signed upload URL
+                const urlRes = await fetch(`${API}/notes/upload-url`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fileName: file.name, fileSize: file.size })
+                });
+
+                if (!urlRes.ok) {
+                    const err = await urlRes.json().catch(() => ({}));
+                    throw new Error(err.message || 'Failed to get upload URL');
+                }
+
+                const { path, signedUrl } = await urlRes.json();
+
+                // Step 2: Upload file to Supabase using the signed URL from backend
+                const uploadRes = await fetch(signedUrl,
+                    { method: 'PUT', headers: { 'Content-Type': 'application/pdf' }, body: file }
+                );
+
+                if (!uploadRes.ok) throw new Error('File upload failed');
+
+                // Step 3: Save metadata
+                const metaRes = await fetch(`${API}/notes`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description, filePath: path, note_type })
+                });
+
+                if (!metaRes.ok) {
+                    const err = await metaRes.json().catch(() => ({}));
+                    throw new Error(err.message || 'Failed to save note');
+                }
+
+                document.getElementById('uploadForm').reset();
+                showApprovalModal();
+                loadNotes();
+            } catch (err) {
+                console.error('Upload error:', err);
+                showMsg(err.message || 'Upload failed. Please try again.', true);
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Upload Note';
+            }
+        });
+
+        // ── Helpers ──
+        function esc(str) {
+            if (!str) return '';
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return str.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function showMsg(text, isError) {
+            const el = document.getElementById('uploadMsg');
+            const txt = document.getElementById('uploadMsgText');
+            el.className = `upload-msg show ${isError ? 'error' : 'success'}`;
+            txt.textContent = text;
+            if (!isError) setTimeout(() => el.classList.remove('show'), 4000);
+        }
+
+        function hideMsg() { document.getElementById('uploadMsg').classList.remove('show'); }
+    </script>
+</body>
+
+</html>

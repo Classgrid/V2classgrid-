@@ -1,0 +1,351 @@
+﻿async function init() {
+            if (!TK) { location.href = '/login'; return }
+            if (!CID) { location.href = '/my-classrooms'; return }
+            try {
+                const r = await api(`/api/classrooms/${CID}`);
+                if (!r.ok) throw new Error('Access denied');
+                const { classroom: c, isOwner } = await r.json();
+                // If API confirms this user owns the classroom, enable edit/delete
+                if (isOwner) TEACH = true;
+                TEACHER = c.teacher || {};
+                document.title = `${c.name} | Classgrid`;
+                g('chatLink').href = `/classroom-chat.html?id=${c._id}`;
+                g('backLink').href = (TEACH || isOwner) ? '/manage-classroom' : '/my-classrooms';
+                shell(c); await loadAll();
+            } catch (e) {
+                g('root').innerHTML = `<div class="empty" style="padding:80px 20px">
+      <i class="fas fa-ban"></i><h4>Access Denied</h4><p>${e.message}</p>
+      <a href="/my-classrooms" class="btnd" style="margin-top:18px;display:inline-flex">
+        <i class="fas fa-arrow-left"></i>&nbsp;Go Back</a></div>`;
+            }
+        }
+
+        function shell(c) {
+            const t = c.teacher || {};
+            const ini = (t.name || 'T').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const av = t.profilePicture ? `<img src="${x(t.profilePicture)}" alt="${x(t.name)}" onerror="this.parentElement.innerHTML='${ini}'">` : ini;
+            let meta = `<div class="im"><i class="fas fa-envelope"></i>${x(t.email || '')}</div>`;
+            if (t.qualification) meta += `<div class="im"><i class="fas fa-graduation-cap"></i>${x(t.qualification)}</div>`;
+            if (t.department) meta += `<div class="im"><i class="fas fa-building"></i>${x(t.department)}</div>`;
+            g('root').innerHTML = `
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-top">
+    <div class="htag"><i class="fas fa-flask"></i>${x(c.subject || 'Classroom')}</div>
+    <div class="htitle"><span>${x(c.name)}</span><button class="refr" onclick="loadAll()" title="Refresh"><i class="fas fa-rotate-right"></i></button></div>
+    <p class="hdesc">${x(c.description || 'Welcome to this classroom.')}</p>
+    <span class="hstat"><i class="fas fa-users"></i>${c.memberCount || 0} Members</span>
+  </div>
+  <div class="inst">
+    <div class="iav">${av}</div>
+    <div class="iinfo">
+      <div class="ilbl">Instructor</div>
+      <div class="iname">${x(t.name || 'Teacher')}</div>
+      <div class="imeta">${meta}</div>
+      ${t.bio ? `<div class="ibio">"${x(t.bio)}"</div>` : ''}
+    </div>
+  </div>
+</div>
+<div class="tabs">
+  <button class="tab on" onclick="swTab('ann',this)"><i class="fas fa-bullhorn"></i>Announcements<span class="tn" id="n-ann">0</span></button>
+  <button class="tab" onclick="swTab('mat',this)"><i class="fas fa-file-alt"></i>Materials<span class="tn" id="n-mat">0</span></button>
+  <button class="tab" onclick="swTab('qz',this)"><i class="fas fa-clipboard-list"></i>Quizzes<span class="tn" id="n-qz">0</span></button>
+  <button class="tab" onclick="swTab('att',this)" id="tab-att" style="display:none"><i class="fas fa-calendar-check"></i>Attendance</button>
+  <button class="tab" onclick="swTab('mem',this)"><i class="fas fa-users"></i>Members<span class="tn" id="n-mem">0</span></button>
+</div>
+<div id="p-ann" class="panel on"></div>
+<div id="p-mat" class="panel"></div>
+<div id="p-qz" class="panel"></div>
+<div id="p-att" class="panel"></div>
+<div id="p-mem" class="panel"></div>`;
+        }
+
+        window.swTab = function (n, b) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+            g('p-' + n).classList.add('on'); b.classList.add('on');
+        };
+
+        async function loadAll() {
+            if (!g('p-ann')) return;
+            ['ann', 'mat', 'qz'].forEach(k => { g('p-' + k).innerHTML = sk() });
+            try {
+                const [mR, aR, qR, sR] = await Promise.all([
+                    api(`/api/classrooms/${CID}/content/materials`),
+                    api(`/api/classrooms/${CID}/content/announcements`),
+                    api(`/api/classrooms/${CID}/content/quizzes`),
+                    api(`/api/classrooms/${CID}/students`)
+                ]);
+                const mats = (await mR.json()).content || [];
+                const anns = (await aR.json()).content || [];
+                const qzs = (await qR.json()).content || [];
+                let sd = { students: [], total: 0 }; try { sd = await sR.json() } catch (e) { }
+                sn('n-ann', anns.length); sn('n-mat', mats.length); sn('n-qz', qzs.length);
+                sn('n-mem', sd.total || (sd.students || []).length);
+                rAnns(anns); rMats(mats); rQzs(qzs); rMems(sd.students || [], sd.total || 0);
+                // Attendance tab â€” check if PRO plan, then load
+                loadAttendanceTab();
+            } catch (e) { console.error(e) }
+        }
+
+        function sk() { return [1, 2, 3].map(() => '<div class="sk-row"></div>').join('') }
+        function sn(id, v) { const e = g(id); if (e) e.textContent = v }
+        function dt(d) { try { return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) } catch (e) { return d } }
+        function dtFull(d) { try { return new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) } catch (e) { return d } }
+        function dateKey(d) { try { const dd = new Date(d); return `${dd.getFullYear()}-${dd.getMonth()}-${dd.getDate()}` } catch (e) { return 'x' } }
+
+        function rAnns(list) {
+            g('p-ann').innerHTML = list.length ? list.map(a => {
+                const T = a.title || '', C = a.content || a.message || '';
+                const show = T && T !== C;
+                const j = JSON.stringify(a).replace(/"/g, '&quot;');
+                const ops = TEACH ? `<div class="cops">
+      <button class="cop" onclick="event.stopPropagation();openEdit('announcements','${a.id}',${j})" title="Edit"><i class="fas fa-pen"></i></button>
+      <button class="cop del" onclick="event.stopPropagation();openDel('announcements','${a.id}','${x(T || C)}')" title="Delete"><i class="fas fa-trash"></i></button></div>` : '';
+                return `<div class="card"><div class="card-ico ci-p"><i class="fas fa-bullhorn"></i></div>
+  <div class="cbody">
+    ${show ? `<div class="ctit">${x(T)}</div>` : ''}
+    <div class="${show ? 'cdesc' : 'ctit'}">${x(C)}</div>
+    <div class="cfoot">
+      <span class="cdate"><i class="fas fa-clock"></i>${dt(a.created_at)}</span>
+      ${a.posted_by ? `<span class="cdate"><i class="fas fa-user"></i>${x(a.posted_by)}</span>` : ''}
+      ${a.tags && a.tags.length ? `<span class="cdate" style="color:var(--ac)"><i class="fas fa-tag"></i>${x(a.tags.join(', '))}</span>` : ''}
+    </div>
+  </div>${ops}</div>`;
+            }).join('')
+                : empty('fa-bullhorn', 'No Announcements', 'Nothing posted yet.');
+        }
+
+        let MAT_ALL = [], MAT_FILTER = 'all', MAT_SORT = 'newest', MAT_SEARCH = '';
+
+        function typeInfo(raw) {
+            const t = (raw || '').toLowerCase().trim();
+            if (t === 'pdf') return { icon: 'fa-file-pdf', color: '#e74c3c', label: 'PDF', group: 'pdf' };
+            if (['ppt', 'pptx'].includes(t)) return { icon: 'fa-file-powerpoint', color: '#e67e22', label: 'PPT', group: 'ppt' };
+            if (['doc', 'docx'].includes(t)) return { icon: 'fa-file-word', color: '#2980b9', label: 'DOC', group: 'doc' };
+            if (['xls', 'xlsx', 'csv'].includes(t)) return { icon: 'fa-file-excel', color: '#27ae60', label: 'XLS', group: 'xls' };
+            if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(t)) return { icon: 'fa-file-image', color: '#8e44ad', label: 'IMG', group: 'img' };
+            if (t === 'txt') return { icon: 'fa-file-lines', color: '#7f8c8d', label: 'TXT', group: 'other' };
+            return { icon: 'fa-file-alt', color: '#5e6e94', label: t.toUpperCase() || 'FILE', group: 'other' };
+        }
+
+        function gvUrl(m) {
+            const t = (m.type || '').toLowerCase();
+            return ['pdf', 'ppt', 'pptx', 'doc', 'docx', 'xls', 'xlsx'].includes(t)
+                ? `https://docs.google.com/gview?url=${encodeURIComponent(m.file_url)}&embedded=true` : m.file_url;
+        }
+
+        function groupMats(list) {
+            const map = new Map();
+            list.forEach(m => {
+                const k = m.post_id || m.batch_id || (dateKey(m.created_at) + '::' + (m.uploaded_by || ''));
+                if (!map.has(k)) map.set(k, { k, title: m.post_title || m.batch_title || '', description: m.post_description || m.description || '', uploaded_by: m.uploaded_by || '', created_at: m.created_at, files: [] });
+                map.get(k).files.push(m);
+            });
+            return [...map.values()];
+        }
+
+        function attRowHTML(m) {
+            const ti = typeInfo(m.type);
+            const vu = gvUrl(m);
+            const j = JSON.stringify(m).replace(/"/g, '&quot;');
+            const eBtn = TEACH ? `<button class="mat-att-btn" onclick="event.stopPropagation();openEdit('materials','${m.id}',${j})"><i class="fas fa-pen"></i> Rename</button>` : '';
+            const dBtn = TEACH ? `<button class="mat-att-btn del" onclick="event.stopPropagation();openDel('materials','${m.id}','${x(m.title)}')"><i class="fas fa-trash"></i> Delete</button>` : '';
+            const checkBox = TEACH ? `<input type="checkbox" class="mat-check" data-id="${m.id}" data-title="${x(m.title)}" onclick="event.stopPropagation();toggleSelect(this)" style="width:20px;height:20px;cursor:pointer;">` : '';
+            return `<div class="mat-att-row" data-file-id="${m.id}">
+  ${checkBox}
+  <div class="mat-att-ico" style="color:${ti.color}"><i class="fas ${ti.icon}"></i></div>
+  <div class="mat-att-info">
+    <div class="mat-att-name" title="${x(m.title)}">${x(m.title)}</div>
+    <div class="mat-att-type" style="color:${ti.color}">${ti.label}</div>
+  </div>
+  <div class="mat-att-btns">
+    <button class="mat-att-btn" onclick="event.stopPropagation();viewFile('${vu}','${x(m.title)}','${m.id}')"><i class="fas fa-eye"></i> View</button>
+    <button class="mat-att-btn dl" onclick="event.stopPropagation();downloadFile('${m.file_url}','${x(m.title)}')"><i class="fas fa-download"></i> Save</button>
+    ${eBtn}${dBtn}
+  </div>
+</div>`;
+        }
+
+        function postHTML(grp, tInfo) {
+            const ini = (grp.uploaded_by || tInfo.name || 'T').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const av = tInfo.profilePicture ? `<img src="${x(tInfo.profilePicture)}" alt="${x(tInfo.name)}" onerror="this.parentElement.innerHTML='${ini}'">` : ini;
+            const title = grp.title || (grp.files.length === 1 ? grp.files[0].title : '');
+            const desc = grp.description;
+            const body = (title || desc) ? `<div class="mat-post-body">
+    ${title ? `<div class="mat-post-title">${x(title)}</div>` : ''}
+    ${desc ? `<div class="mat-post-desc">${x(desc)}</div>` : ''}
+  </div>`: '';
+            const attLbl = grp.files.length > 1 ? `<div class="mat-att-label"><i class="fas fa-paperclip"></i>${grp.files.length} attachments</div>` : '';
+            return `<div class="mat-post">
+  <div class="mat-post-head">
+    <div class="mat-post-avatar">${av}</div>
+    <div class="mat-post-info">
+      <div class="mat-post-name">${x(grp.uploaded_by || tInfo.name || 'Instructor')}</div>
+      <div class="mat-post-meta">
+        <span><i class="fas fa-calendar-alt"></i>${dtFull(grp.created_at)}</span>
+        <span><i class="fas fa-file"></i>${grp.files.length} file${grp.files.length !== 1 ? 's' : ''}</span>
+      </div>
+    </div>
+  </div>
+  ${body}
+  <div class="mat-attachments">${attLbl}${grp.files.map(attRowHTML).join('')}</div>
+</div>`;
+        }
+
+        function renderMats() {
+            const el = g('p-mat');
+            if (!MAT_ALL.length) {
+                el.innerHTML = `<div class="mat-empty"><div class="mat-empty-icon"><i class="fas fa-folder-open"></i></div><h4>No Materials Yet</h4><p>Files uploaded by your instructor will appear here.</p></div>`; return;
+            }
+            let filt = MAT_ALL.filter(m => {
+                const ti = typeInfo(m.type);
+                return (MAT_FILTER === 'all' || ti.group === MAT_FILTER) && (!MAT_SEARCH || m.title.toLowerCase().includes(MAT_SEARCH.toLowerCase()));
+            });
+            if (MAT_SORT === 'newest') filt.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            else if (MAT_SORT === 'oldest') filt.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            else if (MAT_SORT === 'name_az') filt.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+            else if (MAT_SORT === 'name_za') filt.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+
+            const cnts = {};
+            MAT_ALL.forEach(m => { const g2 = typeInfo(m.type).group; cnts[g2] = (cnts[g2] || 0) + 1 });
+            const chips = [
+                { key: 'all', icon: 'fa-layer-group', label: 'All' },
+                { key: 'pdf', icon: 'fa-file-pdf', label: 'PDF' },
+                { key: 'ppt', icon: 'fa-file-powerpoint', label: 'PPT' },
+                { key: 'doc', icon: 'fa-file-word', label: 'Doc' },
+                { key: 'img', icon: 'fa-file-image', label: 'Image' },
+                { key: 'xls', icon: 'fa-file-excel', label: 'Sheet' },
+                { key: 'other', icon: 'fa-file-alt', label: 'Other' },
+            ].filter(c => c.key === 'all' || cnts[c.key])
+                .map(c => {
+                    const n = c.key === 'all' ? MAT_ALL.length : (cnts[c.key] || 0);
+                    return `<button class="mf-chip ${MAT_FILTER === c.key ? 'active' : ''}" onclick="setMatFilter('${c.key}')"><i class="fas ${c.icon}"></i>${c.label} <span style="opacity:.55">${n}</span></button>`;
+                }).join('');
+
+            const groups = groupMats(filt);
+            if (MAT_SORT === 'newest' || MAT_SORT === 'oldest')
+                groups.sort((a, b) => MAT_SORT === 'newest' ? new Date(b.created_at) - new Date(a.created_at) : new Date(a.created_at) - new Date(b.created_at));
+
+            let html = ''; let ldk = null;
+            groups.forEach(grp => {
+                const dk = dateKey(grp.created_at);
+                if ((MAT_SORT === 'newest' || MAT_SORT === 'oldest') && dk !== ldk) {
+                    html += `<div class="mat-date-sep"><span class="mat-date-label"><i class="fas fa-calendar-days"></i>${dtFull(grp.created_at)}</span><div class="mat-date-line"></div></div>`;
+                    ldk = dk;
+                }
+                html += postHTML(grp, TEACHER);
+            });
+
+            const bulkBar = TEACH ? `<div class="bulk-bar" id="bulkBar">
+  <div class="bulk-info">
+    <i class="fas fa-check-circle"></i>
+    <span id="bulkCount">0 selected</span>
+  </div>
+  <div class="bulk-actions">
+    <button class="bulk-btn cancel" onclick="clearSelection()">Cancel</button>
+    <button class="bulk-btn delete" onclick="bulkDelete()"><i class="fas fa-trash"></i> Delete Selected</button>
+  </div>
+</div>` : '';
+
+            el.innerHTML = `${bulkBar}<div class="mat-toolbar">
+  <div class="mat-search"><i class="fas fa-search"></i><input type="text" placeholder="Search materialsâ€¦" value="${x(MAT_SEARCH)}" oninput="setMatSearch(this.value)" autocomplete="off"></div>
+  <div class="mat-filters">${chips}</div>
+  <div class="mat-sort"><i class="fas fa-sort"></i>
+    <select onchange="setMatSort(this.value)" aria-label="Sort">
+      <option value="newest" ${MAT_SORT === 'newest' ? 'selected' : ''}>Newest First</option>
+      <option value="oldest" ${MAT_SORT === 'oldest' ? 'selected' : ''}>Oldest First</option>
+      <option value="name_az" ${MAT_SORT === 'name_az' ? 'selected' : ''}>Name A â†’ Z</option>
+      <option value="name_za" ${MAT_SORT === 'name_za' ? 'selected' : ''}>Name Z â†’ A</option>
+    </select>
+  </div>
+</div>
+<div class="mat-count">Showing <strong>${filt.length}</strong> of ${MAT_ALL.length} file${MAT_ALL.length !== 1 ? 's' : ''}</div>
+${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div class="mat-empty-icon"><i class="fas fa-search"></i></div><h4>No Results</h4><p>Try a different search or filter.</p></div>`}`;
+        }
+
+        window.toggleSelect = function (checkbox) {
+            const id = checkbox.dataset.id;
+            if (checkbox.checked) {
+                SELECTED_FILES.add(id);
+            } else {
+                SELECTED_FILES.delete(id);
+            }
+            updateBulkBar();
+        };
+
+        function updateBulkBar() {
+            if (!TEACH) return;
+            const bar = g('bulkBar');
+            const count = g('bulkCount');
+            if (!bar) return;
+
+            if (SELECTED_FILES.size > 0) {
+                bar.classList.add('active');
+                count.textContent = `${SELECTED_FILES.size} selected`;
+            } else {
+                bar.classList.remove('active');
+            }
+        }
+
+        window.clearSelection = function () {
+            SELECTED_FILES.clear();
+            document.querySelectorAll('.mat-check').forEach(cb => cb.checked = false);
+            updateBulkBar();
+        };
+
+        window.bulkDelete = async function () {
+            if (SELECTED_FILES.size === 0) return;
+
+            const confirmMsg = `Delete ${SELECTED_FILES.size} file${SELECTED_FILES.size !== 1 ? 's' : ''}? This cannot be undone.`;
+            if (!confirm(confirmMsg)) return;
+
+            toast('Deleting files...', 'ok');
+
+            try {
+                const promises = Array.from(SELECTED_FILES).map(id =>
+                    api(`/api/classrooms/${CID}/content/materials/${id}`, { method: 'DELETE' })
+                );
+                await Promise.all(promises);
+                clearSelection();
+                toast(`Deleted ${promises.length} file${promises.length !== 1 ? 's' : ''}`, 'ok');
+                loadAll();
+            } catch (e) {
+                toast('Delete failed', 'err');
+            }
+        };
+
+        window.viewFile = function (url, title, id) {
+            const viewer = g('fileViewer');
+            const viewerTitle = g('fileViewerTitle');
+            const viewerBody = g('fileViewerBody');
+
+            viewerTitle.textContent = title;
+            viewerBody.innerHTML = `<iframe src="${url}" frameborder="0"></iframe>`;
+            viewer.classList.add('active');
+
+            logV('material', id, title);
+        };
+
+        window.closeFileViewer = function () {
+            const viewer = g('fileViewer');
+            const viewerBody = g('fileViewerBody');
+            viewer.classList.remove('active');
+            viewerBody.innerHTML = '';
+        };
+
+        window.downloadFile = function (url, title) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = title;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            toast('Download started', 'ok');
+        };
+
+        window.setMatFilter = k => { MAT_FILTER = k; renderMats() };
+        window.setMatSort = v => { MAT_SORT = v; renderMats() };
+        window.setMatSearch = v => { MAT_SEARCH = v; renderMats() };
+        

@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "src/**",
+          "config/**",
+          "public/**",
+          "env.js"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.js"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/classroom-chat/cleanup",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/digest/daily",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/process-email-queue",
+      "schedule": "30 6 * * *"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+=== LOADER CSS (lines 1625-1670) ===
+1625:         #loader {
+1626:             position: fixed;
+1627:             inset: 0;
+1628:             background: var(--bg-deep);
+1629:             z-index: 2000;
+1630:             display: flex;
+1631:             align-items: center;
+1632:             justify-content: center;
+1633:             flex-direction: column;
+1634:             gap: 1rem;
+1635:         }
+1636: 
+1637:         .loader-ring {
+1638:             width: 52px;
+1639:             height: 52px;
+1640:             border: 3px solid rgba(255, 255, 255, 0.06);
+1641:             border-top-color: var(--cyan);
+1642:             border-right-color: var(--purple);
+1643:             border-radius: 50%;
+1644:             animation: spin 0.8s linear infinite;
+1645:         }
+1646: 
+1647:         @keyframes spin {
+1648:             to {
+1649:                 transform: rotate(360deg);
+1650:             }
+1651:         }
+1652: 
+1653:         .loader-text {
+1654:             font-family: 'Orbitron';
+1655:             font-size: 0.72rem;
+1656:             color: var(--text-dim);
+1657:             letter-spacing: 2px;
+1658:             text-transform: uppercase;
+1659:         }
+1660: 
+1661:         /* ============================================================
+1662:            EMPTY STATE
+1663:         ============================================================ */
+1664:         .empty-state {
+1665:             text-align: center;
+1666:             padding: 2rem;
+1667:             color: var(--text-dim);
+1668:         }
+1669: 
+1670:         .empty-state i {
+
+=== LOADER HTML (lines 2515-2540) ===
+2515:     </div>
+2516: 
+2517:     <!-- Loader -->
+2518:     <div id="loader">
+2519:         <div class="loader-ring"></div>
+2520:         <div class="loader-text">Initializing Dashboard</div>
+2521:     </div>
+2522: 
+2523:     <!-- ============================================================
+2524:          NAVBAR
+2525:     ============================================================ -->
+2526:     <nav class="navbar">
+2527:         <div class="nav-left">
+2528:             <a href="/classroom" class="nav-brand" title="Dashboard">
+2529:                 <img src="/Classgrid.png" alt="Classgrid Logo" style="height:28px; width:auto; border-radius:4px;">
+2530:                 <span class="brand-text">Classgrid</span>
+2531:             </a>
+2532:             <div class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></div>
+2533:             <span class="nav-page-label">Dashboard</span>
+2534:         </div>
+2535: 
+2536:         <div class="nav-right">
+2537:             <!-- Notifications -->
+2538:             <button class="nav-icon-btn" id="notifBtn" onclick="window.toggleNotifications()" title="Notifications">
+2539:                 <i class="fas fa-bell"></i>
+2540:                 <span class="nav-icon-label">Alerts</span>
+
+=== mainContent (lines 2540-2560) ===
+2540:                 <span class="nav-icon-label">Alerts</span>
+2541:                 <span id="notifBadge" class="notif-badge" style="display:none"></span>
+2542:             </button>
+2543: 
+2544:             <!-- User pill -->
+2545:             <div class="nav-pill" title="Current Session">
+2546:                 <i class="fas fa-user-circle"></i>
+2547:                 <span id="navName">User</span>
+2548:                 <span id="navRole" class="role-badge">Role</span>
+2549:             </div>
+2550: 
+2551:             <!-- Action buttons -->
+2552:             <a href="/my-classrooms" class="nav-icon-btn" title="My Classrooms">
+2553:                 <i class="fas fa-school"></i>
+2554:                 <span class="nav-icon-label">Classes</span>
+2555:             </a>
+2556:             <a href="/manage-classroom" class="nav-icon-btn" id="manageLink" style="display:none"
+2557:                 title="Manage Classrooms">
+2558:                 <i class="fas fa-cog"></i>
+2559:                 <span class="nav-icon-label">Manage</span>
+2560:             </a>
+
+=== line 77 overflow ===
+77:             overflow-x: hidden;
+78:         }
+79: 

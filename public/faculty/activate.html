@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Faculty Account Setup | Classgrid</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hi: rgba(255, 255, 255, 0.16);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --muted: #888888;
+            --success: #10B981;
+            --error: #EF4444;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .reset-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 440px;
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 36px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo-box {
+            width: 48px;
+            height: 48px;
+            background: #000;
+            border-radius: 10px;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            margin-bottom: 24px;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 11.5px;
+            background: var(--grad-bp);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            border-radius: 9px;
+            z-index: 0;
+        }
+
+        .logo-box img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 0.88rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .label {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-left: 2px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #444;
+            font-size: 14px;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 48px 14px 44px;
+            color: #fff;
+            font-size: 0.92rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .form-input::placeholder {
+            color: #444;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--blue);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 3px rgba(74, 144, 245, 0.12);
+        }
+
+        .form-input:focus~.icon {
+            color: var(--blue-light);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #444;
+            cursor: pointer;
+            padding: 6px;
+            transition: color 0.2s;
+            font-size: 14px;
+        }
+
+        .password-toggle:hover {
+            color: #888;
+        }
+
+        .submit-btn {
+            width: 100%;
+            margin-top: 8px;
+            background: var(--grad-bp);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message-box {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 3px solid transparent;
+            animation: msgFade 0.3s ease;
+        }
+
+        .countdown-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #fca5a5;
+            letter-spacing: 0.5px;
+        }
+
+        .countdown-badge i {
+            font-size: 0.78rem;
+        }
+
+        @keyframes msgFade {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-box.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.08);
+            color: #f87171;
+            border-left-color: var(--error);
+        }
+
+        .message-box.success {
+            display: block;
+            background: rgba(16, 185, 129, 0.08);
+            color: #6EE7B7;
+            border-left-color: var(--success);
+        }
+
+        .loading-ring {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .brand-footer {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 480px) {
+            .reset-card {
+                padding: 36px 24px;
+            }
+
+            .card-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reset-card">
+        <div class="card-header">
+            <div class="logo-box">
+                <img src="/Classgrid.png" alt="Classgrid">
+            </div>
+            <span class="portal-label"
+                style="font-family: 'Sora', sans-serif; font-size: 0.65rem; font-weight: 700; color: var(--blue-light); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; display: inline-block; background: rgba(74, 144, 245, 0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(74, 144, 245, 0.2);">Faculty
+                Password Setup Portal</span>
+            <h1 class="card-title">Faculty Account Setup</h1>
+            <p class="card-subtitle">Set your secure password to activate your Faculty account.</p>
+        </div>
+
+        <div id="messageContainer" class="message-box"></div>
+
+        <form id="resetPasswordForm" class="form-section">
+            <div class="form-group">
+                <label class="label">New Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock icon"></i>
+                    <input type="password" id="password" class="form-input" placeholder="At least 6 characters" required
+                        minlength="6">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="label">Confirm Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-shield-alt icon"></i>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="Re-enter your password"
+                        required minlength="6">
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="label">Faculty Organization Code</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-building icon"></i>
+                    <input type="text" id="orgCode" class="form-input" placeholder="Enter your organization code"
+                        required>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <span>Activate Account</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <div class="brand-footer">© 2026 Classgrid. All rights reserved.</div>
+    </div>
+
+    <script>
+        function getApiBaseUrl() {
+            const origin = window.location.origin;
+            return origin.includes('localhost') ? 'http://localhost:3000/api' : '/api';
+        }
+
+        const API_URL = `${getApiBaseUrl()}/auth/faculty-activate`;
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (!token) {
+            window.location.href = '/login?error=missing_token';
+        }
+
+        function togglePassword(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const icon = el.nextElementSibling ? el.nextElementSibling.querySelector('i') : null;
+            if (el.type === 'password') {
+                el.type = 'text';
+                if (icon) icon.className = 'fas fa-eye-slash';
+            } else {
+                el.type = 'password';
+                if (icon) icon.className = 'fas fa-eye';
+            }
+        }
+
+        let _countdownTimer = null;
+
+        function showMessage(text, type = 'error') {
+            const container = document.getElementById('messageContainer');
+            if (!container) return;
+            container.innerHTML = text;
+            container.className = `message-box ${type}`;
+        }
+
+        function startRateLimitCountdown(seconds) {
+            const btn = document.getElementById('submitBtn');
+            const container = document.getElementById('messageContainer');
+            if (_countdownTimer) clearInterval(_countdownTimer);
+
+            let remaining = seconds;
+
+            function fmt(s) {
+                const m = Math.floor(s / 60);
+                const sec = s % 60;
+                return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+            }
+
+            function render() {
+                container.innerHTML = `Too many attempts. Please wait before trying again.<br>
+                    <span class="countdown-badge"><i class="fas fa-clock"></i> Try again in ${fmt(remaining)}</span>`;
+                container.className = 'message-box error';
+            }
+
+            if (btn) btn.disabled = true;
+            render();
+
+            _countdownTimer = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(_countdownTimer);
+                    _countdownTimer = null;
+                    container.innerHTML = 'You can try again now.';
+                    container.className = 'message-box error';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>Activate Account</span> <i class="fas fa-arrow-right"></i>';
+                    }
+                } else {
+                    render();
+                }
+            }, 1000);
+        }
+
+        const resetForm = document.getElementById('resetPasswordForm');
+        if (resetForm) {
+            resetForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const password = document.getElementById('password').value;
+                const confirm = document.getElementById('confirmPassword').value;
+                const orgCode = document.getElementById('orgCode').value.trim();
+                const btn = document.getElementById('submitBtn');
+
+                if (password !== confirm) {
+                    showMessage('Passwords do not match.');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showMessage('Password must be at least 6 characters.');
+                    return;
+                }
+
+                if (!orgCode) {
+                    showMessage('Faculty Organization Code is required.');
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML = '<div class="loading-ring"></div> <span>Activating...</span>';
+
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token, password, orgCode })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage('Account activated! Redirecting...', 'success');
+                        if (data.token) localStorage.setItem('jwt_token', data.token);
+                        if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+                        setTimeout(() => {
+                            window.location.replace('/classroom');
+                        }, 2000);
+                    } else if (response.status === 429 && data.retryAfterSeconds) {
+                        startRateLimitCountdown(data.retryAfterSeconds);
+                    } else {
+                        showMessage(data.message || 'Activation failed. Link may be invalid or expired.');
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>Activate Account</span> <i class="fas fa-arrow-right"></i>';
+                    }
+                } catch (err) {
+                    showMessage('Network error. Please try again.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Activate Account</span> <i class="fas fa-arrow-right"></i>';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

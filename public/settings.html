@@ -1,0 +1,865 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        /* Auth Guard — runs BEFORE CSS/content to prevent any flash of protected content */
+        (function () {
+            var t = null; var hasUrlToken = window.location.search.indexOf('token=') !== -1;
+            if (t || hasUrlToken) {
+                window.addEventListener('pageshow', function (e) { if (e.persisted && !null) window.location.replace('/login.html'); });
+                window.addEventListener('storage', function (e) { if (e.key === 'jwt_token' && !e.newValue) window.location.replace('/login.html'); });
+                return;
+            }
+            var _cs = document.createElement('style'); _cs.id = '_ag'; _cs.textContent = 'body>*:not(script):not(style){visibility:hidden!important}'; document.head.appendChild(_cs);
+            var _cb = location.origin.includes('localhost') ? 'http://localhost:3000' : '';
+            var _tok = localStorage.getItem('jwt_token'); var _hdrs = { 'Cache-Control': 'no-store' }; if (_tok && _tok !== 'null' && _tok !== 'undefined') { _hdrs['Authorization'] = 'Bearer ' + _tok; } fetch(_cb + '/api/auth/me', { credentials: 'include', cache: 'no-store', headers: _hdrs })
+                .then(function (r) { if (r.ok) return r.json().then(function (u) { window._cookieAuthUser = u; var e = document.getElementById('_ag'); if (e) e.remove(); }); throw 0; })
+                .catch(function () { window.location.replace('/login.html'); });
+        })();
+    </script>
+    <script src="/app-state.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Settings | Classgrid</title>
+    <meta name="description" content="Manage your Classgrid notification preferences and account settings.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/mobile-nav.css">
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --surface2: #141414;
+            --border: rgba(255, 255, 255, 0.07);
+            --border-hi: rgba(255, 255, 255, 0.15);
+            --text: #ffffff;
+            --muted: #888888;
+            --dim: #444444;
+            --green: #22c55e;
+            --red: #ef4444;
+            --navbar-h: 64px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.65;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--navbar-h);
+            z-index: 200;
+            background: #000000;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            gap: 1rem;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-brand {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-brand .brand-highlight {
+            color: #ffffff;
+        }
+
+        .breadcrumb-sep {
+            color: var(--muted);
+            font-size: 0.75rem;
+        }
+
+        .nav-page-label {
+            font-weight: 600;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .nav-icon-btn {
+            height: 36px;
+            padding: 0 0.85rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        .nav-icon-btn:hover {
+            border-color: var(--border-hi);
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            padding: calc(var(--navbar-h) + 2rem) 1.5rem 3rem;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: #fff;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .phase-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-bottom: 1.25rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--text);
+        }
+
+        /* SETTINGS CARD */
+        .settings-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: #fff;
+        }
+
+        .settings-card-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .settings-card-subtitle {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.2rem;
+        }
+
+        /* TOGGLE ROW */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toggle-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .toggle-info {
+            flex: 1;
+        }
+
+        .toggle-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 0.2rem;
+        }
+
+        .toggle-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        /* TOGGLE SWITCH */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            transition: all 0.3s;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            left: 2px;
+            bottom: 2px;
+            background: var(--muted);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .toggle-switch input:checked+.toggle-slider::before {
+            transform: translateX(20px);
+            background: #ffffff;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+        }
+
+        /* GLOBAL TOGGLE */
+        .global-toggle {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        /* DIGEST OPTIONS */
+        .digest-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .digest-option {
+            display: block;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .digest-option:hover {
+            border-color: var(--border-hi);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .digest-option.selected {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .digest-option input[type="radio"] {
+            display: none;
+        }
+
+        .digest-option-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .digest-icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .digest-option-title {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .digest-option-desc {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 0.1rem;
+        }
+
+        /* LOADING & TOAST */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            gap: 1rem;
+            color: var(--muted);
+        }
+
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #ffffff;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .save-status {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #ffffff;
+            color: #000000;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 500;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .save-status.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .save-status.error {
+            background: var(--red);
+            color: #ffffff;
+        }
+
+        @media (max-width: 640px) {
+            .nav-icon-label {
+                display: none;
+            }
+
+            .nav-icon-btn {
+                width: 36px;
+                padding: 0;
+                justify-content: center;
+            }
+
+            .navbar {
+                padding: 0 0.75rem;
+            }
+
+            .nav-brand .brand-text {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Cosmos background strictly deprecated in Modern aesthetic -->
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/classroom" class="nav-brand">
+                <img src="/Classgrid.png" alt="Classgrid Logo"
+                    style="height:28px; width:auto; border-radius:4px; margin-right:8px;">
+                <span class="brand-text">Class<span class="brand-highlight">grid</span></span>
+            </a>
+            <span class="breadcrumb-sep">/</span>
+            <span class="nav-page-label">Settings</span>
+        </div>
+        <div class="nav-right">
+            <a href="/classroom" class="nav-icon-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span class="nav-icon-label">Dashboard</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main-content" id="settingsContainer">
+        <div class="loading-state" id="loadingState">
+            <div class="loading-spinner"></div>
+            <span>Loading preferences…</span>
+        </div>
+
+        <div id="settingsContent" style="display: none;">
+            <a href="/classroom" class="back-link"><i class="fas fa-chevron-left"></i> Back to Dashboard</a>
+
+            <div class="page-header">
+                <h1><i class="fas fa-cog" style="margin-right: 0.4rem;"></i> Settings</h1>
+                <p>Manage your email notification preferences. These settings control which emails you receive from
+                    Classgrid.</p>
+                <div style="margin-top: 0.6rem;">
+                    <span class="phase-label"><i class="fas fa-rocket"></i> Phase 1</span>
+                </div>
+            </div>
+
+            <!-- GLOBAL TOGGLE -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon"><i class="fas fa-power-off"></i></div>
+                    <div>
+                        <div class="settings-card-title">Master Email Control</div>
+                        <div class="settings-card-subtitle">Turn all email notifications on or off</div>
+                    </div>
+                </div>
+                <div class="global-toggle">
+                    <div class="toggle-row" style="border-bottom: none;">
+                        <div class="toggle-info">
+                            <div class="toggle-label">Enable Email Notifications</div>
+                            <div class="toggle-desc">When OFF, Classgrid will not send you any emails. Dashboard
+                                notifications remain active.</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-global" data-pref="global">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DELIVERY MODE -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon"><i class="fas fa-clock"></i></div>
+                    <div>
+                        <div class="settings-card-title">Delivery Mode</div>
+                        <div class="settings-card-subtitle">Choose how you receive email notifications</div>
+                    </div>
+                </div>
+                <div class="digest-options" id="digestOptions">
+                    <label class="digest-option" data-mode="instant">
+                        <input type="radio" name="digestMode" value="instant">
+                        <div class="digest-option-content">
+                            <span class="digest-icon">⚡</span>
+                            <div>
+                                <div class="digest-option-title">Instant</div>
+                                <div class="digest-option-desc">Get emails immediately when events happen</div>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="digest-option" data-mode="daily">
+                        <input type="radio" name="digestMode" value="daily">
+                        <div class="digest-option-content">
+                            <span class="digest-icon">📬</span>
+                            <div>
+                                <div class="digest-option-title">Daily Digest</div>
+                                <div class="digest-option-desc">One summary email per day at 6 AM</div>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="digest-option" data-mode="weekly">
+                        <input type="radio" name="digestMode" value="weekly">
+                        <div class="digest-option-content">
+                            <span class="digest-icon">📅</span>
+                            <div>
+                                <div class="digest-option-title">Weekly Summary</div>
+                                <div class="digest-option-desc">One summary email every Monday</div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- STUDENT/COMMON PREFERENCES -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon"><i class="fas fa-envelope"></i></div>
+                    <div>
+                        <div class="settings-card-title">Email Notification Preferences</div>
+                        <div class="settings-card-subtitle">Choose which classroom activities trigger email
+                            notifications</div>
+                    </div>
+                </div>
+
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <div class="toggle-label">📢 Announcements</div>
+                        <div class="toggle-desc">Get emailed when new announcements are posted in your classrooms</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-announcements" data-pref="announcements">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <div class="toggle-label">📄 Notes & Materials</div>
+                        <div class="toggle-desc">Get emailed when new notes or materials are uploaded</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-notes" data-pref="notes">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <div class="toggle-label">📝 Quizzes</div>
+                        <div class="toggle-desc">Get emailed when new quizzes are created</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-quizzes" data-pref="quizzes">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <div class="toggle-label">✅ Join Request Status</div>
+                        <div class="toggle-desc">Get emailed when your classroom join request is approved</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-joinApproval" data-pref="joinApproval">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- FACULTY-ONLY SECTION -->
+            <div class="settings-card" id="facultySection" style="display: none;">
+                <div class="settings-card-header">
+                    <div class="settings-card-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div>
+                        <div class="settings-card-title">Faculty Email Settings</div>
+                        <div class="settings-card-subtitle">Control whether posting content sends emails to your
+                            students</div>
+                    </div>
+                </div>
+
+                <div class="toggle-row" style="border-bottom: none;">
+                    <div class="toggle-info">
+                        <div class="toggle-label">📨 Email Students on Post</div>
+                        <div class="toggle-desc">When you post announcements, notes, or quizzes, automatically email all
+                            students in the classroom who have notifications enabled</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-emailOnPost" data-pref="emailOnPost">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Save Status Toast -->
+    <div class="save-status" id="saveStatus">
+        <i class="fas fa-check-circle"></i>
+        <span id="saveStatusText">Preferences saved</span>
+    </div>
+
+    <script>
+        const API_BASE = '/api/user';
+        let currentPrefs = {};
+        let userRole = null;
+
+        // ── Auth (matches auth-check.js) ────────────
+        const TOKEN_KEY = 'jwt_token';
+        const USER_KEY = 'user';
+
+        function getToken() {
+            return localStorage.getItem(TOKEN_KEY) || null;
+        }
+
+        function getCachedUser() {
+            try {
+                const raw = localStorage.getItem(USER_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch { return null; }
+        }
+
+        function authHeaders() {
+            const token = getToken();
+            return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+        }
+
+        // ── Load Preferences ────────────────────────
+        async function loadPreferences() {
+            const headers = authHeaders();
+            if (!headers) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                // Fetch preferences + user profile in parallel
+                const [prefsRes, profileRes] = await Promise.all([
+                    fetch(`${API_BASE}/email-preferences`, { headers, credentials: 'include' }),
+                    fetch(`${API_BASE}/profile`, { headers, credentials: 'include' }),
+                ]);
+
+                if (prefsRes.status === 401 || profileRes.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const prefsData = await prefsRes.json();
+                const profileData = await profileRes.json();
+
+                currentPrefs = prefsData.emailNotifications || {};
+                userRole = profileData.user?.role || 'student';
+
+                // Set toggles
+                document.querySelectorAll('[data-pref]').forEach(input => {
+                    const key = input.dataset.pref;
+                    input.checked = currentPrefs[key] !== false; // default to true
+                });
+
+                // Set digest mode radio
+                const digestMode = currentPrefs.digestMode || 'instant';
+                const digestRadio = document.querySelector(`input[name="digestMode"][value="${digestMode}"]`);
+                if (digestRadio) {
+                    digestRadio.checked = true;
+                    digestRadio.closest('.digest-option').classList.add('selected');
+                }
+
+                // Show faculty section if applicable
+                if (userRole === 'faculty' || userRole === 'teacher') {
+                    document.getElementById('facultySection').style.display = 'block';
+                }
+
+                // Show content
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('settingsContent').style.display = 'block';
+
+                // Attach listeners after load
+                attachToggleListeners();
+                attachDigestListeners();
+            } catch (err) {
+                console.error('Failed to load preferences:', err);
+                document.getElementById('loadingState').innerHTML =
+                    '<i class="fas fa-exclamation-circle" style="color:var(--red); font-size:1.5rem;"></i><span>Failed to load settings.</span>';
+            }
+        }
+
+        // ── Save on Toggle ──────────────────────────
+        function attachToggleListeners() {
+            document.querySelectorAll('[data-pref]').forEach(input => {
+                input.addEventListener('change', async (e) => {
+                    const key = e.target.dataset.pref;
+                    const value = e.target.checked;
+
+                    // If global is disabled, visually dim other toggles
+                    if (key === 'global') {
+                        toggleDimState(!value);
+                    }
+
+                    await savePreference(key, value);
+                });
+            });
+
+            // Initialize dim state
+            const globalToggle = document.getElementById('toggle-global');
+            if (globalToggle && !globalToggle.checked) {
+                toggleDimState(true);
+            }
+        }
+
+        function toggleDimState(disabled) {
+            document.querySelectorAll('[data-pref]').forEach(input => {
+                if (input.dataset.pref === 'global') return;
+                const row = input.closest('.toggle-row');
+                if (row) {
+                    row.style.opacity = disabled ? '0.4' : '1';
+                    row.style.pointerEvents = disabled ? 'none' : 'auto';
+                }
+            });
+        }
+
+        function attachDigestListeners() {
+            document.querySelectorAll('input[name="digestMode"]').forEach(radio => {
+                radio.addEventListener('change', async (e) => {
+                    // Update selected styling
+                    document.querySelectorAll('.digest-option').forEach(opt => opt.classList.remove('selected'));
+                    e.target.closest('.digest-option').classList.add('selected');
+
+                    // Save
+                    const headers = authHeaders();
+                    if (!headers) return;
+                    try {
+                        const res = await fetch(`${API_BASE}/email-preferences`, {
+                            method: 'PUT',
+                            headers,
+                            credentials: 'include',
+                            body: JSON.stringify({ digestMode: e.target.value }),
+                        });
+                        if (!res.ok) throw new Error('Save failed');
+                        showToast('Delivery mode updated', false);
+                    } catch (err) {
+                        showToast('Failed to save', true);
+                    }
+                });
+            });
+        }
+
+        async function savePreference(key, value) {
+            const headers = authHeaders();
+            if (!headers) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/email-preferences`, {
+                    method: 'PUT',
+                    headers,
+                    credentials: 'include',
+                    body: JSON.stringify({ [key]: value }),
+                });
+
+                if (!res.ok) throw new Error('Save failed');
+
+                showToast('Preferences saved', false);
+            } catch (err) {
+                console.error('Save error:', err);
+                showToast('Failed to save', true);
+                // Revert toggle
+                const toggle = document.getElementById(`toggle-${key}`);
+                if (toggle) toggle.checked = !value;
+            }
+        }
+
+        // ── Toast ────────────────────────────────────
+        function showToast(message, isError = false) {
+            const el = document.getElementById('saveStatus');
+            const textEl = document.getElementById('saveStatusText');
+            const iconEl = el.querySelector('i');
+
+            textEl.textContent = message;
+            el.className = 'save-status' + (isError ? ' error' : '');
+            iconEl.className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+
+            el.classList.add('visible');
+            setTimeout(() => el.classList.remove('visible'), 2500);
+        }
+
+        // ── Init (SPA-safe: DOMContentLoaded may have already fired) ──
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadPreferences);
+        } else {
+            loadPreferences();
+        }
+    </script>
+
+    <!-- SPA Router: instant navigation between classroom/view-classroom/settings -->
+    <script src="/js/spa-router.js"></script>
+</body>
+
+</html>

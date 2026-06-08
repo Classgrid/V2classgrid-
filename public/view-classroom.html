@@ -1,0 +1,3903 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <script>
+        /* Auth Guard â— runs BEFORE CSS/content to prevent any flash of protected content */
+        (function () {
+            var t = null; var hasUrlToken = window.location.search.indexOf('token=') !== -1;
+            if (t || hasUrlToken) {
+                window.addEventListener('pageshow', function (e) { if (e.persisted && !null) window.location.replace('/login.html'); });
+                window.addEventListener('storage', function (e) { if (e.key === 'jwt_token' && !e.newValue) window.location.replace('/login.html'); });
+                return;
+            }
+            var _cs = document.createElement('style'); _cs.id = '_ag'; _cs.textContent = 'body>*:not(script):not(style){visibility:hidden!important}'; document.head.appendChild(_cs);
+            var _cb = location.origin.includes('localhost') ? 'http://localhost:3000' : '';
+            var _tok = localStorage.getItem('jwt_token'); var _hdrs = { 'Cache-Control': 'no-store' }; if (_tok && _tok !== 'null' && _tok !== 'undefined') { _hdrs['Authorization'] = 'Bearer ' + _tok; } fetch(_cb + '/api/auth/me', { credentials: 'include', cache: 'no-store', headers: _hdrs })
+                .then(function (r) { if (r.ok) return r.json().then(function (u) { window._cookieAuthUser = u; var e = document.getElementById('_ag'); if (e) e.remove(); }); throw 0; })
+                .catch(function () { window.location.replace('/login.html'); });
+        })();
+    </script>
+    <script src="/app-state.js"></script>
+    <!-- pdf.js deferred — only needed for PDF summarization, not page render -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"
+        onload="pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js'"></script>
+    <!-- Preconnect to speed up CDN resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Classroom | Classgrid</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        img {
+            max-width: 100%
+        }
+
+        :root {
+            --bg: #f0f4fb;
+            --bg2: #ffffff;
+            --bg3: #edf1fb;
+            --bg4: #dce3f5;
+            --bd: rgba(0, 0, 0, .07);
+            --bd2: rgba(0, 0, 0, .12);
+            --tx: #0b0f1e;
+            --tx2: #3d4a6a;
+            --mt: #5a6a8e;
+            --dm: #94a3c0;
+            --ac: #2d6fdf;
+            --ac2: #6340d6;
+            --gr: #00a87a;
+            --rd: #d93545;
+            --nav: 60px;
+            --r: 14px;
+            --f: 'Outfit', sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg: #07080f;
+            --bg2: #0e111c;
+            --bg3: #151a2b;
+            --bg4: #1c2338;
+            --bd: rgba(255, 255, 255, .07);
+            --bd2: rgba(255, 255, 255, .13);
+            --tx: #eef2ff;
+            --tx2: #a8b4d0;
+            --mt: #5e6e94;
+            --dm: #364058;
+            --ac: #4f8eff;
+            --ac2: #7c5cfc;
+            --gr: #00c896;
+            --rd: #ff4757;
+        }
+
+        body {
+            font-family: var(--f);
+            background: var(--bg);
+            color: var(--tx);
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            font-size: 16px;
+        }
+
+        /* BG */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden
+        }
+
+        .bg-layer::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(45, 111, 223, .06) 0%, transparent 70%);
+            top: -150px;
+            right: -120px;
+            animation: ga 22s ease-in-out infinite alternate
+        }
+
+        .bg-layer::after {
+            content: '';
+            position: absolute;
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 64, 214, .04) 0%, transparent 70%);
+            bottom: -60px;
+            left: -80px;
+            animation: gb 28s ease-in-out infinite alternate
+        }
+
+        @keyframes ga {
+            to {
+                transform: translate(-40px, 60px)scale(1.06)
+            }
+        }
+
+        @keyframes gb {
+            to {
+                transform: translate(40px, -30px)scale(1.08)
+            }
+        }
+
+        [data-theme="dark"] .bg-layer::before {
+            background: radial-gradient(circle, rgba(79, 142, 255, .06) 0%, transparent 70%)
+        }
+
+        [data-theme="dark"] .bg-layer::after {
+            background: radial-gradient(circle, rgba(124, 92, 252, .05) 0%, transparent 70%)
+        }
+
+        /* NAV */
+        .nav {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            height: var(--nav);
+            z-index: 500;
+            background: rgba(255, 255, 255, .97);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(0, 0, 0, .08);
+            box-shadow: 0 1px 10px rgba(45, 111, 223, .08);
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            gap: 8px;
+        }
+
+        [data-theme="dark"] .nav {
+            background: rgba(7, 8, 15, .95);
+            border-bottom-color: rgba(255, 255, 255, .1);
+            box-shadow: 0 1px 10px rgba(0, 0, 0, .4)
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            text-decoration: none;
+            flex-shrink: 0
+        }
+
+        .logo-img {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid rgba(45, 111, 223, .25);
+            box-shadow: 0 2px 10px rgba(45, 111, 223, .18)
+        }
+
+        [data-theme="dark"] .logo-img {
+            border-color: rgba(79, 142, 255, .3)
+        }
+
+        .logo-text {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -.4px;
+            color: var(--tx);
+            white-space: nowrap
+        }
+
+        .logo-text em {
+            color: var(--ac);
+            font-style: normal
+        }
+
+        .nav-sp {
+            flex: 1;
+            min-width: 0
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0
+        }
+
+        .nl {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--mt);
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: color .15s, background .15s;
+            white-space: nowrap;
+            min-height: 42px;
+            min-width: 42px;
+            touch-action: manipulation;
+        }
+
+        .nl:hover {
+            color: var(--tx);
+            background: var(--bg3)
+        }
+
+        .nl i {
+            font-size: 15px
+        }
+
+        .nl-lbl {
+            display: none
+        }
+
+        @media(min-width:520px) {
+            .nl-lbl {
+                display: inline
+            }
+
+            .nl {
+                padding: 8px 12px
+            }
+        }
+
+        @media(min-width:768px) {
+            .nav {
+                padding: 0 22px
+            }
+        }
+
+        .thm {
+            display: flex;
+            align-items: center;
+            background: var(--bg3);
+            border: 1px solid var(--bd2);
+            border-radius: 9px;
+            padding: 3px;
+            gap: 2px;
+            margin-left: 4px
+        }
+
+        .tb {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--mt);
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+            touch-action: manipulation;
+        }
+
+        .tb:hover {
+            color: var(--tx)
+        }
+
+        .tb.on {
+            background: var(--ac);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(45, 111, 223, .4)
+        }
+
+        /* WRAP */
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 960px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 14px 12px 60px;
+            flex: 1
+        }
+
+        @media(min-width:480px) {
+            .wrap {
+                padding: 18px 16px 64px
+            }
+        }
+
+        @media(min-width:768px) {
+            .wrap {
+                padding: 26px 22px 72px
+            }
+        }
+
+        /* HERO */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--r);
+            border: 1px solid var(--bd2);
+            background: var(--bg2);
+            margin-bottom: 14px;
+            box-shadow: 0 2px 14px rgba(45, 111, 223, .09), 0 1px 4px rgba(0, 0, 0, .05)
+        }
+
+        [data-theme="dark"] .hero {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .35)
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--ac), var(--ac2), var(--gr));
+            z-index: 2
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: -80px;
+            right: -60px;
+            z-index: 0;
+            pointer-events: none;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(45, 111, 223, .07) 0%, transparent 70%)
+        }
+
+        [data-theme="dark"] .hero-glow {
+            background: radial-gradient(circle, rgba(79, 142, 255, .07) 0%, transparent 70%)
+        }
+
+        .hero-top {
+            padding: 16px 14px 14px;
+            position: relative;
+            z-index: 1
+        }
+
+        @media(min-width:480px) {
+            .hero-top {
+                padding: 20px 18px 16px
+            }
+        }
+
+        @media(min-width:768px) {
+            .hero-top {
+                padding: 26px 26px 20px
+            }
+        }
+
+        .htag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ac);
+            background: rgba(45, 111, 223, .08);
+            border: 1px solid rgba(45, 111, 223, .2);
+            padding: 4px 11px;
+            border-radius: 99px;
+            margin-bottom: 10px
+        }
+
+        [data-theme="dark"] .htag {
+            background: rgba(79, 142, 255, .1);
+            border-color: rgba(79, 142, 255, .22)
+        }
+
+        .htitle {
+            font-size: clamp(18px, 5vw, 30px);
+            font-weight: 800;
+            letter-spacing: -.5px;
+            line-height: 1.2;
+            color: var(--tx);
+            margin-bottom: 9px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px
+        }
+
+        .htitle span {
+            flex: 1;
+            word-break: break-word
+        }
+
+        .refr {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border-radius: 9px;
+            border: 1px solid var(--bd2);
+            background: var(--bg3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--mt);
+            transition: all .18s;
+            touch-action: manipulation;
+        }
+
+        .refr:hover {
+            color: var(--ac);
+            border-color: rgba(45, 111, 223, .4);
+            background: rgba(45, 111, 223, .07)
+        }
+
+        [data-theme="dark"] .refr:hover {
+            border-color: rgba(79, 142, 255, .4);
+            background: rgba(79, 142, 255, .08)
+        }
+
+        .hdesc {
+            font-size: 13.5px;
+            color: var(--tx2);
+            line-height: 1.7;
+            margin-bottom: 12px
+        }
+
+        @media(min-width:480px) {
+            .hdesc {
+                font-size: 14.5px
+            }
+        }
+
+        .hstat {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--mt);
+            background: var(--bg3);
+            border: 1px solid var(--bd);
+            padding: 6px 13px;
+            border-radius: 9px
+        }
+
+        .hstat i {
+            font-size: 11px;
+            color: var(--ac)
+        }
+
+        .inst {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 13px 14px;
+            border-top: 1px solid var(--bd);
+            background: #f4f7fe;
+            position: relative;
+            z-index: 1
+        }
+
+        @media(min-width:480px) {
+            .inst {
+                gap: 15px;
+                padding: 15px 18px;
+                align-items: center
+            }
+        }
+
+        @media(min-width:768px) {
+            .inst {
+                padding: 17px 26px;
+                gap: 18px
+            }
+        }
+
+        [data-theme="dark"] .inst {
+            background: var(--bg3);
+            border-top-color: var(--bd)
+        }
+
+        .iav {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--ac), var(--ac2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            overflow: hidden;
+            border: 2px solid rgba(45, 111, 223, .25)
+        }
+
+        .iav img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .iinfo {
+            flex: 1;
+            min-width: 0
+        }
+
+        .ilbl {
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--dm);
+            margin-bottom: 2px
+        }
+
+        .iname {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--tx);
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        .imeta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px 12px
+        }
+
+        .im {
+            font-size: 12px;
+            color: var(--mt);
+            display: flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .im i {
+            font-size: 10px;
+            color: var(--dm)
+        }
+
+        .ibio {
+            font-size: 12px;
+            color: var(--mt);
+            font-style: italic;
+            margin-top: 4px;
+            line-height: 1.5
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            background: var(--bg2);
+            border: 1px solid var(--bd2);
+            border-radius: var(--r);
+            padding: 4px;
+            gap: 3px;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, .05)
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none
+        }
+
+        [data-theme="dark"] .tabs {
+            box-shadow: none
+        }
+
+        .tab {
+            flex: 1;
+            min-width: max-content;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 11px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            cursor: pointer;
+            font-family: var(--f);
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--mt);
+            transition: all .2s;
+            white-space: nowrap;
+            min-height: 40px;
+            touch-action: manipulation;
+        }
+
+        .tab i {
+            font-size: 12px
+        }
+
+        .tab:hover {
+            color: var(--tx);
+            background: var(--bg3)
+        }
+
+        .tab.on {
+            background: linear-gradient(135deg, rgba(45, 111, 223, .11), rgba(99, 64, 214, .07));
+            color: var(--ac);
+            box-shadow: inset 0 0 0 1px rgba(45, 111, 223, .22)
+        }
+
+        [data-theme="dark"] .tab.on {
+            background: linear-gradient(135deg, rgba(79, 142, 255, .14), rgba(124, 92, 252, .09));
+            color: var(--ac);
+            box-shadow: inset 0 0 0 1px rgba(79, 142, 255, .22)
+        }
+
+        .tn {
+            min-width: 18px;
+            height: 18px;
+            border-radius: 99px;
+            background: var(--bg3);
+            color: var(--mt);
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px
+        }
+
+        .tab.on .tn {
+            background: rgba(45, 111, 223, .14);
+            color: var(--ac)
+        }
+
+        [data-theme="dark"] .tab.on .tn {
+            background: rgba(79, 142, 255, .18);
+            color: var(--ac)
+        }
+
+        @media(max-width:360px) {
+            .tab {
+                font-size: 11.5px;
+                padding: 8px 7px
+            }
+
+            .tab i {
+                display: none
+            }
+
+            .tn {
+                display: none
+            }
+        }
+
+        @media(min-width:768px) {
+            .tab {
+                font-size: 13.5px;
+                padding: 10px 16px;
+                gap: 7px
+            }
+        }
+
+        /* PANELS */
+        .panel {
+            display: none
+        }
+
+        .panel.on {
+            display: block;
+            animation: pi .26s cubic-bezier(.25, .46, .45, .94)
+        }
+
+        @keyframes pi {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* CARD (announcements/quizzes) */
+        .card {
+            display: flex;
+            gap: 11px;
+            align-items: flex-start;
+            background: var(--bg2);
+            border: 1px solid var(--bd);
+            border-radius: var(--r);
+            padding: 14px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        @media(min-width:480px) {
+            .card {
+                gap: 14px;
+                padding: 16px 18px
+            }
+        }
+
+        [data-theme="light"] .card {
+            background: #fff;
+            border-color: rgba(0, 0, 0, .08);
+            box-shadow: 0 1px 8px rgba(45, 111, 223, .06)
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--ac), var(--ac2));
+            opacity: 0;
+            transition: opacity .2s
+        }
+
+        .card:hover {
+            border-color: var(--bd2);
+            box-shadow: 0 5px 20px rgba(45, 111, 223, .1)
+        }
+
+        .card:hover::after {
+            opacity: 1
+        }
+
+        [data-theme="dark"] .card:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .35)
+        }
+
+        .card-ico {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px
+        }
+
+        .ci-p {
+            background: rgba(99, 64, 214, .1);
+            color: var(--ac2)
+        }
+
+        .ci-g {
+            background: rgba(0, 168, 122, .1);
+            color: var(--gr)
+        }
+
+        [data-theme="dark"] .ci-p {
+            background: rgba(124, 92, 252, .12)
+        }
+
+        [data-theme="dark"] .ci-g {
+            background: rgba(0, 200, 150, .1);
+            color: var(--gr)
+        }
+
+        .cbody {
+            flex: 1;
+            min-width: 0
+        }
+
+        .ctit {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--tx);
+            margin-bottom: 5px;
+            line-height: 1.35
+        }
+
+        .cdesc {
+            font-size: 13px;
+            color: var(--tx2);
+            line-height: 1.7;
+            margin-bottom: 10px;
+            word-break: break-word
+        }
+
+        .cfoot {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .cdate {
+            font-size: 11.5px;
+            color: var(--mt);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500
+        }
+
+        .cdate i {
+            font-size: 9.5px
+        }
+
+        .btnd {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 9px;
+            font-family: var(--f);
+            font-size: 12.5px;
+            font-weight: 700;
+            background: var(--ac);
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            touch-action: manipulation;
+            box-shadow: 0 2px 8px rgba(45, 111, 223, .28);
+            transition: all .18s;
+        }
+
+        .btnd:hover {
+            filter: brightness(1.08)
+        }
+
+        .btnd i {
+            font-size: 11px
+        }
+
+        .cops {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0
+        }
+
+        .cop {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            border: 1px solid var(--bd);
+            background: transparent;
+            cursor: pointer;
+            color: var(--dm);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+            touch-action: manipulation;
+        }
+
+        [data-theme="light"] .cop {
+            border-color: var(--bd2);
+            color: var(--mt)
+        }
+
+        .cop:hover {
+            border-color: rgba(45, 111, 223, .4);
+            color: var(--ac);
+            background: rgba(45, 111, 223, .07)
+        }
+
+        .cop.del:hover {
+            border-color: rgba(217, 53, 69, .4);
+            color: var(--rd);
+            background: rgba(217, 53, 69, .07)
+        }
+
+        [data-theme="dark"] .cop:hover {
+            border-color: rgba(79, 142, 255, .4);
+            background: rgba(79, 142, 255, .08)
+        }
+
+        [data-theme="dark"] .cop.del:hover {
+            border-color: rgba(255, 71, 87, .4);
+            background: rgba(255, 71, 87, .07)
+        }
+
+        /* MEMBERS */
+        .mtop {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .mtop h3 {
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 7px
+        }
+
+        .mtop h3 i {
+            font-size: 12px;
+            color: var(--ac)
+        }
+
+        .mbadge {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ac);
+            background: rgba(45, 111, 223, .08);
+            border: 1px solid rgba(45, 111, 223, .18);
+            padding: 4px 11px;
+            border-radius: 99px
+        }
+
+        [data-theme="dark"] .mbadge {
+            background: rgba(79, 142, 255, .1);
+            border-color: rgba(79, 142, 255, .2)
+        }
+
+        .mtable {
+            background: var(--bg2);
+            border: 1px solid var(--bd2);
+            border-radius: var(--r);
+            overflow: hidden;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, .04)
+        }
+
+        [data-theme="dark"] .mtable {
+            box-shadow: none
+        }
+
+        .mrow {
+            display: grid;
+            grid-template-columns: 56px 38px 1fr auto;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--bd);
+            transition: background .15s;
+        }
+
+        @media(min-width:480px) {
+            .mrow {
+                grid-template-columns: 60px 42px 1fr auto;
+                gap: 12px;
+                padding: 13px 16px
+            }
+        }
+
+        @media(min-width:768px) {
+            .mrow {
+                grid-template-columns: 64px 46px 1fr auto;
+                gap: 16px;
+                padding: 14px 20px
+            }
+        }
+
+        .mrow:last-child {
+            border-bottom: none
+        }
+
+        .mrow:hover {
+            background: rgba(45, 111, 223, .025)
+        }
+
+        [data-theme="dark"] .mrow:hover {
+            background: rgba(79, 142, 255, .025)
+        }
+
+        .midx {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--dm);
+            text-align: center;
+            font-variant-numeric: tabular-nums
+        }
+
+        .mav {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--ac), var(--ac2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+            overflow: hidden;
+            border: 2px solid var(--bd2);
+            flex-shrink: 0
+        }
+
+        .mav img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .minfo {
+            min-width: 0
+        }
+
+        .mname {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--tx);
+            margin-bottom: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .memail {
+            font-size: 11.5px;
+            color: var(--mt);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .memail i {
+            font-size: 9px;
+            color: var(--dm);
+            flex-shrink: 0
+        }
+
+        .rp {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+            padding: 4px 9px;
+            border-radius: 99px;
+            white-space: nowrap
+        }
+
+        .rp-t {
+            background: rgba(99, 64, 214, .1);
+            color: var(--ac2);
+            border: 1px solid rgba(99, 64, 214, .18)
+        }
+
+        .rp-s {
+            background: rgba(45, 111, 223, .08);
+            color: var(--ac);
+            border: 1px solid rgba(45, 111, 223, .16)
+        }
+
+        [data-theme="dark"] .rp-t {
+            background: rgba(124, 92, 252, .12);
+            border-color: rgba(124, 92, 252, .2)
+        }
+
+        [data-theme="dark"] .rp-s {
+            background: rgba(79, 142, 255, .1);
+            border-color: rgba(79, 142, 255, .17)
+        }
+
+        /* EMPTY / LOADING */
+        .empty {
+            text-align: center;
+            padding: 44px 20px;
+            color: var(--mt)
+        }
+
+        .empty i {
+            font-size: 26px;
+            opacity: .2;
+            display: block;
+            margin-bottom: 10px
+        }
+
+        .empty h4 {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--tx);
+            opacity: .4;
+            margin-bottom: 5px
+        }
+
+        .empty p {
+            font-size: 13px
+        }
+
+        .ld {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 72px 0;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .sp {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 3px solid var(--bd2);
+            border-top-color: var(--ac);
+            animation: rot .7s linear infinite
+        }
+
+        @keyframes rot {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .ld p {
+            font-size: 13px;
+            color: var(--mt);
+            font-weight: 500
+        }
+
+        @keyframes sk {
+            from {
+                background-position: 200% 0
+            }
+
+            to {
+                background-position: -200% 0
+            }
+        }
+
+        .sk-row {
+            height: 110px;
+            border-radius: var(--r);
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
+            background-size: 200% 100%;
+            animation: sk 1.5s linear infinite;
+        }
+
+        /* â─â─ MATERIALS â— GOOGLE CLASSROOM STYLE â─â─ */
+
+        /* Toolbar */
+        .mat-toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-bottom: 14px
+        }
+
+        @media(min-width:640px) {
+            .mat-toolbar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center
+            }
+        }
+
+        .mat-search {
+            position: relative;
+            width: 100%
+        }
+
+        @media(min-width:640px) {
+            .mat-search {
+                flex: 1;
+                min-width: 160px;
+                max-width: 250px
+            }
+        }
+
+        .mat-search input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border-radius: 10px;
+            border: 1.5px solid var(--bd2);
+            background: var(--bg2);
+            color: var(--tx);
+            font-family: var(--f);
+            font-size: 14px;
+            outline: none;
+            transition: border-color .2s;
+            -webkit-appearance: none;
+            height: 44px;
+        }
+
+        [data-theme="light"] .mat-search input {
+            background: #fff;
+            border-color: rgba(0, 0, 0, .12)
+        }
+
+        .mat-search input::placeholder {
+            color: var(--dm)
+        }
+
+        .mat-search input:focus {
+            border-color: var(--ac)
+        }
+
+        .mat-search i {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--dm);
+            font-size: 13px;
+            pointer-events: none
+        }
+
+        .mat-filters {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+            flex-shrink: 0
+        }
+
+        .mat-filters::-webkit-scrollbar {
+            display: none
+        }
+
+        .mf-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: var(--f);
+            font-size: 12px;
+            font-weight: 700;
+            border: 1.5px solid var(--bd2);
+            background: var(--bg2);
+            color: var(--mt);
+            cursor: pointer;
+            transition: all .15s;
+            white-space: nowrap;
+            touch-action: manipulation;
+            min-height: 38px;
+            flex-shrink: 0;
+        }
+
+        [data-theme="light"] .mf-chip {
+            background: #fff;
+            border-color: rgba(0, 0, 0, .11)
+        }
+
+        .mf-chip:hover,
+        .mf-chip:active {
+            color: var(--ac);
+            border-color: rgba(45, 111, 223, .3);
+            background: rgba(45, 111, 223, .06)
+        }
+
+        [data-theme="dark"] .mf-chip:hover {
+            background: rgba(79, 142, 255, .07);
+            border-color: rgba(79, 142, 255, .3)
+        }
+
+        .mf-chip.active {
+            background: rgba(45, 111, 223, .1);
+            color: var(--ac);
+            border-color: rgba(45, 111, 223, .28)
+        }
+
+        [data-theme="dark"] .mf-chip.active {
+            background: rgba(79, 142, 255, .12);
+            border-color: rgba(79, 142, 255, .3)
+        }
+
+        .mf-chip i {
+            font-size: 10.5px
+        }
+
+        .mat-sort {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            width: 100%
+        }
+
+        @media(min-width:640px) {
+            .mat-sort {
+                width: auto;
+                margin-left: auto;
+                flex-shrink: 0
+            }
+        }
+
+        .mat-sort>i {
+            font-size: 11px;
+            color: var(--mt);
+            flex-shrink: 0
+        }
+
+        .mat-sort select {
+            flex: 1;
+            border: 1.5px solid var(--bd2);
+            background: var(--bg2);
+            color: var(--tx);
+            font-family: var(--f);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 12px;
+            border-radius: 9px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color .2s;
+            -webkit-appearance: none;
+            height: 44px;
+        }
+
+        @media(min-width:640px) {
+            .mat-sort select {
+                flex: none;
+                width: auto
+            }
+        }
+
+        [data-theme="light"] .mat-sort select {
+            background: #fff;
+            border-color: rgba(0, 0, 0, .12)
+        }
+
+        .mat-sort select:focus {
+            border-color: var(--ac)
+        }
+
+        .mat-count {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--mt);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .mat-count strong {
+            color: var(--tx)
+        }
+
+        /* Bulk delete bar */
+        .bulk-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--ac);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 12px rgba(45, 111, 223, .3);
+            animation: pi .26s ease;
+        }
+
+        .bulk-bar.active {
+            display: flex;
+        }
+
+        .bulk-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .bulk-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-family: var(--f);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bulk-btn.cancel {
+            background: rgba(255, 255, 255, .2);
+            color: #fff;
+        }
+
+        .bulk-btn.cancel:hover {
+            background: rgba(255, 255, 255, .3);
+        }
+
+        .bulk-btn.delete {
+            background: var(--rd);
+            color: #fff;
+        }
+
+        .bulk-btn.delete:hover {
+            background: #c5221f;
+        }
+
+        /* Date separator */
+        .mat-date-sep {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0 10px;
+        }
+
+        .mat-date-sep:first-child {
+            margin-top: 0
+        }
+
+        .mat-date-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .9px;
+            text-transform: uppercase;
+            color: var(--mt);
+            white-space: nowrap;
+        }
+
+        .mat-date-label i {
+            font-size: 9px;
+            color: var(--dm)
+        }
+
+        .mat-date-line {
+            flex: 1;
+            height: 1px;
+            background: var(--bd)
+        }
+
+        /* Post card */
+        .mat-post {
+            background: var(--bg2);
+            border: 1.5px solid var(--bd);
+            border-radius: 13px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            transition: border-color .2s, box-shadow .2s;
+            animation: pi .26s ease both;
+        }
+
+        [data-theme="light"] .mat-post {
+            background: #fff;
+            border-color: rgba(0, 0, 0, .08);
+            box-shadow: 0 1px 8px rgba(45, 111, 223, .07)
+        }
+
+        .mat-post:hover {
+            border-color: rgba(45, 111, 223, .2);
+            box-shadow: 0 5px 22px rgba(45, 111, 223, .11)
+        }
+
+        [data-theme="dark"] .mat-post:hover {
+            border-color: rgba(79, 142, 255, .2);
+            box-shadow: 0 5px 22px rgba(0, 0, 0, .35)
+        }
+
+        /* Post header */
+        .mat-post-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 13px 10px;
+            border-bottom: 1px solid var(--bd);
+            background: var(--bg3);
+        }
+
+        @media(min-width:480px) {
+            .mat-post-head {
+                padding: 14px 16px 12px
+            }
+        }
+
+        [data-theme="light"] .mat-post-head {
+            background: #f8faff;
+            border-bottom-color: rgba(0, 0, 0, .06)
+        }
+
+        .mat-post-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--ac), var(--ac2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+            overflow: hidden;
+            border: 2px solid rgba(45, 111, 223, .2);
+        }
+
+        .mat-post-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .mat-post-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .mat-post-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--tx);
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap
+        }
+
+        .mat-post-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--mt);
+            flex-wrap: wrap
+        }
+
+        .mat-post-meta span {
+            display: flex;
+            align-items: center;
+            gap: 3px
+        }
+
+        .mat-post-meta i {
+            font-size: 8.5px
+        }
+
+        /* Post body */
+        .mat-post-body {
+            padding: 11px 13px 10px;
+        }
+
+        @media(min-width:480px) {
+            .mat-post-body {
+                padding: 13px 16px 12px
+            }
+        }
+
+        .mat-post-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--tx);
+            margin-bottom: 4px;
+            line-height: 1.4
+        }
+
+        .mat-post-desc {
+            font-size: 13px;
+            color: var(--tx2);
+            line-height: 1.65
+        }
+
+        /* Attachments section */
+        .mat-attachments {
+            padding: 0 13px 10px;
+        }
+
+        @media(min-width:480px) {
+            .mat-attachments {
+                padding: 0 16px 12px
+            }
+        }
+
+        .mat-att-label {
+            font-size: 9.5px;
+            font-weight: 800;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            color: var(--dm);
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        [data-theme="light"] .mat-att-label {
+            color: var(--mt)
+        }
+
+        .mat-att-label i {
+            font-size: 8.5px
+        }
+
+        /* â˜… Attachment row â— smart mobile layout â˜… */
+        .mat-att-row {
+            background: var(--bg3);
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            padding: 10px 11px;
+            margin-bottom: 6px;
+            display: grid;
+            grid-template-areas: "check ico info" "check ico btns";
+            grid-template-columns: auto 36px 1fr;
+            grid-template-rows: auto auto;
+            gap: 4px 10px;
+            transition: border-color .15s, background .15s;
+            align-items: start;
+        }
+
+        .mat-att-row:last-child {
+            margin-bottom: 0
+        }
+
+        [data-theme="light"] .mat-att-row {
+            background: #f3f6fd;
+            border-color: rgba(0, 0, 0, .07)
+        }
+
+        .mat-att-row:hover {
+            border-color: var(--bd2)
+        }
+
+        [data-theme="light"] .mat-att-row:hover {
+            background: #eaf0fc;
+            border-color: rgba(45, 111, 223, .18)
+        }
+
+        [data-theme="dark"] .mat-att-row:hover {
+            background: var(--bg4)
+        }
+
+        /* On tablet+ â— one-row layout with buttons on right */
+        @media(min-width:580px) {
+            .mat-att-row {
+                grid-template-areas: "check ico info btns";
+                grid-template-columns: auto 36px 1fr auto;
+                grid-template-rows: auto;
+                align-items: center;
+                gap: 0 10px;
+                padding: 10px 12px;
+            }
+        }
+
+        .mat-check {
+            grid-area: check;
+            align-self: center;
+        }
+
+        .mat-att-ico {
+            grid-area: ico;
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: var(--bg2);
+            flex-shrink: 0;
+            align-self: start;
+        }
+
+        @media(min-width:580px) {
+            .mat-att-ico {
+                align-self: center
+            }
+        }
+
+        [data-theme="light"] .mat-att-ico {
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .07)
+        }
+
+        .mat-att-info {
+            grid-area: info;
+            min-width: 0
+        }
+
+        .mat-att-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--tx);
+            margin-bottom: 2px;
+            word-break: break-word;
+            line-height: 1.35
+        }
+
+        @media(min-width:580px) {
+            .mat-att-name {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis
+            }
+        }
+
+        .mat-att-type {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase
+        }
+
+        /* Buttons row â— full width on mobile, auto on desktop */
+        .mat-att-btns {
+            grid-area: btns;
+            display: flex;
+            gap: 5px;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+
+        @media(min-width:580px) {
+            .mat-att-btns {
+                width: auto;
+                flex-shrink: 0
+            }
+        }
+
+        .mat-att-btn {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 6px;
+            border-radius: 8px;
+            font-family: var(--f);
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--bd2);
+            background: var(--bg2);
+            cursor: pointer;
+            color: var(--mt);
+            transition: all .15s;
+            white-space: nowrap;
+            text-decoration: none;
+            min-height: 36px;
+            touch-action: manipulation;
+        }
+
+        @media(min-width:580px) {
+            .mat-att-btn {
+                flex: none;
+                padding: 7px 12px;
+                font-size: 12px
+            }
+        }
+
+        [data-theme="light"] .mat-att-btn {
+            background: #fff;
+            border-color: rgba(0, 0, 0, .1);
+            color: #5a6a8e
+        }
+
+        .mat-att-btn i {
+            font-size: 10.5px
+        }
+
+        .mat-att-btn:hover,
+        .mat-att-btn:active {
+            color: var(--ac);
+            border-color: rgba(45, 111, 223, .32);
+            background: rgba(45, 111, 223, .07)
+        }
+
+        [data-theme="dark"] .mat-att-btn:hover {
+            border-color: rgba(79, 142, 255, .38);
+            background: rgba(79, 142, 255, .08)
+        }
+
+        .mat-att-btn.dl:hover,
+        .mat-att-btn.dl:active {
+            color: var(--gr);
+            border-color: rgba(0, 168, 122, .32);
+            background: rgba(0, 168, 122, .07)
+        }
+
+        [data-theme="dark"] .mat-att-btn.dl:hover {
+            border-color: rgba(0, 200, 150, .38);
+            background: rgba(0, 200, 150, .08)
+        }
+
+        .mat-att-btn.del:hover,
+        .mat-att-btn.del:active {
+            color: var(--rd);
+            border-color: rgba(217, 53, 69, .32);
+            background: rgba(217, 53, 69, .07)
+        }
+
+        [data-theme="dark"] .mat-att-btn.del:hover {
+            border-color: rgba(255, 71, 87, .38);
+            background: rgba(255, 71, 87, .08)
+        }
+
+        /* Empty state */
+        .mat-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 52px 20px;
+            text-align: center;
+            border: 2px dashed var(--bd2);
+            border-radius: var(--r);
+            color: var(--mt)
+        }
+
+        .mat-empty-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: var(--bg3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: var(--dm);
+            margin-bottom: 12px
+        }
+
+        .mat-empty h4 {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: var(--tx);
+            margin-bottom: 6px;
+            opacity: .5
+        }
+
+        .mat-empty p {
+            font-size: 13px;
+            line-height: 1.6;
+            max-width: 240px
+        }
+
+        /* File viewer modal */
+        .file-viewer-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, .9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .file-viewer-modal.active {
+            display: flex;
+        }
+
+        .file-viewer-content {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background: var(--bg2);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .file-viewer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--bd);
+            background: var(--bg3);
+        }
+
+        .file-viewer-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--tx);
+        }
+
+        .file-viewer-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--bd2);
+            background: var(--bg2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--mt);
+            transition: all .15s;
+        }
+
+        .file-viewer-close:hover {
+            background: var(--rd);
+            color: #fff;
+            border-color: var(--rd);
+        }
+
+        .file-viewer-body {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+        }
+
+        .file-viewer-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* MODALS â— slide-up sheet on mobile, centered on desktop */
+        .mbg {
+            position: fixed;
+            inset: 0;
+            z-index: 800;
+            background: rgba(0, 0, 0, .45);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s;
+        }
+
+        @media(min-width:520px) {
+            .mbg {
+                align-items: center;
+                padding: 20px
+            }
+        }
+
+        [data-theme="light"] .mbg {
+            background: rgba(0, 0, 0, .3)
+        }
+
+        .mbg.open {
+            opacity: 1;
+            pointer-events: auto
+        }
+
+        .mbox {
+            background: var(--bg2);
+            border: 1px solid var(--bd2);
+            border-radius: 20px 20px 0 0;
+            padding: 22px 18px 36px;
+            width: 100%;
+            max-width: 100%;
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, .22);
+            transform: translateY(100%);
+            transition: transform .28s cubic-bezier(.25, .46, .45, .94);
+        }
+
+        @media(min-width:520px) {
+            .mbox {
+                border-radius: 18px;
+                padding: 26px 28px;
+                max-width: 460px;
+                transform: scale(.96) translateY(10px)
+            }
+        }
+
+        .mbg.open .mbox {
+            transform: translateY(0)
+        }
+
+        @media(min-width:520px) {
+            .mbg.open .mbox {
+                transform: scale(1) translateY(0)
+            }
+        }
+
+        [data-theme="light"] .mbox {
+            background: #fff
+        }
+
+        .mbox h3 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 18px;
+            color: var(--tx);
+            letter-spacing: -.3px
+        }
+
+        .mf {
+            margin-bottom: 13px
+        }
+
+        .mf label {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: var(--mt);
+            margin-bottom: 6px
+        }
+
+        .mf input,
+        .mf textarea {
+            width: 100%;
+            padding: 11px 13px;
+            border-radius: 10px;
+            border: 1.5px solid var(--bd2);
+            background: var(--bg3);
+            color: var(--tx);
+            font-family: var(--f);
+            font-size: 15px;
+            outline: none;
+            transition: border-color .2s;
+            -webkit-appearance: none;
+        }
+
+        [data-theme="light"] .mf input,
+        [data-theme="light"] .mf textarea {
+            background: #f5f7fe;
+            border-color: rgba(0, 0, 0, .12);
+            color: #0b0f1e
+        }
+
+        .mf input:focus,
+        .mf textarea:focus {
+            border-color: var(--ac)
+        }
+
+        .mf textarea {
+            resize: vertical;
+            min-height: 88px
+        }
+
+        .mfoot {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 16px
+        }
+
+        .mb {
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-family: var(--f);
+            font-size: 14px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all .15s;
+            touch-action: manipulation;
+            min-height: 44px;
+        }
+
+        .mb-c {
+            background: var(--bg3);
+            color: var(--mt);
+            border: 1px solid var(--bd2)
+        }
+
+        .mb-c:hover {
+            color: var(--tx)
+        }
+
+        [data-theme="light"] .mb-c {
+            background: #f0f3fc;
+            border-color: rgba(0, 0, 0, .1)
+        }
+
+        .mb-s {
+            background: var(--ac);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(45, 111, 223, .3)
+        }
+
+        .mb-s:hover {
+            filter: brightness(1.07)
+        }
+
+        .mb-d {
+            background: var(--rd);
+            color: #fff
+        }
+
+        .mb-d:hover {
+            opacity: .88
+        }
+
+        .cbox {
+            background: var(--bg2);
+            border: 1px solid var(--bd2);
+            border-radius: 20px 20px 0 0;
+            padding: 28px 22px 38px;
+            width: 100%;
+            max-width: 100%;
+            text-align: center;
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, .22);
+            transform: translateY(100%);
+            transition: transform .28s cubic-bezier(.25, .46, .45, .94);
+        }
+
+        @media(min-width:520px) {
+            .cbox {
+                border-radius: 18px;
+                padding: 30px 24px;
+                max-width: 360px;
+                transform: scale(.94)
+            }
+        }
+
+        .mbg.open .cbox {
+            transform: translateY(0)
+        }
+
+        @media(min-width:520px) {
+            .mbg.open .cbox {
+                transform: scale(1)
+            }
+        }
+
+        [data-theme="light"] .cbox {
+            background: #fff
+        }
+
+        .cbox-ico {
+            font-size: 34px;
+            display: block;
+            margin-bottom: 10px
+        }
+
+        .cbox h4 {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: var(--tx)
+        }
+
+        .cbox p {
+            font-size: 13px;
+            color: var(--mt);
+            line-height: 1.6;
+            margin-bottom: 18px
+        }
+
+        .crow {
+            display: flex;
+            gap: 8px;
+            justify-content: center
+        }
+
+        /* TOAST â— centered on mobile */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(18px) scale(.97);
+            z-index: 999;
+            padding: 11px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 6px 22px rgba(0, 0, 0, .22);
+            opacity: 0;
+            transition: all .22s cubic-bezier(.25, .46, .45, .94);
+            pointer-events: none;
+            max-width: calc(100vw - 32px);
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0) scale(1);
+            opacity: 1
+        }
+
+        .toast.ok {
+            background: linear-gradient(135deg, #00c896, #009e78)
+        }
+
+        .toast.err {
+            background: linear-gradient(135deg, #ff4757, #cc2233)
+        }
+
+        @media(min-width:520px) {
+            .toast {
+                left: auto;
+                right: 20px;
+                transform: translateY(18px) scale(.97)
+            }
+
+            .toast.show {
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        /* FOOTER */
+        .footer {
+            position: relative;
+            z-index: 1;
+            background: var(--bg2);
+            border-top: 1px solid var(--bd2);
+            padding: 22px 14px 18px;
+            margin-top: auto
+        }
+
+        [data-theme="light"] .footer {
+            background: #fff;
+            border-top-color: rgba(0, 0, 0, .08)
+        }
+
+        @media(min-width:480px) {
+            .footer {
+                padding: 26px 20px 20px
+            }
+        }
+
+        @media(min-width:768px) {
+            .footer {
+                padding: 30px 26px 22px
+            }
+        }
+
+        .footer-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 7px
+        }
+
+        .footer-logo-img {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1.5px solid rgba(45, 111, 223, .22)
+        }
+
+        .footer-brand-text {
+            font-size: 14.5px;
+            font-weight: 800;
+            letter-spacing: -.3px;
+            color: var(--tx)
+        }
+
+        .footer-brand-text em {
+            color: var(--ac);
+            font-style: normal
+        }
+
+        .footer-tag {
+            font-size: 12px;
+            color: var(--mt);
+            line-height: 1.65;
+            max-width: 270px
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .footer-links h5 {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--dm);
+            margin-bottom: 3px
+        }
+
+        [data-theme="light"] .footer-links h5 {
+            color: var(--mt)
+        }
+
+        .fl {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--mt);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: color .15s
+        }
+
+        .fl i {
+            font-size: 10.5px;
+            color: var(--dm);
+            width: 12px;
+            text-align: center
+        }
+
+        .fl:hover {
+            color: var(--ac)
+        }
+
+        .footer-bottom {
+            max-width: 960px;
+            margin: 14px auto 0;
+            padding-top: 13px;
+            border-top: 1px solid var(--bd);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .footer-copy {
+            font-size: 11.5px;
+            color: var(--dm);
+            font-weight: 500
+        }
+
+        [data-theme="light"] .footer-copy {
+            color: var(--mt)
+        }
+
+        .footer-copy span {
+            color: var(--mt)
+        }
+
+        .footer-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--dm);
+            background: var(--bg3);
+            border: 1px solid var(--bd);
+            padding: 4px 10px;
+            border-radius: 99px
+        }
+
+        .footer-pill i {
+            font-size: 9px;
+            color: var(--ac)
+        }
+
+        [data-theme="light"] .footer-pill {
+            color: var(--mt)
+        }
+
+        @media(max-width:480px) {
+            .footer-inner {
+                flex-direction: column;
+                gap: 16px
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 7px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-layer"></div>
+
+    <header class="nav">
+        <a href="/classroom" class="logo">
+            <img src="/Classgrid.png" alt="Classgrid" class="logo-img" onerror="this.style.display='none'">
+            <span class="logo-text">Classgrid</span>
+        </a>
+        <div class="nav-sp"></div>
+        <nav class="nav-links">
+            <a href="/classroom" class="nl"><i class="fas fa-grid-2"></i><span class="nl-lbl">Dashboard</span></a>
+            <a href="#" id="backLink" class="nl"
+                onclick="event.preventDefault(); window.location.href=this.dataset.dest"><i
+                    class="fas fa-school"></i><span class="nl-lbl">Classes</span></a>
+            <a href="#" id="chatLink" class="nl"><i class="fas fa-comments"></i><span class="nl-lbl">Chat</span></a>
+            <div class="thm">
+                <button class="tb" onclick="setT('system')" title="System"><i class="fas fa-desktop"></i></button>
+                <button class="tb on" onclick="setT('light')" title="Light"><i class="fas fa-sun"></i></button>
+                <button class="tb" onclick="setT('dark')" title="Dark"><i class="fas fa-moon"></i></button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="wrap" id="root">
+        <!-- Loader -->
+        <div class="ld" id="loader">
+            <div class="sp"></div>
+            <p>Loading classroom</p>
+        </div>
+
+        <!-- App Container -->
+        <div id="app" style="display:none; gap:14px; flex-direction:column">
+            <div class="hero">
+                <div class="hero-glow"></div>
+                <div class="hero-top">
+                    <div class="htag"><i class="fas fa-flask"></i><span id="tTag">Classroom</span></div>
+                    <div class="htitle"><span id="hTitle">Loading...</span><button class="refr" onclick="loadAll()"
+                            title="Refresh"><i class="fas fa-rotate-right"></i></button></div>
+                    <p class="hdesc" id="hDesc">...</p>
+                    <span class="hstat" id="hStat"></span>
+                </div>
+                <div class="inst">
+                    <div class="iav" id="tAv"></div>
+                    <div class="iinfo">
+                        <div class="ilbl">Instructor</div>
+                        <div class="iname" id="tName">Loading...</div>
+                        <div class="ibio" id="tBio"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab on" onclick="swTab('ann',this)" id="tabAnn" style="display:none"><i
+                        class="fas fa-bullhorn"></i>Announcements<span class="tn" id="n-ann">0</span></button>
+                <button class="tab" onclick="swTab('mat',this)" id="tabMat" style="display:none"><i
+                        class="fas fa-file-alt"></i>Materials<span class="tn" id="n-mat">0</span></button>
+                <button class="tab" onclick="swTab('qz',this)" id="tabQz" style="display:none"><i
+                        class="fas fa-clipboard-list"></i>Quizzes<span class="tn" id="n-qz">0</span></button>
+
+                <button class="tab" onclick="swTab('att',this)" id="tab-att" style="display:none"><i
+                        class="fas fa-calendar-check"></i>Attendance</button>
+                <button class="tab" onclick="swTab('mem',this)" id="tabMbr" style="display:none"><i
+                        class="fas fa-users"></i>Members<span class="tn" id="n-mem">0</span></button>
+                <button class="tab" onclick="swTab('act',this)" id="tabAct" style="display:none"><i
+                        class="fas fa-chart-line"></i>Activity Log</button>
+            </div>
+
+            <div id="p-ann" class="panel on"></div>
+            <div id="p-mat" class="panel"></div>
+            <div id="p-qz" class="panel"></div>
+
+            <div id="p-att" class="panel"></div>
+            <div id="p-mem" class="panel"></div>
+            <div id="p-act" class="panel"></div>
+        </div>
+    </main>
+
+
+
+
+    <!-- File Viewer Modal -->
+    <div class="file-viewer-modal" id="fileViewer">
+        <div class="file-viewer-content">
+            <div class="file-viewer-header">
+                <div class="file-viewer-title" id="fileViewerTitle">Loading...</div>
+                <button class="file-viewer-close" onclick="closeFileViewer()">&times;</button>
+            </div>
+            <div class="file-viewer-body" id="fileViewerBody"></div>
+        </div>
+    </div>
+
+    <div class="mbg" id="editModal">
+        <div class="mbox">
+            <h3 id="editTitle">Edit</h3>
+            <div id="editFields"></div>
+            <div class="mfoot">
+                <button class="mb mb-c" onclick="closeEdit()">Cancel</button>
+                <button class="mb mb-s" id="editSave">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div class="mbg" id="smzModal">
+        <div class="mbox" style="max-width: 600px;">
+            <h3 id="smzTitle" style="display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-magic" style="color:var(--ac)"></i>
+                <span>Summary</span>
+            </h3>
+            <div id="smzBody"
+                style="font-size:14px;color:var(--tx2);line-height:1.6;max-height:60vh;overflow-y:auto;padding-right:8px;white-space:pre-wrap;">
+                Loading...
+            </div>
+            <div class="mfoot" style="justify-content:space-between;display:flex;width:100%">
+                <button class="mb"
+                    style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;"
+                    onclick="readSummaryAloud()" id="smzBtnRead"><i class="fas fa-volume-up"
+                        style="color:var(--ac)"></i> Read Aloud</button>
+                <button class="mb mb-c" onclick="closeSmzModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mbg" id="delModal">
+        <div class="cbox">
+            <span class="cbox-ico"><i class="fas fa-trash-alt" style="color:var(--rd)"></i></span>
+            <h4>Delete item?</h4>
+            <p id="delTxt">This cannot be undone.</p>
+            <div class="crow">
+                <button class="mb mb-c" onclick="closeDel()">Cancel</button>
+                <button class="mb mb-d" id="delOk">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        function setT(m) { localStorage.setItem('qt', m); applyT() }
+        function applyT() {
+            const m = localStorage.getItem('qt') || 'light';
+            const dk = m === 'dark' || (m === 'system' && matchMedia('(prefers-color-scheme:dark)').matches);
+            document.documentElement.setAttribute('data-theme', dk ? 'dark' : 'light');
+            const map = { system: 'System', light: 'Light', dark: 'Dark' };
+            document.querySelectorAll('.tb').forEach(b => b.classList.toggle('on', b.title === map[m]));
+        }
+        applyT();
+        matchMedia('(prefers-color-scheme:dark)').addEventListener('change', applyT);
+
+        const TK = localStorage.getItem('jwt_token');
+        const CID = new URLSearchParams(location.search).get('id');
+        if (CID) localStorage.setItem('cg_last_classroom', CID);
+        const USR = JSON.parse(localStorage.getItem('user') || '{}');
+        let TEACH = ['teacher', 'faculty', 'admin', 'org_admin', 'super_admin'].includes(USR.role);
+        function api(u, o = {}) { return fetch(u, { ...o, headers: { 'Authorization': `Bearer ${TK}`, ...(o.headers || {}) }, credentials: 'include' }) }
+        let TEACHER = {};
+        let SELECTED_FILES = new Set();
+
+        window.swTab = function (n, btn) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+            const panel = g('p-' + n);
+            if (panel) panel.classList.add('on');
+            if (btn) btn.classList.add('on');
+            if (n === 'act') loadActivityLog();
+            if (n === 'att') loadAttendanceTab();
+
+        };
+
+        window.goTab = function (n) {
+            const tab = document.querySelector('.tab[onclick*="swTab(\'' + n + '\'"]');
+            if (tab) { swTab(n, tab); }
+            else { const first = document.querySelector('.tab:not([style*="display:none"])'); if (first) first.click(); }
+        };
+
+        function sk() { return '<div class="sk-row"></div><div class="sk-row"></div><div class="sk-row"></div>'; }
+        function sn(id, v) { const e = g(id); if (e) e.textContent = v; }
+        function dt(d) { try { return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) } catch (e) { return d } }
+        function dtFull(d) { try { return new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) } catch (e) { return d } }
+        function dateKey(d) { try { const dd = new Date(d); return dd.getFullYear() + '-' + dd.getMonth() + '-' + dd.getDate() } catch (e) { return 'x' } }
+
+        async function generateDeviceFingerprint() {
+            try {
+                const components = [
+                    navigator.userAgent,
+                    screen.width,
+                    screen.height,
+                    Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    navigator.language,
+                    navigator.hardwareConcurrency || 'unknown'
+                ];
+                const rawString = components.join('|');
+                const buffer = new TextEncoder().encode(rawString);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch (e) {
+                console.warn("Fingerprint generation failed. Falling back to simple string.");
+                return btoa(navigator.userAgent).substring(0, 32);
+            }
+        }
+
+        async function loadAll() {
+            if (!g('p-ann')) return;
+            ['ann', 'mat', 'qz'].forEach(k => { const el = g('p-' + k); if (el) el.innerHTML = sk(); });
+            try {
+                const [mR, aR, qR, sR, orgAnnR] = await Promise.all([
+                    api('/api/classrooms/' + CID + '/content/materials'),
+                    api('/api/classrooms/' + CID + '/content/announcements'),
+                    api('/api/classrooms/' + CID + '/content/quizzes'),
+                    api('/api/classrooms/' + CID + '/students'),
+                    api('/api/org/announcements').catch(() => null)
+                ]);
+                const mats = (await mR.json()).content || [];
+                const classAnns = (await aR.json()).content || [];
+                const qzs = (await qR.json()).content || [];
+                let sd = { students: [], total: 0 };
+                try { sd = await sR.json(); } catch (e) { }
+
+                // Merge org announcements into the announcements tab
+                let orgAnns = [];
+                try {
+                    if (orgAnnR && orgAnnR.ok) {
+                        const orgData = await orgAnnR.json();
+                        orgAnns = (orgData.announcements || []).map(a => ({
+                            ...a,
+                            id: a._id || a.id,
+                            title: a.title || '',
+                            content: a.content || '',
+                            message: a.content || '',
+                            created_at: a.createdAt || a.created_at || a.sent_at,
+                            posted_by: (a.created_by?.name || a.creator_name || 'Org Admin'),
+                            _isOrgAnn: true
+                        }));
+                    }
+                } catch (e) { /* org announcements fetch failed - non-critical */ }
+
+                const allAnns = [...classAnns, ...orgAnns].sort((a, b) =>
+                    new Date(b.created_at || 0) - new Date(a.created_at || 0)
+                );
+
+                sn('n-ann', allAnns.length); sn('n-mat', mats.length); sn('n-qz', qzs.length);
+                sn('n-mem', sd.total || (sd.students || []).length);
+                rAnns(allAnns); rMats(mats); rQzs(qzs); rMems(sd.students || [], sd.total || 0);
+                loadAttendanceTab();
+
+            } catch (e) { console.error(e); }
+        }
+
+        function rAnns(list) {
+            const el = g('p-ann');
+            if (!el) return;
+            el.innerHTML = list.length ? list.map(a => {
+                const T = a.title || '', C = a.content || a.message || '';
+                const show = T && T !== C;
+                const j = JSON.stringify(a).replace(/"/g, '&quot;');
+                const isOrg = a._isOrgAnn;
+                const ops = (!isOrg && TEACH) ? '<div class="cops"><button class="cop" onclick="event.stopPropagation();openEdit(\'announcements\',\'' + (a.id || a._id) + '\',' + j + ')"><i class="fas fa-pen"></i></button><button class="cop del" onclick="event.stopPropagation();openDel(\'announcements\',\'' + (a.id || a._id) + '\',\'' + x(T || C) + '\')"><i class="fas fa-trash"></i></button></div>' : '';
+                const orgBadge = isOrg ? '<span style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;margin-left:6px;vertical-align:middle"><i class="fas fa-building"></i>Organization Admin</span>' : '';
+
+                let attHTML = '';
+                if (a.attachment_url) {
+                    const attName = a.attachment_name || 'Attached Document';
+                    attHTML = '<div style="margin-top:12px;padding:10px 12px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;display:flex;align-items:center;gap:10px;">' +
+                        '<div style="font-size:18px;color:var(--rd);display:flex;align-items:center;justify-content:center"><i class="fas fa-file-pdf"></i></div>' +
+                        '<div style="flex:1;min-width:0;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tx)">' + x(attName) + '</div>' +
+                        '<button onclick="event.stopPropagation();viewFile(\'' + a.attachment_url + '\',\'' + x(attName) + '\',\'ann_' + (a.id || a._id) + '\')" style="background:var(--ac);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:0.2s"><i class="fas fa-eye"></i> View</button>' +
+                        '</div>';
+                }
+
+                // Tag rendering
+                const tagColors = { Urgent: '#ff4757', Exam: '#ffa502', Event: '#2ed573', General: '#57606f' };
+                let tagsHTML = '';
+                const rawTags = a.tags || [];
+                const tagArr = Array.isArray(rawTags) ? rawTags : [rawTags];
+                tagArr.filter(Boolean).forEach(t => {
+                    const tc = tagColors[t] || tagColors.General;
+                    tagsHTML += '<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:' + tc + '18;color:' + tc + ';border:1px solid ' + tc + '30"><i class="fas fa-tag" style="font-size:8px"></i>' + x(t) + '</span>';
+                });
+
+                return '<div class="card"><div class="card-ico ' + (isOrg ? 'ci-p' : 'ci-p') + '"><i class="fas fa-bullhorn"></i></div><div class="cbody">' +
+                    (show ? '<div class="ctit">' + x(T) + orgBadge + '</div>' : '') +
+                    '<div class="' + (show ? 'cdesc' : 'ctit') + '">' + x(C) + (!show ? orgBadge : '') + '</div>' +
+                    attHTML +
+                    '<div class="cfoot"><span class="cdate"><i class="fas fa-clock"></i>' + dt(a.created_at) + '</span>' +
+                    (a.posted_by ? '<span class="cdate"><i class="fas fa-user"></i>' + x(a.posted_by) + '</span>' : '') +
+                    (tagsHTML ? '<span style="display:inline-flex;gap:4px">' + tagsHTML + '</span>' : '') +
+                    '</div></div>' + ops + '</div>';
+            }).join('') : empty('fa-bullhorn', 'No Announcements', 'Nothing posted yet.');
+        }
+
+        async function loadActivityLog() {
+            const el = g('p-act');
+            if (!el) return;
+            if (!TEACH) {
+                el.innerHTML = '<div style="text-align:center;padding:40px 20px"><i class="fas fa-lock" style="font-size:36px;color:var(--mt);opacity:.5;margin-bottom:10px;display:block"></i><h4 style="color:var(--tx);margin-bottom:4px">Faculty Only</h4><p style="color:var(--mt);font-size:13px">This section is only visible to instructors.</p></div>';
+                return;
+            }
+            el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--mt)"><i class="fas fa-spinner fa-spin" style="font-size:20px"></i><p style="margin-top:10px">Loading activity...</p></div>';
+            try {
+                const r = await api('/api/activity/classroom/' + CID);
+                if (!r.ok) throw new Error('Failed');
+                const { logs, total } = await r.json();
+                if (!logs || logs.length === 0) {
+                    el.innerHTML = '<div style="text-align:center;padding:40px 20px"><i class="fas fa-chart-line" style="font-size:36px;color:var(--mt);opacity:.4;margin-bottom:10px;display:block"></i><h4 style="color:var(--tx);margin-bottom:4px">No Activity Yet</h4><p style="color:var(--mt);font-size:13px">Activity will appear here as students interact with materials.</p></div>';
+                    return;
+                }
+                const actionLabel = a => ({ view_material: 'Viewed Material', view_quiz: 'Viewed Quiz', view_announcement: 'Viewed Announcement' }[a] || a.replace(/_/g, ' '));
+                const actionIcon = a => ({ view_material: 'fa-file-alt', view_quiz: 'fa-clipboard-list', view_announcement: 'fa-bullhorn' }[a] || 'fa-circle');
+                el.innerHTML = `
+<div style="padding:16px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <h3 style="font-size:15px;font-weight:700;color:var(--tx)"><i class="fas fa-chart-line" style="color:var(--ac);margin-right:7px"></i>Student Activity</h3>
+    <span style="font-size:12px;color:var(--mt);font-weight:600">${total} total events</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px">
+    ${logs.map(l => {
+                    const u = l.user || {};
+                    const ini = (u.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                    const av = u.profilePicture ? `<img src="${esc(u.profilePicture)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.textContent='${ini}'">` : ini;
+                    const ts = new Date(l.timestamp).toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    return `<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;background:var(--bg3);border:1px solid var(--bd)">
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">${av}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:var(--tx)">${esc(u.name || 'Unknown')}</div>
+            <div style="font-size:11px;color:var(--mt);margin-top:1px"><i class="fas ${actionIcon(l.action)}" style="margin-right:4px;color:var(--ac)"></i>${actionLabel(l.action)}${l.targetTitle ? ': <em>' + esc(l.targetTitle) + '</em>' : ''}</div>
+          </div>
+          <div style="font-size:11px;color:var(--dm);white-space:nowrap;flex-shrink:0">${ts}</div>
+        </div>`;
+                }).join('')}
+  </div>
+</div>`;
+            } catch (e) {
+                el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--rd);font-size:13px"><i class="fas fa-exclamation-triangle"></i> Failed to load activity log.</div>';
+            }
+        }
+
+        async function init() {
+
+            if (!TK) { location.href = '/login.html'; return; }
+            if (!CID || CID === 'undefined') { location.href = '/my-classrooms'; return; }
+
+            // ── FAST-BOOT: Render cached classroom header instantly ──
+            const cacheKey = 'vc_cache_' + CID;
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                try {
+                    const c = JSON.parse(cached);
+                    document.title = (c.name || 'Classroom') + ' | Classgrid';
+                    const hT = g('hTitle'); if (hT) hT.textContent = c.name || '';
+                    const hD = g('hDesc'); if (hD) hD.textContent = c.description || 'Welcome to this classroom.';
+                    const tT = g('tTag'); if (tT) tT.textContent = c.subject || c.subjectSlug || 'Classroom';
+                    if (c.teacherName) { const tN = g('tName'); if (tN) tN.textContent = c.teacherName; }
+                    if (c.teacherPic) { const tA = g('tAv'); if (tA) tA.innerHTML = '<img src="' + c.teacherPic + '" onerror="this.parentElement.textContent=\'' + (c.teacherName || 'I').charAt(0).toUpperCase() + '\'">'; }
+                    // Show the app shell immediately with cached data
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('app').style.display = 'flex';
+                    // Show default tab
+                    const activeTab = new URLSearchParams(window.location.search).get('tab') || 'ann';
+                    window.goTab(activeTab);
+                } catch (e) { console.warn('Fast-boot cache parse failed', e); }
+            }
+
+            const ctrl = window.initCtrl = new AbortController();
+            const tid = setTimeout(() => ctrl.abort(), 15000);
+
+            try {
+                // Fetch auth and classroom data in parallel
+                const [authRes, classRes] = await Promise.all([
+                    fetch('/api/auth/me', { signal: ctrl.signal, headers: { 'Authorization': `Bearer ${TK}` }, credentials: 'include' }),
+                    fetch('/api/classrooms/' + CID, { signal: ctrl.signal, headers: { 'Authorization': `Bearer ${TK}` }, credentials: 'include' })
+                ]);
+                clearTimeout(tid);
+
+                if (!authRes.ok) { localStorage.removeItem('jwt_token'); location.href = '/login.html'; return; }
+                const authData = await authRes.json();
+                USER = authData.user || authData;
+                if (USER.organization && !USER.organization_id) USER.organization_id = USER.organization;
+                localStorage.setItem('user', JSON.stringify(USER));
+
+                if (!classRes.ok) throw new Error('Classroom not found or access denied.');
+                const classData = await classRes.json();
+                // API returns { classroom: {...}, isOwner: bool }
+                ROOM = classData.classroom || classData;
+                const isOwner = classData.isOwner || false;
+                TEACHER = (ROOM.teacher && typeof ROOM.teacher === 'object') ? ROOM.teacher : {};
+
+                // ── Cache classroom metadata for fast-boot next time ──
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify({
+                        name: ROOM.name, description: ROOM.description,
+                        subject: ROOM.subject, subjectSlug: ROOM.subjectSlug,
+                        teacherName: TEACHER.name || '',
+                        teacherPic: TEACHER.profilePicture || '',
+                        _ts: Date.now()
+                    }));
+                } catch (e) { /* localStorage full — non-critical */ }
+
+                // Populate classroom meta
+                document.title = (ROOM.name || 'Classroom') + ' | Classgrid';
+                document.getElementById('hTitle').textContent = ROOM.name || '';
+                document.getElementById('hDesc').textContent = ROOM.description || 'Welcome to this classroom.';
+                document.getElementById('tTag').textContent = ROOM.subject || ROOM.subjectSlug || 'Classroom';
+
+                const bs = document.getElementById('hStat');
+                if (bs) {
+                    bs.innerHTML = '';
+                    if (ROOM.subject) bs.innerHTML += '<i class="fas fa-book" style="color:var(--ac)"></i> ' + esc(ROOM.subject);
+                    if (ROOM.subject && ROOM.subjectSlug) bs.innerHTML += ' &nbsp;&middot;&nbsp; ';
+                    if (ROOM.subjectSlug) bs.innerHTML += '<i class="fas fa-tag" style="color:var(--ac2)"></i> ' + esc(ROOM.subjectSlug);
+                }
+
+                const teacher = (ROOM.teacher && typeof ROOM.teacher === 'object') ? ROOM.teacher : null;
+                if (teacher) {
+                    document.getElementById('tName').textContent = teacher.name || 'Instructor';
+                    document.getElementById('tBio').textContent = teacher.bio || teacher.qualification || teacher.department || '';
+                    const tav = document.getElementById('tAv');
+                    if (teacher.profilePicture) {
+                        tav.innerHTML = '<img src="' + esc(teacher.profilePicture) + '" onerror="this.parentElement.textContent=\'' + (teacher.name || 'I').charAt(0).toUpperCase() + '\'">';
+                    } else {
+                        tav.textContent = (teacher.name || 'I').charAt(0).toUpperCase();
+                    }
+                } else {
+                    document.getElementById('tName').textContent = 'Instructor';
+                    document.getElementById('tBio').textContent = '';
+                    document.getElementById('tAv').textContent = 'I';
+                }
+
+                // Set nav links
+                const roomId = ROOM._id || ROOM.id || CID;
+                document.getElementById('chatLink').href = '/classroom-chat.html?id=' + roomId;
+                const isTeacher = isOwner || USER._id === ROOM.createdBy || (ROOM.teacher && USER._id === ROOM.teacher._id);
+                const backEl = document.getElementById('backLink');
+                backEl.dataset.dest = isTeacher ? '/manage-classroom' : '/my-classrooms';
+
+                // Show tabs
+                document.getElementById('tabAnn').style.display = '';
+                document.getElementById('tabMat').style.display = '';
+                document.getElementById('tabQz').style.display = '';
+                if (isTeacher) {
+                    document.getElementById('tab-att').style.display = '';
+                    document.getElementById('tabAct').style.display = '';
+                }
+
+                document.getElementById('tabMbr').style.display = '';
+
+                // Show the app
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('app').style.display = 'flex';
+
+                // Go to requested tab or default
+                const activeTab = new URLSearchParams(window.location.search).get('tab') || 'ann';
+                window.goTab(activeTab);
+
+                // Load all tab content
+                await loadAll();
+
+            } catch (err) {
+                console.error('Init error:', err);
+                if (err.name === 'AbortError') toast('Connection timeout. Please refresh.', 'error');
+                else {
+                    document.getElementById('loader').innerHTML = "<div style='text-align:center;padding:2rem'><i class='fas fa-door-closed' style='font-size:3rem;color:var(--mt);margin-bottom:1rem;display:block'></i><h2 style='color:var(--tx);margin-bottom:0.5rem'>Classroom Unavailable</h2><p style='color:var(--mt);margin-bottom:1.5rem'>You do not have access, or it has been removed.</p><a href='/my-classrooms' class='btn btn-primary' style='display:inline-flex'><i class='fas fa-arrow-left'></i>&nbsp;Go Back</a></div>";
+                }
+            }
+        }
+
+        const rD = d => { try { return new Date(d).toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) } catch { return 'Unknown' } };
+        const esc = s => s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '';
+        function typeInfo(raw) {
+            const t = (raw || '').toLowerCase().trim();
+            if (t === 'pdf') return { icon: 'fa-file-pdf', color: '#e74c3c', label: 'PDF', group: 'pdf' };
+            if (['ppt', 'pptx'].includes(t)) return { icon: 'fa-file-powerpoint', color: '#e67e22', label: 'PPT', group: 'ppt' };
+            if (['doc', 'docx'].includes(t)) return { icon: 'fa-file-word', color: '#2980b9', label: 'DOC', group: 'doc' };
+            if (['xls', 'xlsx', 'csv'].includes(t)) return { icon: 'fa-file-excel', color: '#27ae60', label: 'XLS', group: 'xls' };
+            if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(t)) return { icon: 'fa-file-image', color: '#8e44ad', label: 'IMG', group: 'img' };
+            if (t === 'txt') return { icon: 'fa-file-lines', color: '#7f8c8d', label: 'TXT', group: 'other' };
+            return { icon: 'fa-file-alt', color: '#5e6e94', label: t.toUpperCase() || 'FILE', group: 'other' };
+        }
+
+        function gvUrl(m) {
+            const t = (m.type || '').toLowerCase();
+            return ['pdf', 'ppt', 'pptx', 'doc', 'docx', 'xls', 'xlsx'].includes(t)
+                ? 'https://docs.google.com/gview?url=' + encodeURIComponent(m.file_url) + '&embedded=true' : m.file_url;
+        }
+
+        function groupMats(list) {
+            const map = new Map();
+            list.forEach(m => {
+                const k = m.post_id || m.batch_id || (dateKey(m.created_at) + '::' + (m.uploaded_by || ''));
+                if (!map.has(k)) map.set(k, { k, title: m.post_title || m.batch_title || '', description: m.post_description || m.description || '', uploaded_by: m.uploaded_by || '', created_at: m.created_at, files: [] });
+                map.get(k).files.push(m);
+            });
+            return [...map.values()];
+        }
+
+        function attRowHTML(m) {
+            const ti = typeInfo(m.type);
+            const vu = gvUrl(m);
+            const j = JSON.stringify(m).replace(/"/g, '&quot;');
+            const eBtn = TEACH ? `<button class="mat-att-btn" onclick="event.stopPropagation();openEdit('materials','${m.id}',${j})"><i class="fas fa-pen"></i> Rename</button>` : '';
+            const dBtn = TEACH ? `<button class="mat-att-btn del" onclick="event.stopPropagation();openDel('materials','${m.id}','${x(m.title)}')"><i class="fas fa-trash"></i> Delete</button>` : '';
+            const checkBox = TEACH ? `<input type="checkbox" class="mat-check" data-id="${m.id}" data-title="${x(m.title)}" onclick="event.stopPropagation();toggleSelect(this)" style="width:20px;height:20px;cursor:pointer;">` : '';
+            const smzBtn = ti.group === 'pdf' ? `<button class="mat-att-btn smz" onclick="event.stopPropagation();summarizePdf('${m.id}','${x(m.title)}','${m.file_url}')" style="color:#8e44ad;border-color:rgba(142,68,173,0.3);"><i class="fas fa-magic"></i> Summarize</button>` : '';
+            return `<div class="mat-att-row" data-file-id="${m.id}">
+  ${checkBox}
+  <div class="mat-att-ico" style="color:${ti.color}"><i class="fas ${ti.icon}"></i></div>
+  <div class="mat-att-info">
+    <div class="mat-att-name" title="${x(m.title)}">${x(m.title)}</div>
+    <div class="mat-att-type" style="color:${ti.color}">${ti.label}</div>
+  </div>
+  <div class="mat-att-btns">
+    <button class="mat-att-btn" onclick="event.stopPropagation();viewFile('${vu}','${x(m.title)}','${m.id}')"><i class="fas fa-eye"></i> View</button>
+    <button class="mat-att-btn dl" onclick="event.stopPropagation();downloadFile('${m.file_url}','${x(m.title)}')"><i class="fas fa-download"></i> Save</button>
+    ${smzBtn}${eBtn}${dBtn}
+  </div>
+</div>`;
+        }
+
+        function postHTML(grp, tInfo) {
+            const ini = (grp.uploaded_by || (tInfo && tInfo.name) || 'T').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const av = (tInfo && tInfo.profilePicture) ? `<img src="${x(tInfo.profilePicture)}" alt="${x(tInfo.name)}" onerror="this.parentElement.innerHTML='${ini}'">` : ini;
+            const title = grp.title || (grp.files.length === 1 ? grp.files[0].title : '');
+            const desc = grp.description;
+            const body = (title || desc) ? `<div class="mat-post-body">
+    ${title ? `<div class="mat-post-title">${x(title)}</div>` : ''}
+    ${desc ? `<div class="mat-post-desc">${x(desc)}</div>` : ''}
+  </div>` : '';
+            const attLbl = grp.files.length > 1 ? `<div class="mat-att-label"><i class="fas fa-paperclip"></i>${grp.files.length} attachments</div>` : '';
+            return `<div class="mat-post">
+  <div class="mat-post-head">
+    <div class="mat-post-avatar">${av}</div>
+    <div class="mat-post-info">
+      <div class="mat-post-name">${x(grp.uploaded_by || (tInfo && tInfo.name) || 'Instructor')}</div>
+      <div class="mat-post-meta">
+        <span><i class="fas fa-calendar-alt"></i>${dtFull(grp.created_at)}</span>
+        <span><i class="fas fa-file"></i>${grp.files.length} file${grp.files.length !== 1 ? 's' : ''}</span>
+      </div>
+    </div>
+  </div>
+  ${body}
+  <div class="mat-attachments">${attLbl}${grp.files.map(attRowHTML).join('')}</div>
+</div>`;
+        }
+
+        function renderMats() {
+            const el = g('p-mat');
+            if (!el) return;
+            if (!MAT_ALL.length) {
+                el.innerHTML = `<div class="mat-empty"><div class="mat-empty-icon"><i class="fas fa-folder-open"></i></div><h4>No Materials Yet</h4><p>Files uploaded by your instructor will appear here.</p></div>`; return;
+            }
+            let filt = MAT_ALL.filter(m => {
+                const ti = typeInfo(m.type);
+                return (MAT_FILTER === 'all' || ti.group === MAT_FILTER) && (!MAT_SEARCH || m.title.toLowerCase().includes(MAT_SEARCH.toLowerCase()));
+            });
+            if (MAT_SORT === 'newest') filt.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            else if (MAT_SORT === 'oldest') filt.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            else if (MAT_SORT === 'name_az') filt.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+            else if (MAT_SORT === 'name_za') filt.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+            const cnts = {};
+            MAT_ALL.forEach(m => { const g2 = typeInfo(m.type).group; cnts[g2] = (cnts[g2] || 0) + 1; });
+            const chips = [
+                { key: 'all', icon: 'fa-layer-group', label: 'All' },
+                { key: 'pdf', icon: 'fa-file-pdf', label: 'PDF' },
+                { key: 'ppt', icon: 'fa-file-powerpoint', label: 'PPT' },
+                { key: 'doc', icon: 'fa-file-word', label: 'Doc' },
+                { key: 'img', icon: 'fa-file-image', label: 'Image' },
+                { key: 'xls', icon: 'fa-file-excel', label: 'Sheet' },
+                { key: 'other', icon: 'fa-file-alt', label: 'Other' },
+            ].filter(c => c.key === 'all' || cnts[c.key])
+                .map(c => {
+                    const n = c.key === 'all' ? MAT_ALL.length : (cnts[c.key] || 0);
+                    return `<button class="mf-chip ${MAT_FILTER === c.key ? 'active' : ''}" onclick="setMatFilter('${c.key}')"><i class="fas ${c.icon}"></i>${c.label} <span style="opacity:.55">${n}</span></button>`;
+                }).join('');
+            const groups = groupMats(filt);
+            if (MAT_SORT === 'newest' || MAT_SORT === 'oldest')
+                groups.sort((a, b) => MAT_SORT === 'newest' ? new Date(b.created_at) - new Date(a.created_at) : new Date(a.created_at) - new Date(b.created_at));
+            let html = ''; let ldk = null;
+            groups.forEach(grp => {
+                const dk = dateKey(grp.created_at);
+                if ((MAT_SORT === 'newest' || MAT_SORT === 'oldest') && dk !== ldk) {
+                    html += `<div class="mat-date-sep"><span class="mat-date-label"><i class="fas fa-calendar-days"></i>${dtFull(grp.created_at)}</span><div class="mat-date-line"></div></div>`;
+                    ldk = dk;
+                }
+                html += postHTML(grp, TEACHER);
+            });
+            const bulkBar = TEACH ? `<div class="bulk-bar" id="bulkBar"><div class="bulk-info"><i class="fas fa-check-circle"></i><span id="bulkCount">0 selected</span></div><div class="bulk-actions"><button class="bulk-btn cancel" onclick="clearSelection()">Cancel</button><button class="bulk-btn delete" onclick="bulkDelete()"><i class="fas fa-trash"></i> Delete Selected</button></div></div>` : '';
+            el.innerHTML = `${bulkBar}<div class="mat-toolbar">
+  <div class="mat-search"><i class="fas fa-search"></i><input type="text" placeholder="Search materials…" value="${x(MAT_SEARCH)}" oninput="setMatSearch(this.value)" autocomplete="off"></div>
+  <div class="mat-filters">${chips}</div>
+  <div class="mat-sort"><i class="fas fa-sort"></i>
+    <select onchange="setMatSort(this.value)" aria-label="Sort">
+      <option value="newest" ${MAT_SORT === 'newest' ? 'selected' : ''}>Newest First</option>
+      <option value="oldest" ${MAT_SORT === 'oldest' ? 'selected' : ''}>Oldest First</option>
+      <option value="name_az" ${MAT_SORT === 'name_az' ? 'selected' : ''}>Name A ? Z</option>
+      <option value="name_za" ${MAT_SORT === 'name_za' ? 'selected' : ''}>Name Z ? A</option>
+    </select>
+  </div>
+</div>
+<div class="mat-count">Showing <strong>${filt.length}</strong> of ${MAT_ALL.length} file${MAT_ALL.length !== 1 ? 's' : ''}</div>
+${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div class="mat-empty-icon"><i class="fas fa-search"></i></div><h4>No Results</h4><p>Try a different search or filter.</p></div>`}`;
+        }
+
+        window.toggleSelect = function (checkbox) {
+            const id = checkbox.dataset.id;
+            if (checkbox.checked) { SELECTED_FILES.add(id); } else { SELECTED_FILES.delete(id); }
+            updateBulkBar();
+        };
+
+        function updateBulkBar() {
+            if (!TEACH) return;
+            const bar = g('bulkBar'); const count = g('bulkCount');
+            if (!bar) return;
+            if (SELECTED_FILES.size > 0) { bar.classList.add('active'); count.textContent = SELECTED_FILES.size + ' selected'; }
+            else { bar.classList.remove('active'); }
+        }
+
+        window.clearSelection = function () {
+            SELECTED_FILES.clear();
+            document.querySelectorAll('.mat-check').forEach(cb => cb.checked = false);
+            updateBulkBar();
+        };
+
+        window.bulkDelete = async function () {
+            if (SELECTED_FILES.size === 0) return;
+            if (!confirm('Delete ' + SELECTED_FILES.size + ' file' + (SELECTED_FILES.size !== 1 ? 's' : '') + '? This cannot be undone.')) return;
+            toast('Deleting files...', 'ok');
+            try {
+                await Promise.all(Array.from(SELECTED_FILES).map(id => api('/api/classrooms/' + CID + '/content/materials/' + id, { method: 'DELETE' })));
+                const count = SELECTED_FILES.size;
+                clearSelection();
+                toast('Deleted ' + count + ' file' + (count !== 1 ? 's' : ''), 'ok');
+                loadAll();
+            } catch (e) { toast('Delete failed', 'err'); }
+        };
+
+        window.viewFile = function (url, title, id) {
+            const viewer = g('fileViewer');
+            const viewerTitle = g('fileViewerTitle');
+            const viewerBody = g('fileViewerBody');
+            viewerTitle.textContent = title;
+            viewerBody.innerHTML = '<iframe src="' + url + '" frameborder="0" style="width:100%;height:100%;border:none"></iframe>';
+            viewer.classList.add('active');
+            logV('material', id, title);
+        };
+
+        window.closeFileViewer = function () {
+            const viewer = g('fileViewer');
+            const viewerBody = g('fileViewerBody');
+            viewer.classList.remove('active');
+            viewerBody.innerHTML = '';
+        };
+
+        async function summarizeWithHF(text) {
+            // Call backend proxy — avoids CORS (HF blocks direct browser requests)
+            const res = await fetch('/api/classrooms/hf-summarize', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${TK}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text })
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.message || `Summarization failed (HTTP ${res.status})`);
+            }
+
+            const data = await res.json();
+            return data.summary;
+        }
+
+        window.summarizePdf = async function (id, title, url) {
+            const modal = g('smzModal');
+            const body = g('smzBody');
+            const titleEl = g('smzTitle').querySelector('span');
+
+            titleEl.textContent = "Summary: " + title;
+            body.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin" style="font-size:24px;color:var(--ac);margin-bottom:10px;"></i><div id="smzStatus">Extracting text from PDF...</div></div>';
+            modal.classList.add('open');
+
+            try {
+                // 1. Fetch and Parse PDF through our backend proxy to bypass Supabase CORS
+                const proxyUrl = `/api/classrooms/proxy/pdf?url=${encodeURIComponent(url)}`;
+                const pdfRes = await fetch(proxyUrl, { headers: { 'Authorization': 'Bearer ' + (TK), 'Content-Type': 'application/json' } });
+
+                if (!pdfRes.ok) {
+                    throw new Error(`Failed to download PDF (HTTP ${pdfRes.status}). The file might be private or unavailable.`);
+                }
+
+                const contentType = pdfRes.headers.get('content-type');
+                if (contentType && !contentType.includes('application/pdf')) {
+                    throw new Error("The downloaded file is not a valid PDF. It might be blocked or corrupted.");
+                }
+
+                const pdfData = await pdfRes.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+
+                let extractedText = '';
+                const maxPagesToProcess = Math.min(4, pdf.numPages);
+                for (let i = 1; i <= maxPagesToProcess; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    extractedText += textContent.items.map(item => item.str).join(' ') + ' ';
+                }
+
+                extractedText = extractedText.trim();
+                if (!extractedText) throw new Error("Could not extract any text from this PDF. It may be an image-only document.");
+
+                let pageLimitNotice = '';
+                if (pdf.numPages > 4) {
+                    pageLimitNotice = `\n\n**Note: To ensure fast processing, this summary only covers the first 4 pages of the ${pdf.numPages}-page document.**`;
+                }
+
+                // 2. Send the extracted text directly to our backend proxy
+                // (The backend proxy now handles chunking and sequential HF/Groq calls)
+                document.getElementById('smzStatus').textContent = `Summarizing document with AI... this may take up to 30 seconds.`;
+
+                let finalSummary = await summarizeWithHF(extractedText);
+
+                // Add notice if we didn't summarize the whole document
+                finalSummary += pageLimitNotice;
+
+                // Format markdown-like response for simple HTML viewing
+                const formattedSummary = finalSummary
+                    .replace(/</g, '&lt;').replace(/>/g, '&gt;') // Prevent XSS
+                    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')       // Bold format
+                    .replace(/\*(.*?)\*/g, '<i>$1</i>')           // Italic format
+                    .replace(/\n/g, '<br>');                      // Newlines
+
+                // 3. Update UI (and optionally cache in background)
+                body.innerHTML = formattedSummary;
+
+                // Cache it silently in background (don't block UI)
+                api(`/api/classrooms/${CID}/content/materials/${id}/summarize`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cachedSummary: finalSummary })
+                }).catch(e => console.warn('Failed to cache summary', e));
+
+            } catch (e) {
+                const safeMsg = e.message ? e.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') : "Unknown error";
+                body.innerHTML = `<div style="color:var(--rd);display:flex;align-items:center;gap:8px;"><i class="fas fa-exclamation-circle"></i> Error: ${safeMsg}</div>`;
+            }
+        };
+
+        window.readSummaryAloud = function () {
+            if (!window.speechSynthesis) {
+                toast('Text-to-Speech is not supported in this browser.', 'err');
+                return;
+            }
+            const btn = document.getElementById('smzBtnRead');
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                if (btn) btn.innerHTML = '<i class="fas fa-volume-up" style="color:var(--ac)"></i> Read Aloud';
+                return;
+            }
+            // Make sure we aren't reading the loading spinner text
+            const bdy = document.getElementById('smzBody');
+            if (bdy.querySelector('.fa-spinner')) return;
+
+            const text = bdy.textContent.replace(/[*#`]/g, '').trim();
+            if (!text) return;
+
+            const synth = window.speechSynthesis;
+            const u = new SpeechSynthesisUtterance(text);
+            u.rate = 1;
+            u.onend = () => { if (btn) btn.innerHTML = '<i class="fas fa-volume-up" style="color:var(--ac)"></i> Read Aloud'; };
+            u.onerror = () => { if (btn) btn.innerHTML = '<i class="fas fa-volume-up" style="color:var(--ac)"></i> Read Aloud'; synth.cancel(); };
+
+            if (btn) btn.innerHTML = '<i class="fas fa-stop" style="color:var(--rd)"></i> Stop Reading';
+            synth.speak(u);
+        };
+
+        window.closeSmzModal = function () {
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            const btn = document.getElementById('smzBtnRead');
+            if (btn) btn.innerHTML = '<i class="fas fa-volume-up" style="color:var(--ac)"></i> Read Aloud';
+            g('smzModal').classList.remove('open');
+        };
+
+        window.downloadFile = function (url, title) {
+            const a = document.createElement('a');
+            a.href = url; a.download = title; a.style.display = 'none';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            toast('Download started', 'ok');
+        };
+
+        window.setMatFilter = k => { MAT_FILTER = k; renderMats(); };
+        window.setMatSort = v => { MAT_SORT = v; renderMats(); };
+        window.setMatSearch = v => { MAT_SEARCH = v; renderMats(); };
+
+
+        function rMats(list) { MAT_ALL = list || []; MAT_FILTER = 'all'; MAT_SORT = 'newest'; MAT_SEARCH = ''; SELECTED_FILES.clear(); renderMats(); }
+
+
+        function rQzs(list) {
+            g('p-qz').innerHTML = list.length ? list.map(q => {
+                const j = JSON.stringify(q).replace(/"/g, '&quot;');
+                const ops = TEACH ? `<div class="cops">
+      <button class="cop" onclick="event.stopPropagation();openEdit('quizzes','${q.id}',${j})"><i class="fas fa-pen"></i></button>
+      <button class="cop del" onclick="event.stopPropagation();openDel('quizzes','${q.id}','${x(q.title)}')"><i class="fas fa-trash"></i></button></div>` : '';
+                return `<div class="card"><div class="card-ico ci-g"><i class="fas fa-clipboard-list"></i></div>
+  <div class="cbody">
+    <div class="ctit">${x(q.title)}</div>
+    <div class="cdesc">${x(q.description || '')}</div>
+    <div class="cfoot"><span class="cdate"><i class="fas fa-stopwatch"></i>${q.duration || 30} min</span>
+      <a href="${q.quiz_url}" target="_blank" class="btnd" onclick="logV('quiz','${q.id}','${x(q.title)}')"><i class="fas fa-play"></i>&nbsp;Start Quiz</a>
+    </div>
+  </div>${ops}</div>`;
+            }).join('')
+                : empty('fa-clipboard-list', 'No Quizzes', 'No quizzes yet.');
+        }
+
+        function rMems(list, total) {
+            const el = g('p-mem'); const t = TEACHER;
+            const tIni = (t.name || 'T').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const tAv = t.profilePicture ? `<img src="${x(t.profilePicture)}" alt="${x(t.name)}" onerror="this.parentElement.innerHTML='${tIni}'">` : tIni;
+            let tM = '';
+            if (t.email) tM += `<div class="memail"><i class="fas fa-envelope"></i>${x(t.email)}</div>`;
+            if (t.qualification) tM += `<div class="memail"><i class="fas fa-graduation-cap"></i>${x(t.qualification)}</div>`;
+            if (t.department) tM += `<div class="memail"><i class="fas fa-building"></i>${x(t.department)}</div>`;
+            const tSec = t.name ? `<div class="mtop" style="margin-bottom:8px"><h3><i class="fas fa-chalkboard-teacher"></i>Faculty / Teacher</h3></div>
+<div class="mtable" style="margin-bottom:18px">
+  <div class="mrow" style="grid-template-columns: 38px 1fr; border-left:3px solid var(--ac);background:rgba(45,111,223,.03);padding-right:15px">
+    <div class="mav">${tAv}</div><div class="minfo"><div class="mname" style="font-size:15px;margin-bottom:2px">${x(t.name)}</div>${tM}</div>
+  </div>
+</div>`: '';
+            const students = list.filter(s => s.role !== 'teacher');
+            const sorted = [...students].sort((a, b) => new Date(a.joinedAt || 0) - new Date(b.joinedAt || 0));
+            const sSec = sorted.length ? `<div class="mtop"><h3><i class="fas fa-user-graduate"></i>Classmates</h3><span class="mbadge">${sorted.length} student${sorted.length !== 1 ? 's' : ''}</span></div>
+<div class="mtable">${sorted.map((s, i) => {
+                const ini = (s.name || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                const av = s.profilePicture ? `<img src="${x(s.profilePicture)}" alt="${x(s.name)}" onerror="this.parentElement.innerHTML='${ini}'">` : ini;
+                return `<div class="mrow"><div class="midx" ${s.prn ? 'style="color:var(--ac);font-weight:800"' : ''}>${s.prn ? x(s.prn) : (i + 1)}</div><div class="mav">${av}</div>
+    <div class="minfo"><div class="mname">${x(s.name)}</div><div class="memail"><i class="fas fa-envelope"></i>${x(s.email)}</div></div>
+    <span class="rp rp-s">Student</span></div>`;
+            }).join('')}</div>`
+                : `<div class="empty" style="padding:20px"><i class="fas fa-user-graduate"></i><h4>No Students Yet</h4><p>No one has joined yet.</p></div>`;
+            el.innerHTML = tSec + sSec;
+        }
+
+        function empty(ic, h, p) { return `<div class="empty"><i class="fas ${ic}"></i><h4>${h}</h4><p>${p}</p></div>` }
+
+        let ES = {};
+        function openEdit(type, id, item) {
+            ES = { type, id };
+            const typeLabel = { materials: 'Material', announcements: 'Announcement', quizzes: 'Quiz' }[type] || type;
+            g('editTitle').textContent = `Edit ${typeLabel}`;
+            let h = '';
+            if (type === 'announcements') h = fta('Content', 'ef2', item.content || item.message);
+            else if (type === 'materials') h = fld('Title', 'text', 'ef1', item.title);
+            else h = fld('Title', 'text', 'ef1', item.title);
+            g('editFields').innerHTML = h; g('editSave').onclick = saveEdit; g('editModal').classList.add('open');
+        }
+        function fld(l, t, i, v) { return `<div class="mf"><label>${l}</label><input id="${i}" type="${t}" value="${x(String(v || ''))}"></div>` }
+        function fta(l, i, v) { return `<div class="mf"><label>${l}</label><textarea id="${i}" rows="4">${x(v || '')}</textarea></div>` }
+        function closeEdit() { g('editModal').classList.remove('open') }
+        async function saveEdit() {
+            const { type, id } = ES; let b = {};
+            if (type === 'announcements') { b.message = g('ef2').value; b.content = b.message; }
+            else if (type === 'materials') { b.title = g('ef1').value; }
+            else { b.title = g('ef1').value; }
+            try {
+                const r = await api(`/api/classrooms/${CID}/content/${type}/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+                if (!r.ok) throw 0; closeEdit(); toast('Updated', 'ok'); loadAll();
+            } catch (e) { toast('Update failed', 'err') }
+        }
+
+        let DS = {};
+        function openDel(type, id, title) {
+            DS = { type, id }; g('delTxt').textContent = `Delete "${title}"? This cannot be undone.`;
+            g('delOk').onclick = doDelete; g('delModal').classList.add('open');
+        }
+        function closeDel() { g('delModal').classList.remove('open') }
+        async function doDelete() {
+            try {
+                const r = await api(`/api/classrooms/${CID}/content/${DS.type}/${DS.id}`, { method: 'DELETE' });
+                if (!r.ok) throw 0; closeDel(); toast('Deleted', 'ok'); loadAll();
+            } catch (e) { toast('Delete failed', 'err') }
+        }
+
+        let TT;
+        function toast(msg, type = 'ok') {
+            const el = g('toast'); el.textContent = msg; el.className = `toast ${type} show`;
+            clearTimeout(TT); TT = setTimeout(() => el.classList.remove('show'), 2800);
+        }
+        function logV(type, id, title) {
+            fetch('/api/activity/log', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ classroomId: CID, action: `view_${type}`, targetType: type, targetId: id, targetTitle: title })
+            }).catch(() => { });
+        }
+        function g(id) { return document.getElementById(id) }
+        function x(s) { if (!s) return ''; return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') }
+
+        ['editModal', 'delModal', 'fileViewer'].forEach(id => {
+            g(id).addEventListener('click', e => {
+                if (e.target.id === id) {
+                    closeEdit();
+                    closeDel();
+                    closeFileViewer();
+                }
+            });
+        });
+
+        // â”€â”€ ATTENDANCE TAB LOGIC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        let ATT_TIMER = null;
+        let ATT_REFRESH = null;
+
+        async function loadAttendanceTab() {
+            try {
+                const r = await api(`/api/attendance/${CID}/active`);
+                if (r.status === 403) {
+                    // Not PRO â— hide tab
+                    const tb = g('tab-att');
+                    if (tb) tb.style.display = 'none';
+                    return;
+                }
+                // Show tab
+                const tb = g('tab-att');
+                if (tb) tb.style.display = '';
+                const data = await r.json();
+                renderAttendancePanel(data);
+            } catch (e) {
+                console.error('[Attendance] Tab load error:', e);
+            }
+        }
+
+        function renderAttendancePanel(data) {
+            const el = g('p-att');
+            if (!el) return;
+
+            if (TEACH) {
+                renderFacultyAttendance(el, data);
+            } else {
+                renderStudentAttendance(el, data);
+            }
+        }
+
+        function renderFacultyAttendance(el, data) {
+            if (data.active) {
+                // Active session â— show countdown + present count
+                const s = data.session;
+                el.innerHTML = `
+                <div style="padding:20px">
+                    <div style="background:linear-gradient(135deg,rgba(0,200,150,.08),rgba(79,142,255,.08));border:1px solid rgba(0,200,150,.25);border-radius:14px;padding:24px;text-align:center;margin-bottom:20px">
+                        <div style="font-size:13px;font-weight:700;color:var(--gr);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px"><i class="fas fa-signal"></i> Session Active</div>
+                        <div id="attTimer" style="font-size:42px;font-weight:900;color:var(--tx);font-family:monospace;margin-bottom:6px">--:--</div>
+                        <div style="font-size:13px;color:var(--mt)">Time remaining</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+                        <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:12px;padding:18px;text-align:center">
+                            <div style="font-size:28px;font-weight:800;color:var(--gr)" id="attPresentCount">${s.presentCount || 0}</div>
+                            <div style="font-size:12px;color:var(--mt);font-weight:600">Present</div>
+                        </div>
+                        <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:12px;padding:18px;text-align:center">
+                            <div style="font-size:28px;font-weight:800;color:var(--ac)">
+                                <i class="fas fa-clock" style="font-size:20px"></i>
+                            </div>
+                            <div style="font-size:12px;color:var(--mt);font-weight:600">Active session</div>
+                        </div>
+                    </div>
+                    <button class="btnd" onclick="loadAttendanceTab()" style="width:100%;padding:12px;border-radius:10px;font-weight:700;margin-bottom:16px;">
+                        <i class="fas fa-sync-alt"></i> Refresh Count
+                    </button>
+                    <div style="display:flex; justify-content:center;">
+                        <button id="stopAttBtn" class="btnd" onclick="stopAttendance()" style="padding:8px 16px;border-radius:8px;font-weight:700;background:rgba(255,71,87,0.1);color:var(--rd);border:1px solid rgba(255,71,87,0.3);cursor:pointer;font-size:13px;">
+                            <i class="fas fa-stop-circle"></i> Stop Session Now
+                        </button>
+                    </div>
+                    <div id="stopAttError" style="display:none;margin-top:10px;padding:10px;border-radius:8px;background:rgba(255,71,87,.08);color:var(--rd);font-size:13px;font-weight:600"></div>
+                    ${s.requiresGPS ? `<div style="display:flex;justify-content:center;margin-top:16px;"><div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,142,255,0.1);color:var(--ac);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;"><i class="fas fa-location-arrow"></i> Teacher Location: ${s.teacherLat.toFixed(5)}, ${s.teacherLng.toFixed(5)}</div></div>` : ''}
+                </div>`;
+                startCountdown(s.expiresAt);
+                if (ATT_REFRESH) clearInterval(ATT_REFRESH);
+                ATT_REFRESH = setInterval(async () => {
+                    const tab = g('tab-att');
+                    if (tab && tab.style.display !== 'none') {
+                        try {
+                            const r = await api('/api/attendance/' + CID + '/active');
+                            const data = await r.json();
+                            if (data.active && g('attPresentCount')) {
+                                g('attPresentCount').textContent = data.session.presentCount || 0;
+                            } else if (!data.active) {
+                                clearInterval(ATT_REFRESH);
+                                loadAttendanceTab();
+                            }
+                        } catch (e) { }
+                    } else {
+                        clearInterval(ATT_REFRESH);
+                    }
+                }, 30000); // Poll attendance every 30s
+            } else {
+                if (ATT_REFRESH) clearInterval(ATT_REFRESH);
+                // No active session â— show start form
+                el.innerHTML = `
+                <div style="padding:20px">
+                    <div style="text-align:center;margin-bottom:24px">
+                        <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">
+                            <i class="fas fa-user-check" style="font-size:22px;color:#fff"></i>
+                        </div>
+                        <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">Smart Attendance</h3>
+                        <p style="font-size:13px;color:var(--mt)">Start an attendance session with a secure code & duration</p>
+                    </div>
+                    <div class="mf" style="margin-bottom:16px">
+                        <label style="font-size:12px;font-weight:700;color:var(--dm);display:block;margin-bottom:6px">Mysterious Code</label>
+                        <input id="attCode" type="text" placeholder="e.g., quantum, brick, nebula" autocomplete="off" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:15px;font-weight:600;font-family:var(--f)">
+                        <div style="font-size:11px;color:var(--mt);margin-top:4px;margin-bottom:14px">Students must enter this exact code to mark attendance. 3-30 characters.</div>
+                        <label style="font-size:12px;font-weight:700;color:var(--dm);display:block;margin-bottom:6px">Session Duration</label>
+                        <select id="attDuration" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:15px;font-weight:600;font-family:var(--f);cursor:pointer">
+                            <option value="60">1 Minute (Quick)</option>
+                            <option value="120">2 Minutes</option>
+                            <option value="240" selected>4 Minutes (Standard)</option>
+                            <option value="420">7 Minutes</option>
+                            <option value="600">10 Minutes (Extended)</option>
+                        </select>
+                    </div>
+                    <button class="btnd" id="startAttBtn" onclick="startAttendance()" style="width:100%;padding:14px;border-radius:10px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--gr),#00a87a);color:#fff;border:none;cursor:pointer">
+                        <i class="fas fa-play"></i> Start Attendance Session
+                    </button>
+                    <div id="attError" style="display:none;margin-top:10px;padding:10px;border-radius:8px;background:rgba(255,71,87,.08);color:var(--rd);font-size:13px;font-weight:600"></div>
+                </div>
+                <div style="border-top:1px solid var(--bd);padding:20px">
+                    <h4 style="font-size:14px;font-weight:700;margin-bottom:12px"><i class="fas fa-history" style="color:var(--ac);margin-right:6px"></i>Past Sessions</h4>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+                        <select id="attFilterType" onchange="onAttFilterChange()" style="padding:7px 10px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:12px;font-weight:600;font-family:var(--f);cursor:pointer">
+                            <option value="month" selected>This Month</option>
+                            <option value="week">This Week</option>
+                            <option value="selectMonth">Select Month</option>
+                            <option value="semester">Select Semester</option>
+                        </select>
+                        <select id="attFilterMonth" onchange="loadPastSessions()" style="display:none;padding:7px 10px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:12px;font-weight:600;font-family:var(--f);cursor:pointer"></select>
+                        <select id="attFilterSem" onchange="loadPastSessions()" style="display:none;padding:7px 10px;border-radius:8px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:12px;font-weight:600;font-family:var(--f);cursor:pointer">
+                            <option value="1">Sem 1 (Jun-Nov)</option>
+                            <option value="2">Sem 2 (Dec-May)</option>
+                        </select>
+                    </div>
+                    <div id="attSessions"><div style="text-align:center;color:var(--mt);padding:20px"><i class="fas fa-spinner fa-spin"></i> Loading...</div></div>
+                </div>`;
+                populateMonthDropdown();
+                loadPastSessions();
+            }
+        }
+
+        function renderStudentAttendance(el, data) {
+            if (data.active) {
+                const s = data.session;
+                if (s.alreadyMarked) {
+                    el.innerHTML = `
+                    <div style="padding:40px 20px;text-align:center">
+                        <div style="width:64px;height:64px;border-radius:50%;background:rgba(0,200,150,.12);display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px">
+                            <i class="fas fa-check-circle" style="font-size:30px;color:var(--gr)"></i>
+                        </div>
+                        <h3 style="font-size:18px;font-weight:700;color:var(--gr);margin-bottom:6px">Attendance Marked!</h3>
+                        <p style="font-size:13px;color:var(--mt)">Your attendance for this session has been recorded.</p>
+                    </div>`;
+                } else {
+                    el.innerHTML = `
+                    <div style="padding:20px">
+                        <div style="background:linear-gradient(135deg,rgba(0,200,150,.08),rgba(79,142,255,.08));border:1px solid rgba(0,200,150,.25);border-radius:14px;padding:20px;text-align:center;margin-bottom:20px">
+                            <div style="font-size:12px;font-weight:700;color:var(--gr);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px"><i class="fas fa-signal"></i> Attendance Active</div>
+                            <div id="attTimer" style="font-size:36px;font-weight:900;color:var(--tx);font-family:monospace;margin-bottom:4px">--:--</div>
+                            <div style="font-size:12px;color:var(--mt)">Enter the code to mark attendance</div>
+                        </div>
+                        <div class="mf" style="margin-bottom:14px">
+                            <input id="attStudentCode" type="text" placeholder="Enter mysterious code" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;padding:14px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:16px;font-weight:700;text-align:center;letter-spacing:2px;font-family:var(--f)">
+                        </div>
+                        <button class="btnd" id="markAttBtn" onclick="markAttendance('${s.sessionToken}', ${s.requiresGPS})" style="width:100%;padding:14px;border-radius:10px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--gr),#00a87a);color:#fff;border:none;cursor:pointer">
+                            <i class="fas fa-check"></i> Mark Attendance
+                        </button>
+                        ${s.requiresGPS ? `<div style="display:flex;justify-content:center;margin-top:14px;"><div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,142,255,0.1);color:var(--ac);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;"><i class="fas fa-crosshairs"></i> Teacher GPS: ${s.teacherLat.toFixed(5)}, ${s.teacherLng.toFixed(5)}</div></div>` : ''}
+                        <div id="studentLocDisplay" style="display:none;justify-content:center;margin-top:8px;"></div>
+                        <div id="attError" style="display:none;margin-top:10px;padding:10px;border-radius:8px;background:rgba(255,71,87,.08);color:var(--rd);font-size:13px;font-weight:600"></div>
+                    </div>`;
+                    startCountdown(s.expiresAt);
+
+                    // Add tracking to the new element
+                    setTimeout(() => {
+                        const iel = g('attStudentCode');
+                        if (iel) {
+                            iel.dataset.pasted = 'false';
+                            iel.addEventListener('paste', () => iel.dataset.pasted = 'true');
+                        }
+                    }, 50);
+                }
+            } else {
+                // No active session â— show stats
+                el.innerHTML = `
+                <div style="padding:20px">
+                    <div style="text-align:center;padding:30px 20px;margin-bottom:20px">
+                        <i class="fas fa-calendar-check" style="font-size:36px;color:var(--mt);opacity:.4;margin-bottom:10px;display:block"></i>
+                        <h4 style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:4px">No Active Session</h4>
+                        <p style="font-size:13px;color:var(--mt)">Your instructor will start attendance when ready.</p>
+                    </div>
+                    <h4 style="font-size:14px;font-weight:700;margin-bottom:12px"><i class="fas fa-chart-bar" style="color:var(--ac);margin-right:6px"></i>My Attendance</h4>
+                    <div id="attStats"><div style="text-align:center;color:var(--mt);padding:20px"><i class="fas fa-spinner fa-spin"></i></div></div>
+                </div>`;
+                loadMyAttendance();
+            }
+        }
+
+        function startCountdown(expiresAt) {
+            if (ATT_TIMER) clearInterval(ATT_TIMER);
+            const timer = g('attTimer');
+            if (!timer) return;
+
+            ATT_TIMER = setInterval(() => {
+                const now = Date.now();
+                const end = new Date(expiresAt).getTime();
+                const diff = Math.max(0, end - now);
+                const mins = Math.floor(diff / 60000);
+                const secs = Math.floor((diff % 60000) / 1000);
+                timer.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+                if (diff <= 0) {
+                    clearInterval(ATT_TIMER);
+                    timer.textContent = 'Ended';
+                    timer.style.color = 'var(--gr)';
+                    timer.style.fontSize = '22px';
+                    setTimeout(() => loadAttendanceTab(), 2000);
+                } else if (diff < 30000) {
+                    timer.style.color = 'var(--rd)';
+                }
+            }, 1000);
+        }
+
+        window.startAttendance = async function () {
+            const code = (g('attCode')?.value || '').trim();
+            const errEl = g('attError');
+            if (!code || code.length < 3 || code.length > 30) {
+                errEl.textContent = 'Code must be 3-30 characters';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            const btn = g('startAttBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+            errEl.style.display = 'none';
+
+            // Get teacher's location before starting
+            let teacherLat = null;
+            let teacherLng = null;
+
+            try {
+                const pos = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 15000, maximumAge: 0, enableHighAccuracy: true });
+                });
+                teacherLat = pos.coords.latitude;
+                teacherLng = pos.coords.longitude;
+            } catch (e) {
+                console.warn("GPS missing for teacher, blocking session start.", e);
+                let msg = "Could not get your GPS location. You MUST allow location access to start an attendance session.";
+                if (window.isSecureContext === false) msg += " (Needs HTTPS or Localhost)";
+                else if (e.code === 1) msg += " (Permission Denied by Browser)";
+
+                errEl.textContent = msg;
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-play"></i> Start Attendance Session';
+                return; // Hard Block
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+
+            try {
+                const durationVal = g('attDuration')?.value || "240";
+                const payload = { code, durationSeconds: parseInt(durationVal) };
+                if (teacherLat) payload.teacherLat = teacherLat;
+                if (teacherLng) payload.teacherLng = teacherLng;
+
+                const r = await api(`/api/attendance/${CID}/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const d = await r.json();
+                if (!r.ok) throw new Error(d.message || 'Failed');
+
+                toast('Attendance session started!', 'ok');
+                loadAttendanceTab();
+            } catch (e) {
+                errEl.textContent = e.message;
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-play"></i> Start Attendance Session';
+            }
+        };
+
+        window.stopAttendance = async () => {
+            if (!confirm("Are you sure you want to stop this attendance session immediately?")) return;
+            const btn = g('stopAttBtn');
+            const errEl = g('stopAttError');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Stopping...';
+            }
+            if (errEl) errEl.style.display = 'none';
+
+            try {
+                const r = await api(`/api/attendance/${CID}/stop`, { method: 'POST' });
+                const d = await r.json();
+                if (!r.ok) throw new Error(d.message || 'Failed to stop session');
+
+                toast('Session stopped successfully.', 'info');
+                loadAttendanceTab();
+            } catch (e) {
+                if (errEl) {
+                    errEl.textContent = e.message;
+                    errEl.style.display = 'block';
+                } else {
+                    toast(e.message, 'err');
+                }
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-stop-circle"></i> Stop Session Now';
+                }
+            }
+        };
+
+        window.markAttendance = async function (sessionToken, requiresGPS) {
+            const codeEl = g('attStudentCode');
+            const code = (codeEl?.value || '').trim();
+            const errEl = g('attError');
+
+            if (!code) {
+                errEl.textContent = 'Please enter the attendance code';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            if (!sessionToken) {
+                errEl.textContent = 'Session token missing. Refresh page.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            const btn = g('markAttBtn');
+            btn.disabled = true;
+
+            // ── Fraud Signals ──
+            const pasteDetected = codeEl.dataset.pasted === 'true';
+
+            // ── GPS ──
+            let studentLat = null;
+            let studentLng = null;
+
+            if (requiresGPS) {
+                btn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Verifying Location...';
+                try {
+                    const pos = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 15000, maximumAge: 0, enableHighAccuracy: true });
+                    });
+                    studentLat = pos.coords.latitude;
+                    studentLng = pos.coords.longitude;
+                } catch (e) {
+                    if (e.code === 3) { // TIMEOUT ON HIGH ACCURACY
+                        try {
+                            btn.innerHTML = '<i class="fas fa-satellite"></i> Retrying without GPS...';
+                            const fallbackPos = await new Promise((resolve, reject) => {
+                                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false });
+                            });
+                            studentLat = fallbackPos.coords.latitude;
+                            studentLng = fallbackPos.coords.longitude;
+                        } catch (eFallback) {
+                            errEl.textContent = "GPS keeps timing out. Please restart your browser or turn on Location Services.";
+                            errEl.style.display = 'block';
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-check"></i> Mark Attendance';
+                            return;
+                        }
+                    } else {
+                        let errMsg = "Location access needed. Please allow GPS to mark attendance.";
+                        if (window.isSecureContext === false) {
+                            errMsg = "Browser requires a secure connection (HTTPS or localhost) for GPS access.";
+                        } else if (e.code === 1) { // PERMISSION_DENIED
+                            errMsg = "GPS permission denied. Please allow it in device/browser settings.";
+                        } else if (e.code === 2) { // POSITION_UNAVAILABLE
+                            errMsg = "GPS position unavailable. Make sure device Location is ON.";
+                        }
+                        errEl.textContent = errMsg;
+                        errEl.style.display = 'block';
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-check"></i> Mark Attendance';
+                        return;
+                    }
+                }
+                const sloc = g('studentLocDisplay');
+                if (sloc) {
+                    sloc.innerHTML = `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,150,0.1);color:var(--gr);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;"><i class="fas fa-user-circle"></i> Your GPS: ${studentLat.toFixed(5)}, ${studentLng.toFixed(5)}</div>`;
+                    sloc.style.display = 'flex';
+                }
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Marking...';
+            errEl.style.display = 'none';
+
+            try {
+                const payload = {
+                    code,
+                    sessionToken,
+                    pasteDetected,
+                    deviceFingerprint: await generateDeviceFingerprint()
+                };
+                if (studentLat) payload.studentLat = studentLat;
+                if (studentLng) payload.studentLng = studentLng;
+
+                const r = await api(`/api/attendance/${CID}/mark`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const d = await r.json();
+                if (!r.ok) throw new Error(d.message || 'Failed');
+
+                toast(d.message || 'Attendance marked successfully!', 'ok');
+                loadAttendanceTab();
+            } catch (e) {
+                errEl.textContent = e.message;
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Mark Attendance';
+            }
+        };
+
+        async function loadPastSessions() {
+            const el = g('attSessions');
+            if (!el) return;
+            try {
+                const filterType = g('attFilterType')?.value || 'month';
+                let qs = '';
+
+                if (filterType === 'week') {
+                    qs = '?filter=week';
+                } else if (filterType === 'selectMonth') {
+                    const mv = g('attFilterMonth')?.value || '';
+                    if (mv) {
+                        const [m, y] = mv.split('-');
+                        qs = `?filter=month&month=${m}&year=${y}`;
+                    } else {
+                        qs = '?filter=month';
+                    }
+                } else if (filterType === 'semester') {
+                    const sem = g('attFilterSem')?.value || '1';
+                    qs = `?filter=semester&semester=${sem}`;
+                } else {
+                    // default: current month
+                    qs = '?filter=month';
+                }
+
+                const r = await api(`/api/attendance/${CID}/sessions${qs}`);
+                if (!r.ok) throw new Error('Failed');
+                const { sessions } = await r.json();
+                if (!sessions || sessions.length === 0) {
+                    el.innerHTML = '<div style="text-align:center;color:var(--mt);padding:20px;font-size:13px">No sessions found for this period.</div>';
+                    return;
+                }
+                el.innerHTML = sessions.map(s => {
+                    const d = new Date(s.createdAt || s.startsAt);
+                    const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                    const timeStr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    return `<div onclick="window.location.href='/view-classroom-attendance-data.html?sessionId=${s._id}&classroomId=${CID}'" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;background:var(--bg3);border:1px solid var(--bd);margin-bottom:6px;cursor:pointer;transition:all .15s" onmouseenter="this.style.borderColor='var(--ac)'" onmouseleave="this.style.borderColor='var(--bd)'">
+                        <div><div style="font-size:13px;font-weight:700">${dateStr}, ${timeStr}</div><div style="font-size:11px;color:var(--mt);margin-top:2px">${s.status} &bull; Click to view details</div></div>
+                        <div style="display:flex;align-items:center;gap:10px">
+                            <div style="font-size:14px;font-weight:700;color:var(--gr)">${s.presentCount || 0} <span style="font-size:11px;color:var(--mt);font-weight:500">present</span></div>
+                            <i class="fas fa-chevron-right" style="color:var(--dm);font-size:11px"></i>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                el.innerHTML = '<div style="text-align:center;color:var(--rd);padding:20px;font-size:13px">Failed to load sessions.</div>';
+            }
+        }
+
+        function populateMonthDropdown() {
+            const sel = g('attFilterMonth');
+            if (!sel) return;
+            const now = new Date();
+            sel.innerHTML = '';
+            for (let i = 0; i < 12; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const m = d.getMonth() + 1;
+                const y = d.getFullYear();
+                const label = d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+                sel.innerHTML += `<option value="${m}-${y}"${i === 0 ? ' selected' : ''}>${label}</option>`;
+            }
+        }
+
+        window.onAttFilterChange = function () {
+            const ft = g('attFilterType')?.value;
+            const monthSel = g('attFilterMonth');
+            const semSel = g('attFilterSem');
+            if (monthSel) monthSel.style.display = ft === 'selectMonth' ? '' : 'none';
+            if (semSel) semSel.style.display = ft === 'semester' ? '' : 'none';
+            loadPastSessions();
+        };
+
+        async function loadMyAttendance() {
+            const el = g('attStats');
+            if (!el) return;
+            try {
+                // Load detailed per-session data
+                const r = await api(`/api/attendance/my-detailed?classroom=${CID}`);
+                if (!r.ok) throw new Error('Failed');
+                const d = await r.json();
+                const classrooms = d.classrooms || [];
+                const cr = classrooms[0]; // Only one classroom since we filtered
+
+                if (!cr || !cr.sessions.length) {
+                    el.innerHTML = '<div style="text-align:center;color:var(--mt);padding:20px;font-size:13px">No attendance data yet.</div>';
+                    return;
+                }
+
+                const pct = cr.total > 0 ? Math.round((cr.present / cr.total) * 100) : 0;
+                const pctColor = pct >= 75 ? 'var(--gr)' : 'var(--rd)';
+                const statusText = pct < 75 ? '⚠️ Below 75% — defaulter' : '✅ Good standing';
+
+                el.innerHTML = `
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+                    <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:14px;text-align:center">
+                        <div style="font-size:24px;font-weight:800;color:var(--ac)">${cr.total}</div>
+                        <div style="font-size:11px;color:var(--mt);font-weight:600">Total</div>
+                    </div>
+                    <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:14px;text-align:center">
+                        <div style="font-size:24px;font-weight:800;color:var(--gr)">${cr.present}</div>
+                        <div style="font-size:11px;color:var(--mt);font-weight:600">Present</div>
+                    </div>
+                    <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:14px;text-align:center">
+                        <div style="font-size:24px;font-weight:800;color:var(--rd)">${cr.absent}</div>
+                        <div style="font-size:11px;color:var(--mt);font-weight:600">Absent</div>
+                    </div>
+                </div>
+                <div style="margin-bottom:16px;background:var(--bg3);border:1px solid var(--bd);border-radius:12px;padding:18px;text-align:center">
+                    <div style="font-size:38px;font-weight:900;color:${pctColor}">${pct}%</div>
+                    <div style="font-size:12px;color:var(--mt);font-weight:600">${statusText}</div>
+                </div>
+                <h4 style="font-size:13px;font-weight:700;margin-bottom:10px"><i class="fas fa-list" style="color:var(--ac);margin-right:5px"></i>Session History</h4>
+                <div style="display:flex;flex-direction:column;gap:4px">${cr.sessions.map(s => {
+                    const sd = new Date(s.date);
+                    const dl = sd.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                    const tl = sd.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    const icon = s.status === 'present'
+                        ? '<i class="fas fa-check-circle" style="color:var(--gr)"></i>'
+                        : '<i class="fas fa-times-circle" style="color:var(--rd)"></i>';
+                    const label = s.status === 'present' ? 'Present' : 'Absent';
+                    const labelColor = s.status === 'present' ? 'var(--gr)' : 'var(--rd)';
+                    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--bd)">
+                        <div style="font-size:12.5px;font-weight:600">${dl}, ${tl}</div>
+                        <div style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:${labelColor}">${icon} ${label}</div>
+                    </div>`;
+                }).join('')}</div>`;
+            } catch (e) {
+                el.innerHTML = '<div style="text-align:center;color:var(--mt);padding:20px;font-size:13px">No attendance data yet.</div>';
+            }
+        }
+
+
+
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+
+    <!-- SPA Router: instant navigation between classroom/view-classroom/settings -->
+    <script src="/js/spa-router.js"></script>
+</body>
+
+</html>

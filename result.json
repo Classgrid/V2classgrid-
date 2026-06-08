@@ -1,0 +1,29 @@
+{
+  "status": 201,
+  "apiResponse": {
+    "message": "Classroom created successfully",
+    "classroom": {
+      "name": "Test Classroom Limit",
+      "description": "Testing backend enforcement",
+      "subject": "physics",
+      "teacher": "699f1fe0a05a7bd17e035ded",
+      "organization_id": "699f1becb59f021ccc450ae7",
+      "coverImage": "",
+      "settings": {
+        "allowJoinRequests": true,
+        "maxStudents": 150,
+        "isArchived": false
+      },
+      "memberCount": 0,
+      "subjectSlug": "physics",
+      "lastEmailSentAt": null,
+      "lastEmailType": null,
+      "_id": "699f34c79a286c75efec3bbe",
+      "createdAt": "2026-02-25T17:43:35.882Z",
+      "updatedAt": "2026-02-25T17:43:35.882Z",
+      "classCode": "ZGTW638083",
+      "__v": 0
+    }
+  },
+  "dbMaxStudents": 150
+}

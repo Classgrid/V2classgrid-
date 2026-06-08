@@ -1,0 +1,287 @@
+
+── 1. Application Received (FREE) ──
+=== EMAIL FUNCTION ENTERED ===
+TO: nikhilsubsun321@gmail.com
+SUBJECT: Application Received — Demo Free School
+[SMTP] Attempting to send email to: nikhilsubsun321@gmail.com
+=== CALLING transporter.sendMail ===
+✅ Brevo SMTP ready
+=== EMAIL SENT SUCCESSFULLY ===
+✅ Email sent to: nikhilsubsun321@gmail.com
+[SMTP] Response: {
+  accepted: [ 'nikhilsubsun321@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'ENHANCEDSTATUSCODES',
+    'CHUNKING',
+    'AUTH PLAIN LOGIN CRAM-MD5',
+    'SIZE 20971520'
+  ],
+  envelopeTime: 440,
+  messageTime: 46,
+  messageSize: 6849,
+  response: '250 2.0.0 OK: queued as <1a1cfd5c-b114-fb75-66cd-eff33fa7a41d@classgrid.in>',
+  envelope: { from: 'support@classgrid.in', to: [ 'nikhilsubsun321@gmail.com' ] },
+  messageId: '<1a1cfd5c-b114-fb75-66cd-eff33fa7a41d@classgrid.in>'
+}
+  ✅ Sent: Application Received — Demo Free School
+
+── 2. Application Received (PRO) ──
+=== EMAIL FUNCTION ENTERED ===
+TO: nikhilsubsun321@gmail.com
+SUBJECT: Application Received — Demo Pro Academy
+[SMTP] Attempting to send email to: nikhilsubsun321@gmail.com
+=== CALLING transporter.sendMail ===
+=== EMAIL SENT SUCCESSFULLY ===
+✅ Email sent to: nikhilsubsun321@gmail.com
+[SMTP] Response: {
+  accepted: [ 'nikhilsubsun321@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'ENHANCEDSTATUSCODES',
+    'CHUNKING',
+    'AUTH PLAIN LOGIN CRAM-MD5',
+    'SIZE 20971520'
+  ],
+  envelopeTime: 96,
+  messageTime: 48,
+  messageSize: 7277,
+  response: '250 2.0.0 OK: queued as <2e834896-6157-0ed9-083f-8f069e15e231@classgrid.in>',
+  envelope: { from: 'support@classgrid.in', to: [ 'nikhilsubsun321@gmail.com' ] },
+  messageId: '<2e834896-6157-0ed9-083f-8f069e15e231@classgrid.in>'
+}
+  ✅ Sent: Application Received — Demo Pro Academy
+
+── 3. Consolidated Approval + Activation (FREE) ──
+=== EMAIL FUNCTION ENTERED ===
+TO: nikhilsubsun321@gmail.com
+SUBJECT: 🎉 Demo Free School is now live — FREE Plan
+[SMTP] Attempting to send email to: nikhilsubsun321@gmail.com
+=== CALLING transporter.sendMail ===
+=== EMAIL SENT SUCCESSFULLY ===
+✅ Email sent to: nikhilsubsun321@gmail.com
+[SMTP] Response: {
+  accepted: [ 'nikhilsubsun321@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'ENHANCEDSTATUSCODES',
+    'CHUNKING',
+    'AUTH CRAM-MD5 PLAIN LOGIN',
+    'SIZE 20971520'
+  ],
+  envelopeTime: 546,
+  messageTime: 368,
+  messageSize: 14274,
+  response: '250 2.0.0 OK: queued as <36105cbd-f4ac-7593-ca63-d516e646d913@classgrid.in>',
+  envelope: { from: 'support@classgrid.in', to: [ 'nikhilsubsun321@gmail.com' ] },
+  messageId: '<36105cbd-f4ac-7593-ca63-d516e646d913@classgrid.in>'
+}
+  ✅ Sent: 🎉 Demo Free School is now live — FREE Plan
+
+── 4. Consolidated Approval + Activation (PRO) ──
+=== EMAIL FUNCTION ENTERED ===
+TO: nikhilsubsun321@gmail.com
+SUBJECT: 🎉 Demo Pro Academy is now live — PRO Plan Active
+[SMTP] Attempting to send email to: nikhilsubsun321@gmail.com
+=== CALLING transporter.sendMail ===
+=== EMAIL SENT SUCCESSFULLY ===
+✅ Email sent to: nikhilsubsun321@gmail.com
+[SMTP] Response: {
+  accepted: [ 'nikhilsubsun321@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'ENHANCEDSTATUSCODES',
+    'CHUNKING',
+    'AUTH PLAIN LOGIN CRAM-MD5',
+    'SIZE 20971520'
+  ],
+  envelopeTime: 765,
+  messageTime: 327,
+  messageSize: 16297,
+  response: '250 2.0.0 OK: queued as <e2a30895-c33d-f6a4-ef8d-854692b425ae@classgrid.in>',
+  envelope: { from: 'support@classgrid.in', to: [ 'nikhilsubsun321@gmail.com' ] },
+  messageId: '<e2a30895-c33d-f6a4-ef8d-854692b425ae@classgrid.in>'
+}
+  ✅ Sent: 🎉 Demo Pro Academy is now live — PRO Plan Active
+
+── 5. Pro Plan Activation (post-payment) ──
+=== EMAIL FUNCTION ENTERED ===
+TO: nikhilsubsun321@gmail.com
+SUBJECT: 🎉 Pro Plan Activated — Demo Pro Academy
+[SMTP] Attempting to send email to: nikhilsubsun321@gmail.com
+=== CALLING transporter.sendMail ===
+=== EMAIL SENT SUCCESSFULLY ===
+✅ Email sent to: nikhilsubsun321@gmail.com
+[SMTP] Response: {
+  accepted: [ 'nikhilsubsun321@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'ENHANCEDSTATUSCODES',
+    'CHUNKING',
+    'AUTH PLAIN LOGIN CRAM-MD5',
+    'SIZE 20971520'
+  ],
+  envelopeTime: 453,
+  messageTime: 274,
+  messageSize: 9558,
+  response: '250 2.0.0 OK: queued as <6ba93671-dba6-81ba-09d7-1c27dd4ca701@classgrid.in>',
+  envelope: { from: 'support@classgrid.in', to: [ 'nikhilsubsun321@gmail.com' ] },
+  messageId: '<6ba93671-dba6-81ba-09d7-1c27dd4ca701@classgrid.in>'
+}
+  ✅ Sent: 🎉 Pro Plan Activated — Demo Pro Academy
+
+── 6. Org Admin Invite (Activation Link) ──
+=== EMAIL FUNCTION ENTERED ===
+TO: nikhilsubsun321@gmail.com
+SUBJECT: Activate Your Classgrid Admin Account
+[SMTP] Attempting to send email to: nikhilsubsun321@gmail.com
+=== CALLING transporter.sendMail ===
+=== EMAIL SENT SUCCESSFULLY ===
+✅ Email sent to: nikhilsubsun321@gmail.com
+[SMTP] Response: {
+  accepted: [ 'nikhilsubsun321@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'ENHANCEDSTATUSCODES',
+    'CHUNKING',
+    'AUTH PLAIN LOGIN CRAM-MD5',
+    'SIZE 20971520'
+  ],
+  envelopeTime: 105,
+  messageTime: 175,
+  messageSize: 6207,
+  response: '250 2.0.0 OK: queued as <79c3a707-1531-b8fc-9e67-156e2af2c9c6@classgrid.in>',
+  envelope: { from: 'support@classgrid.in', to: [ 'nikhilsubsun321@gmail.com' ] },
+  messageId: '<79c3a707-1531-b8fc-9e67-156e2af2c9c6@classgrid.in>'
+}
+  ✅ Sent: Activate Your Classgrid Admin Account
+
+── 7. Org Admin Account Activated ──
+=== EMAIL FUNCTION ENTERED ===
+TO: nikhilsubsun321@gmail.com
+SUBJECT: Your Classgrid Admin Account is Active
+[SMTP] Attempting to send email to: nikhilsubsun321@gmail.com
+=== CALLING transporter.sendMail ===
+=== EMAIL SENT SUCCESSFULLY ===
+✅ Email sent to: nikhilsubsun321@gmail.com
+[SMTP] Response: {
+  accepted: [ 'nikhilsubsun321@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'ENHANCEDSTATUSCODES',
+    'CHUNKING',
+    'AUTH PLAIN LOGIN CRAM-MD5',
+    'SIZE 20971520'
+  ],
+  envelopeTime: 339,
+  messageTime: 58,
+  messageSize: 5909,
+  response: '250 2.0.0 OK: queued as <f309494b-9b3c-5554-fd61-52e40b8c2a1f@classgrid.in>',
+  envelope: { from: 'support@classgrid.in', to: [ 'nikhilsubsun321@gmail.com' ] },
+  messageId: '<f309494b-9b3c-5554-fd61-52e40b8c2a1f@classgrid.in>'
+}
+  ✅ Sent: Your Classgrid Admin Account is Active
+
+── 8. Org Approval (legacy format) ──
+=== EMAIL FUNCTION ENTERED ===
+TO: nikhilsubsun321@gmail.com
+SUBJECT: Organization Approved — Demo Free School
+[SMTP] Attempting to send email to: nikhilsubsun321@gmail.com
+=== CALLING transporter.sendMail ===
+=== EMAIL SENT SUCCESSFULLY ===
+✅ Email sent to: nikhilsubsun321@gmail.com
+[SMTP] Response: {
+  accepted: [ 'nikhilsubsun321@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'ENHANCEDSTATUSCODES',
+    'CHUNKING',
+    'AUTH PLAIN LOGIN CRAM-MD5',
+    'SIZE 20971520'
+  ],
+  envelopeTime: 77,
+  messageTime: 151,
+  messageSize: 13853,
+  response: '250 2.0.0 OK: queued as <947399eb-fa09-2b5b-8929-01a62c7b4761@classgrid.in>',
+  envelope: { from: 'support@classgrid.in', to: [ 'nikhilsubsun321@gmail.com' ] },
+  messageId: '<947399eb-fa09-2b5b-8929-01a62c7b4761@classgrid.in>'
+}
+  ✅ Sent: Organization Approved — Demo Free School
+
+── 9. Application Rejected ──
+=== EMAIL FUNCTION ENTERED ===
+TO: nikhilsubsun321@gmail.com
+SUBJECT: Application Update — Demo Rejected School
+[SMTP] Attempting to send email to: nikhilsubsun321@gmail.com
+=== CALLING transporter.sendMail ===
+=== EMAIL SENT SUCCESSFULLY ===
+✅ Email sent to: nikhilsubsun321@gmail.com
+[SMTP] Response: {
+  accepted: [ 'nikhilsubsun321@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'ENHANCEDSTATUSCODES',
+    'CHUNKING',
+    'AUTH PLAIN LOGIN CRAM-MD5',
+    'SIZE 20971520'
+  ],
+  envelopeTime: 228,
+  messageTime: 55,
+  messageSize: 4768,
+  response: '250 2.0.0 OK: queued as <a59dd780-ddb9-e38e-919c-4e720401e637@classgrid.in>',
+  envelope: { from: 'support@classgrid.in', to: [ 'nikhilsubsun321@gmail.com' ] },
+  messageId: '<a59dd780-ddb9-e38e-919c-4e720401e637@classgrid.in>'
+}
+  ✅ Sent: Application Update — Demo Rejected School
+
+── 10. Plan Expiry Reminder ──
+=== EMAIL FUNCTION ENTERED ===
+TO: nikhilsubsun321@gmail.com
+SUBJECT: ⚠️ Pro Plan Expiring Soon — Demo Pro Academy
+[SMTP] Attempting to send email to: nikhilsubsun321@gmail.com
+=== CALLING transporter.sendMail ===
+=== EMAIL SENT SUCCESSFULLY ===
+✅ Email sent to: nikhilsubsun321@gmail.com
+[SMTP] Response: {
+  accepted: [ 'nikhilsubsun321@gmail.com' ],
+  rejected: [],
+  ehlo: [
+    'PIPELINING',
+    '8BITMIME',
+    'ENHANCEDSTATUSCODES',
+    'CHUNKING',
+    'AUTH PLAIN LOGIN CRAM-MD5',
+    'SIZE 20971520'
+  ],
+  envelopeTime: 83,
+  messageTime: 40,
+  messageSize: 6337,
+  response: '250 2.0.0 OK: queued as <47502275-a1fe-8583-739c-f84dc324f3fd@classgrid.in>',
+  envelope: { from: 'support@classgrid.in', to: [ 'nikhilsubsun321@gmail.com' ] },
+  messageId: '<47502275-a1fe-8583-739c-f84dc324f3fd@classgrid.in>'
+}
+  ✅ Sent: ⚠️ Pro Plan Expiring Soon — Demo Pro Academy
+
+════════════════════════════════════
+📧 Total sent: 10 | ❌ Failed: 0
+📬 All sent to: nikhilsubsun321@gmail.com
+════════════════════════════════════
+

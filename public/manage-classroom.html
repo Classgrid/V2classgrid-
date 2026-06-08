@@ -1,0 +1,2554 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <script>
+        /* Auth Guard — runs BEFORE CSS/content to prevent any flash of protected content */
+        (function () {
+            var t = null; var hasUrlToken = window.location.search.indexOf('token=') !== -1;
+            if (t || hasUrlToken) {
+                window.addEventListener('pageshow', function (e) { if (e.persisted && !null) window.location.replace('/login.html'); });
+                window.addEventListener('storage', function (e) { if (e.key === 'jwt_token' && !e.newValue) window.location.replace('/login.html'); });
+                return;
+            }
+            var _cs = document.createElement('style'); _cs.id = '_ag'; _cs.textContent = 'body>*:not(script):not(style){visibility:hidden!important}'; document.head.appendChild(_cs);
+            var _cb = location.origin.includes('localhost') ? 'http://localhost:3000' : '';
+            var _tok = localStorage.getItem('jwt_token'); var _hdrs = { 'Cache-Control': 'no-store' }; if (_tok && _tok !== 'null' && _tok !== 'undefined') { _hdrs['Authorization'] = 'Bearer ' + _tok; } fetch(_cb + '/api/auth/me', { credentials: 'include', cache: 'no-store', headers: _hdrs })
+                .then(function (r) { if (r.ok) return r.json().then(function (u) { window._cookieAuthUser = u; var e = document.getElementById('_ag'); if (e) e.remove(); }); throw 0; })
+                .catch(function () { window.location.replace('/login.html'); });
+        })();
+    </script>
+    <script src="/app-state.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Manage Classrooms | Classgrid</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase CDN for direct browser uploads -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        /* ── THEMES ── */
+        :root {
+            --tr: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --elevated: #191919;
+            --glass: rgba(15, 15, 15, 0.85);
+            --border: rgba(255, 255, 255, 0.08);
+            --cyan: #4a90f5;
+            --cyan-dim: rgba(74, 144, 245, 0.10);
+            --purple: #8b6fff;
+            --purple-dim: rgba(139, 111, 255, 0.10);
+            --green: #00c896;
+            --green-dim: rgba(0, 200, 150, 0.10);
+            --red: #ff4757;
+            --red-dim: rgba(255, 71, 87, 0.10);
+            --orange: #ff9f43;
+            --t1: #ffffff;
+            --t2: #888888;
+            --t3: #444444;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 30px rgba(74, 144, 245, 0.06);
+        }
+
+        [data-theme="light"] {
+            --bg: #f8f9fc;
+            --surface: #ffffff;
+            --elevated: #f0f2f5;
+            --glass: rgba(255, 255, 255, 0.85);
+            --border: rgba(0, 0, 0, 0.08);
+            --cyan: #3b7ddd;
+            --cyan-dim: rgba(59, 125, 221, 0.08);
+            --purple: #7c5cfc;
+            --purple-dim: rgba(124, 92, 252, 0.08);
+            --green: #05a77b;
+            --green-dim: rgba(5, 167, 123, 0.08);
+            --red: #e53e3e;
+            --red-dim: rgba(229, 62, 62, 0.08);
+            --orange: #dd8a2e;
+            --t1: #1a1a2e;
+            --t2: #6e7591;
+            --t3: #b0b7c8;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            --glow: 0 0 30px rgba(59, 125, 221, 0.04);
+        }
+
+        [data-theme="aurora"] {
+            --bg: #0a0612;
+            --surface: #110a1e;
+            --elevated: #1a1030;
+            --glass: rgba(16, 10, 30, 0.85);
+            --border: rgba(255, 255, 255, 0.06);
+            --cyan: #a87fff;
+            --cyan-dim: rgba(168, 127, 255, 0.10);
+            --purple: #ff6eb4;
+            --purple-dim: rgba(255, 110, 180, 0.10);
+            --green: #7dffb4;
+            --green-dim: rgba(125, 255, 180, 0.10);
+            --red: #ff5c7a;
+            --red-dim: rgba(255, 92, 122, 0.10);
+            --orange: #ffb347;
+            --t1: #f5eeff;
+            --t2: #b89fd4;
+            --t3: #6b5690;
+            --shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+            --glow: 0 0 40px rgba(168, 127, 255, 0.08);
+        }
+
+        /* ── RESET ── */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--t1);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── ATMOSPHERE ── */
+        .atm {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .atm::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -10%;
+            width: 60%;
+            height: 80%;
+            background: radial-gradient(ellipse, var(--cyan-dim) 0%, transparent 70%);
+            filter: blur(80px);
+            animation: d1 12s ease-in-out infinite alternate;
+        }
+
+        .atm::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -10%;
+            width: 55%;
+            height: 75%;
+            background: radial-gradient(ellipse, var(--purple-dim) 0%, transparent 70%);
+            filter: blur(80px);
+            animation: d2 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes d1 {
+            from {
+                transform: translate(0, 0)
+            }
+
+            to {
+                transform: translate(3%, 5%)
+            }
+        }
+
+        @keyframes d2 {
+            from {
+                transform: translate(0, 0)
+            }
+
+            to {
+                transform: translate(-3%, -5%)
+            }
+        }
+
+        /* ════════════════════════════════════════════
+   NAVBAR  — written once, no patches
+   Mobile  : [Logo]  ........... [≡ Prof Name]
+   Desktop : [Logo > Manage] .. [Theme | Av Name TEACHER | | Classes | Manage | | Logout]
+   ════════════════════════════════════════════ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 500;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            background: var(--glass);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* left */
+        .n-left {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--t1);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .brand img {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            object-fit: cover;
+        }
+
+        .brand-c {
+            color: var(--cyan);
+        }
+
+        .n-sep {
+            color: var(--t3);
+            font-size: .7rem;
+        }
+
+        .n-page {
+            font-size: .85rem;
+            font-weight: 600;
+            color: var(--t2);
+        }
+
+        /* right */
+        .n-right {
+            display: flex;
+            align-items: center;
+        }
+
+        /* every icon-above-label button */
+        .nb {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 0 .55rem;
+            height: 60px;
+            min-width: 0;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--t2);
+            font-family: 'DM Sans', sans-serif;
+            flex-shrink: 0;
+            transition: color .2s, background .2s;
+        }
+
+        .nb:hover {
+            color: var(--cyan);
+            background: var(--cyan-dim);
+        }
+
+        .nb.is-active {
+            color: var(--cyan);
+        }
+
+        .nb.is-red:hover {
+            color: var(--red);
+            background: var(--red-dim);
+        }
+
+        .nb i {
+            font-size: 1.05rem;
+        }
+
+        .nb em {
+            font-size: .58rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            font-style: normal;
+        }
+
+        /* the menu button on mobile: row layout, shows name */
+        .nb.is-menu {
+            flex-direction: row;
+            gap: .4rem;
+            padding: 0 .75rem;
+        }
+
+        .nb.is-menu em {
+            font-size: .82rem;
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
+        }
+
+        /* divider */
+        .n-div {
+            width: 1px;
+            height: 28px;
+            background: var(--border);
+            margin: 0 2px;
+            flex-shrink: 0;
+        }
+
+        /* user chip (desktop) */
+        .n-user {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            padding: 0 .55rem;
+            height: 60px;
+            flex-shrink: 0;
+            cursor: default;
+        }
+
+        .n-av {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .72rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .n-name {
+            font-size: .82rem;
+            font-weight: 600;
+            color: var(--t1);
+            white-space: nowrap;
+        }
+
+        .n-role {
+            font-size: .57rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            padding: .13rem .4rem;
+            border-radius: 4px;
+            background: var(--purple-dim);
+            color: var(--purple);
+            border: 1px solid rgba(168, 85, 247, .25);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* theme pill (desktop only) */
+        .n-theme {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: var(--elevated);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3px;
+            margin: 0 .5rem;
+            flex-shrink: 0;
+        }
+
+        .th {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--t3);
+            cursor: pointer;
+            font-size: .62rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+        }
+
+        .th.on,
+        .th:hover {
+            background: var(--cyan-dim);
+            color: var(--cyan);
+        }
+
+        /* ── WHAT SHOWS WHERE ──
+   Default (desktop): everything visible, menu button hidden
+   Mobile ≤680px: hide theme pill, user chip, dividers, Classes/Manage btns; show menu btn
+*/
+        .nb.is-menu {
+            display: none;
+        }
+
+        /* hidden on desktop */
+
+        @media(max-width:680px) {
+            .n-theme {
+                display: none;
+            }
+
+            .n-user {
+                display: none;
+            }
+
+            .n-div {
+                display: none;
+            }
+
+            .nb.is-desk {
+                display: none;
+            }
+
+            .nb.is-menu {
+                display: flex;
+            }
+
+            /* show menu+name on mobile */
+            .n-sep,
+            .n-page {
+                display: none;
+            }
+        }
+
+        /* ── SIDEBAR ── */
+        .s-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            z-index: 399;
+        }
+
+        .s-overlay.on {
+            display: block;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 270px;
+            height: calc(100vh - 60px);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 400;
+            transition: transform var(--tr);
+        }
+
+        @media(max-width:899px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: var(--shadow);
+            }
+
+            .sidebar.on {
+                transform: translateX(0);
+            }
+        }
+
+        .s-profile {
+            padding: 1.5rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .s-av-wrap {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            padding: 2.5px;
+            margin: 0 auto .75rem;
+        }
+
+        .s-av-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--cyan);
+            overflow: hidden;
+        }
+
+        .s-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: .95rem;
+            margin-bottom: .2rem;
+        }
+
+        .s-email {
+            font-size: .72rem;
+            color: var(--t3);
+        }
+
+        /* theme row inside sidebar — only on mobile */
+        .s-theme-row {
+            display: none;
+            align-items: center;
+            gap: .5rem;
+            padding: .75rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .s-theme-row span {
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--t3);
+        }
+
+        @media(max-width:680px) {
+            .s-theme-row {
+                display: flex;
+            }
+        }
+
+        .s-nav {
+            padding: 1rem .75rem;
+            flex: 1;
+        }
+
+        .s-lbl {
+            font-size: .62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--t3);
+            padding: 0 .5rem;
+            margin: .75rem 0 .35rem;
+        }
+
+        .s-item {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .65rem .75rem;
+            border-radius: 10px;
+            color: var(--t2);
+            text-decoration: none;
+            font-size: .875rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+            cursor: pointer;
+            background: none;
+            width: 100%;
+            text-align: left;
+            transition: all var(--tr);
+        }
+
+        .s-item i {
+            width: 16px;
+            text-align: center;
+            font-size: .85rem;
+        }
+
+        .s-item:hover {
+            background: var(--cyan-dim);
+            color: var(--cyan);
+            border-color: rgba(0, 212, 255, .1);
+        }
+
+        .s-item.on {
+            background: var(--cyan-dim);
+            color: var(--cyan);
+            border-color: rgba(0, 212, 255, .15);
+            font-weight: 600;
+        }
+
+        .s-badge {
+            margin-left: auto;
+            background: var(--red);
+            color: #fff;
+            font-size: .6rem;
+            font-weight: 700;
+            padding: .1rem .4rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .s-badge.on {
+            display: inline;
+        }
+
+        .s-actions {
+            padding: .75rem .75rem 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+        }
+
+        /* ── LAYOUT ── */
+        .layout {
+            display: grid;
+            grid-template-columns: 270px 1fr;
+            min-height: 100vh;
+            padding-top: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media(max-width:899px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .main {
+            grid-column: 2;
+            padding: 1.5rem;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        @media(max-width:899px) {
+            .main {
+                grid-column: 1;
+                padding: 1rem;
+            }
+        }
+
+        @media(max-width:480px) {
+            .main {
+                padding: .875rem;
+            }
+        }
+
+        /* ── PAGE HEADER ── */
+        .ph {
+            margin-bottom: 1.5rem;
+        }
+
+        .ph-inner {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: .75rem;
+        }
+
+        .ph-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            line-height: 1.2;
+        }
+
+        .ph-grad {
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ph-sub {
+            font-size: .875rem;
+            color: var(--t3);
+            margin-top: .3rem;
+        }
+
+        /* ── STATS ── */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: .75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media(max-width:640px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .sc {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1rem 1rem .875rem;
+            transition: all var(--tr);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sc::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            opacity: 0;
+            transition: opacity var(--tr);
+        }
+
+        .sc:hover {
+            border-color: rgba(0, 212, 255, .25);
+            transform: translateY(-2px);
+            box-shadow: var(--glow);
+        }
+
+        .sc:hover::before {
+            opacity: 1;
+        }
+
+        .sc-icon {
+            font-size: 1.3rem;
+            margin-bottom: .4rem;
+        }
+
+        .sc-val {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--cyan);
+            line-height: 1;
+        }
+
+        .sc-lbl {
+            font-size: .7rem;
+            color: var(--t3);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: .25rem;
+        }
+
+        /* ── TABS ── */
+        .tab-wrap {
+            position: relative;
+            margin-bottom: 1.25rem;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: .25rem;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .65rem .9rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .83rem;
+            font-weight: 600;
+            color: var(--t3);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all var(--tr);
+            flex-shrink: 0;
+            position: relative;
+            bottom: -1px;
+        }
+
+        .tab-btn:hover {
+            color: var(--t2);
+        }
+
+        .tab-btn.on {
+            color: var(--cyan);
+            border-bottom-color: var(--cyan);
+        }
+
+        .tab-bdg {
+            background: var(--red);
+            color: #fff;
+            font-size: .6rem;
+            font-weight: 700;
+            padding: .1rem .35rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .tab-bdg.on {
+            display: inline;
+        }
+
+        .tab-wrap::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 1px;
+            width: 40px;
+            background: linear-gradient(to right, transparent, var(--bg));
+            pointer-events: none;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.on {
+            display: block;
+            animation: fadeIn .2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: border-color var(--tr), box-shadow var(--tr);
+        }
+
+        @media(max-width:480px) {
+            .card {
+                padding: 1rem;
+            }
+        }
+
+        .card:hover {
+            border-color: rgba(0, 212, 255, .25);
+            box-shadow: var(--glow);
+        }
+
+        .card-hd {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: .75rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .card-ttl {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .card-ttl i {
+            color: var(--cyan);
+        }
+
+        /* ── CLASSROOM GRID ── */
+        .cc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+            gap: 1rem;
+        }
+
+        .cc {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all var(--tr);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cc::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--cyan-dim), transparent);
+            opacity: 0;
+            transition: opacity var(--tr);
+            pointer-events: none;
+        }
+
+        .cc:hover {
+            border-color: rgba(0, 212, 255, .25);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .cc:hover::after {
+            opacity: 1;
+        }
+
+        .cc-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: .5rem;
+            margin-bottom: .75rem;
+        }
+
+        .cc-subj {
+            font-size: .65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            padding: .2rem .55rem;
+            border-radius: 6px;
+            background: var(--cyan-dim);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 212, 255, .2);
+        }
+
+        .cc-code {
+            font-family: 'Fira Code', monospace;
+            font-size: .65rem;
+            font-weight: 500;
+            background: var(--purple-dim);
+            color: var(--purple);
+            border: 1px solid rgba(168, 85, 247, .2);
+            padding: .2rem .5rem;
+            border-radius: 6px;
+            letter-spacing: 1px;
+        }
+
+        .cc-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: .3rem;
+            line-height: 1.3;
+        }
+
+        .cc-desc {
+            font-size: .8rem;
+            color: var(--t3);
+            line-height: 1.5;
+            margin-bottom: .75rem;
+        }
+
+        .cc-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .75rem;
+            font-size: .75rem;
+            color: var(--t2);
+        }
+
+        .cc-meta span {
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+
+        .cc-acts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+            margin-top: .875rem;
+            padding-top: .875rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .5rem 1rem;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--tr);
+            border: 1px solid transparent;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        @media(max-width:480px) {
+            .btn {
+                padding: .45rem .875rem;
+            }
+        }
+
+        .btn-sm {
+            padding: .35rem .7rem;
+            font-size: .75rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, .2);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, .3);
+        }
+
+        .btn-glass {
+            background: var(--elevated);
+            border-color: var(--border);
+            color: var(--t2);
+        }
+
+        .btn-glass:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: var(--cyan-dim);
+        }
+
+        .btn-success {
+            background: var(--green-dim);
+            border-color: rgba(16, 185, 129, .25);
+            color: var(--green);
+        }
+
+        .btn-success:hover {
+            background: var(--green);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .btn-danger {
+            background: var(--red-dim);
+            border-color: rgba(239, 68, 68, .25);
+            color: var(--red);
+        }
+
+        .btn-danger:hover {
+            background: var(--red);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* ── FORMS ── */
+        .fg {
+            margin-bottom: 1rem;
+        }
+
+        .fl {
+            display: block;
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--t2);
+            margin-bottom: .4rem;
+        }
+
+        .fi,
+        .fs,
+        .fta {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: .65rem .875rem;
+            color: var(--t1);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9rem;
+            transition: border-color var(--tr), box-shadow var(--tr);
+            outline: none;
+            appearance: none;
+        }
+
+        .fs {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .875rem center;
+            padding-right: 2.5rem;
+        }
+
+        .fi:focus,
+        .fs:focus,
+        .fta:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px var(--cyan-dim);
+        }
+
+        .fta {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .fr {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media(max-width:480px) {
+            .fr {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .upload-zone {
+            border: 1.5px dashed var(--border);
+            border-radius: 12px;
+            padding: 2rem 1.25rem;
+            text-align: center;
+            transition: all var(--tr);
+            cursor: pointer;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--cyan);
+            background: var(--cyan-dim);
+        }
+
+        .upload-zone i {
+            font-size: 2rem;
+            color: var(--cyan);
+            margin-bottom: .75rem;
+            display: block;
+        }
+
+        .upload-zone input[type="file"] {
+            display: block;
+            margin: .75rem auto 0;
+            color: var(--t2);
+            font-size: .82rem;
+        }
+
+        .sub-tabs {
+            display: flex;
+            gap: .25rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .sub-tab {
+            padding: .45rem .875rem;
+            border-radius: 8px;
+            font-size: .8rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--t3);
+            cursor: pointer;
+            transition: all var(--tr);
+        }
+
+        .sub-tab:hover {
+            color: var(--t2);
+            border-color: rgba(0, 212, 255, .25);
+        }
+
+        .sub-tab.on {
+            background: var(--cyan-dim);
+            border-color: rgba(0, 212, 255, .25);
+            color: var(--cyan);
+        }
+
+        /* ── REQUESTS ── */
+        .req-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-bottom: 1rem;
+        }
+
+        .req-item {
+            display: flex;
+            align-items: center;
+            gap: .875rem;
+            background: var(--elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: .875rem 1rem;
+            margin-bottom: .5rem;
+            transition: all var(--tr);
+        }
+
+        .req-item:hover {
+            border-color: rgba(0, 212, 255, .25);
+        }
+
+        .req-av {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .95rem;
+            flex-shrink: 0;
+        }
+
+        .req-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .req-name {
+            font-weight: 600;
+            font-size: .875rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .req-meta {
+            font-size: .73rem;
+            color: var(--t3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .req-msg {
+            font-size: .73rem;
+            color: var(--t2);
+            font-style: italic;
+            margin-top: .2rem;
+        }
+
+        .req-acts {
+            display: flex;
+            gap: .35rem;
+            flex-shrink: 0;
+        }
+
+        @media(max-width:480px) {
+            .req-item {
+                flex-wrap: wrap;
+            }
+
+            .req-acts {
+                width: 100%;
+                margin-left: 50px;
+            }
+        }
+
+        /* ── MEMBERS ── */
+        .mem-item {
+            display: flex;
+            align-items: center;
+            gap: .875rem;
+            padding: .75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mem-item:last-child {
+            border-bottom: none;
+        }
+
+        .mem-av {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--purple), var(--cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .82rem;
+            flex-shrink: 0;
+        }
+
+        .mem-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .mem-name {
+            font-weight: 600;
+            font-size: .875rem;
+        }
+
+        .mem-email {
+            font-size: .72rem;
+            color: var(--t3);
+        }
+
+        /* ── ANALYTICS ── */
+        .a-bar {
+            height: 20px;
+            border-radius: 10px;
+            background: var(--elevated);
+            overflow: hidden;
+            margin: .75rem 0;
+        }
+
+        .a-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--cyan), var(--green));
+            transition: width .8s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .eng-item {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .6rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .eng-item:last-child {
+            border-bottom: none;
+        }
+
+        .eng-av {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--cyan-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .7rem;
+            color: var(--cyan);
+            flex-shrink: 0;
+        }
+
+        .eng-cnt {
+            font-family: 'Fira Code', monospace;
+            font-size: .8rem;
+            color: var(--cyan);
+            margin-left: auto;
+        }
+
+        .sec-lbl {
+            font-size: .65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: var(--t3);
+            margin: 1.25rem 0 .6rem;
+        }
+
+        /* ── EMPTY / LOADING ── */
+        .empty {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--t3);
+        }
+
+        .empty-ico {
+            font-size: 2.5rem;
+            margin-bottom: .75rem;
+            opacity: .5;
+        }
+
+        .empty-ttl {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: var(--t2);
+            margin-bottom: .4rem;
+        }
+
+        .empty-sub {
+            font-size: .82rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--t2);
+        }
+
+        .loading i {
+            font-size: 1.75rem;
+            margin-bottom: .75rem;
+            display: block;
+            color: var(--cyan);
+        }
+
+        /* ── MODAL ── */
+        .modal-ov {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .65);
+            backdrop-filter: blur(8px);
+            z-index: 600;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-ov.on {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 480px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: mIn .25s ease;
+        }
+
+        @keyframes mIn {
+            from {
+                opacity: 0;
+                transform: scale(.95) translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0)
+            }
+        }
+
+        .modal-hd {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .modal-ttl {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .modal-x {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: none;
+            color: var(--t2);
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--tr);
+        }
+
+        .modal-x:hover {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-dim);
+        }
+
+        /* ── TOAST ── */
+        .toast-wrap {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 700;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            max-width: calc(100vw - 3rem);
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: .75rem 1rem;
+            box-shadow: var(--shadow);
+            animation: tIn .3s ease;
+            max-width: 360px;
+            font-size: .85rem;
+        }
+
+        .toast.ok {
+            border-color: var(--green);
+        }
+
+        .toast.err {
+            border-color: var(--red);
+        }
+
+        @keyframes tIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px) translateX(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(0)
+            }
+        }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="atm"></div>
+    <div class="s-overlay" id="sOverlay" onclick="closeSidebar()"></div>
+
+    <!-- ═══════════════════════════════════════════
+     NAVBAR
+     Mobile : Logo  |  ≡ Prof Name
+     Desktop: Logo > Manage  |  Theme Av Name TEACHER | Classes Manage | Logout
+═══════════════════════════════════════════ -->
+    <nav class="navbar">
+        <div class="n-left">
+            <a href="/classroom" class="brand">
+                <img src="/Classgrid.png" alt="Logo">
+                Classgrid
+            </a>
+            <!-- breadcrumb — hidden on mobile via CSS -->
+            <span class="n-sep"><i class="fas fa-chevron-right"></i></span>
+            <span class="n-page">Manage</span>
+        </div>
+
+        <div class="n-right">
+            <!-- ── DESKTOP ONLY ── -->
+            <div class="n-theme is-desk">
+                <button class="th on" onclick="setTheme('dark')" title="Dark"><i class="fas fa-moon"></i></button>
+                <button class="th" onclick="setTheme('light')" title="Light"><i class="fas fa-sun"></i></button>
+                <button class="th" onclick="setTheme('aurora')" title="Aurora"><i class="fas fa-star"></i></button>
+            </div>
+            <div class="n-user is-desk">
+                <div class="n-av" id="navAv">?</div>
+                <span class="n-name" id="navName">Loading...</span>
+                <span class="n-role">Teacher</span>
+            </div>
+            <div class="n-div is-desk"></div>
+            <a href="/classroom" class="nb is-desk" title="Classes"><i class="fas fa-th-large"></i><em>Classes</em></a>
+            <a href="/manage-classroom" class="nb is-desk is-active" title="Manage"><i
+                    class="fas fa-school"></i><em>Manage</em></a>
+            <div class="n-div is-desk"></div>
+            <button class="nb is-desk is-red" onclick="logout()" title="Logout"><i
+                    class="fas fa-sign-out-alt"></i><em>Logout</em></button>
+
+            <!-- ── MOBILE ONLY: hamburger + faculty name ── -->
+            <button class="nb is-menu" onclick="toggleSidebar()" title="Menu">
+                <i class="fas fa-bars"></i>
+                <em id="navMenuName">Menu</em>
+            </button>
+        </div>
+    </nav>
+
+    <div class="layout">
+        <!-- ═══ SIDEBAR ═══ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="s-profile">
+                <div class="s-av-wrap">
+                    <div class="s-av-inner" id="sAv">?</div>
+                </div>
+                <div class="s-name" id="sName">Loading...</div>
+                <div class="s-email" id="sEmail">...</div>
+                <div id="sBadge" style="margin-top:.5rem"></div>
+            </div>
+
+            <!-- theme switcher inside sidebar — only shows on mobile -->
+            <div class="s-theme-row">
+                <span>Theme</span>
+                <div class="n-theme" style="margin:0">
+                    <button class="th on" onclick="setTheme('dark')" title="Dark"><i class="fas fa-moon"></i></button>
+                    <button class="th" onclick="setTheme('light')" title="Light"><i class="fas fa-sun"></i></button>
+                    <button class="th" onclick="setTheme('aurora')" title="Aurora"><i class="fas fa-star"></i></button>
+                </div>
+            </div>
+
+            <nav class="s-nav">
+                <div class="s-lbl">Navigation</div>
+                <a href="/" class="s-item"><i class="fas fa-home"></i> Home</a>
+                <a href="/classroom" class="s-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/manage-classroom" class="s-item on"><i class="fas fa-school"></i> Manage Classrooms</a>
+                <a href="/approved-notes.html" class="s-item"><i class="fas fa-folder-open"></i> Student Notes</a>
+                <a href="/classgrid_assistant.html" class="s-item"><i class="fas fa-robot"></i> AI Assistant</a>
+                <div class="s-lbl" style="margin-top:1.25rem">Quick Actions</div>
+                <button class="s-item" onclick="switchTab('create');closeSidebar()"><i class="fas fa-plus-circle"></i>
+                    New Classroom</button>
+                <button class="s-item" onclick="switchTab('requests');closeSidebar()">
+                    <i class="fas fa-user-clock"></i> Join Requests
+                    <span class="s-badge" id="navBadge">0</span>
+                </button>
+                <button class="s-item" onclick="switchTab('upload');closeSidebar()"><i class="fas fa-upload"></i>
+                    Upload Content</button>
+            </nav>
+
+            <div class="s-actions">
+                <a href="/classroom" class="btn btn-glass btn-full"><i class="fas fa-th-large"></i> Dashboard</a>
+                <button class="btn btn-danger btn-full" onclick="logout()"><i class="fas fa-sign-out-alt"></i>
+                    Logout</button>
+            </div>
+        </aside>
+
+        <!-- ═══ MAIN ═══ -->
+        <main class="main">
+            <div class="ph">
+                <div class="ph-inner">
+                    <div>
+                        <h1 class="ph-title"><span class="ph-grad">Management Hub</span></h1>
+                        <p class="ph-sub">Oversee your classrooms, students, and curriculum.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="switchToTab('create')"><i class="fas fa-plus"></i> New
+                        Classroom</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="sc">
+                    <div class="sc-icon">🏫</div>
+                    <div class="sc-val" id="statClassrooms">0</div>
+                    <div class="sc-lbl">Classrooms</div>
+                </div>
+                <div class="sc">
+                    <div class="sc-icon">👥</div>
+                    <div class="sc-val" id="statStudents">0</div>
+                    <div class="sc-lbl">Students</div>
+                </div>
+                <div class="sc">
+                    <div class="sc-icon">⏳</div>
+                    <div class="sc-val" id="statPending">0</div>
+                    <div class="sc-lbl">Pending</div>
+                </div>
+                <div class="sc">
+                    <div class="sc-icon">📊</div>
+                    <div class="sc-val" id="statActivity">0</div>
+                    <div class="sc-lbl">Interactions</div>
+                </div>
+            </div>
+
+            <div class="tab-wrap">
+                <div class="tab-nav">
+                    <button class="tab-btn on" onclick="switchTab('classrooms')" data-tab="classrooms"><i
+                            class="fas fa-school"></i> Classrooms</button>
+                    <button class="tab-btn" onclick="switchTab('requests')" data-tab="requests"><i
+                            class="fas fa-user-plus"></i> Requests <span class="tab-bdg" id="reqBadge">0</span></button>
+                    <button class="tab-btn" onclick="switchTab('analytics')" data-tab="analytics"><i
+                            class="fas fa-chart-bar"></i> Analytics</button>
+                    <button class="tab-btn" onclick="switchTab('upload')" data-tab="upload"><i
+                            class="fas fa-upload"></i> Upload</button>
+                    <button class="tab-btn" onclick="switchTab('create')" data-tab="create"><i
+                            class="fas fa-plus-circle"></i> Create</button>
+                </div>
+            </div>
+
+            <!-- CLASSROOMS -->
+            <div class="tab-panel on" id="panel-classrooms">
+                <div class="cc-grid" id="ccGrid">
+                    <div class="loading"><i class="fas fa-circle-notch fa-spin"></i>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REQUESTS -->
+            <div class="tab-panel" id="panel-requests">
+                <div class="card">
+                    <div class="card-hd">
+                        <div class="card-ttl"><i class="fas fa-user-clock"></i> Pending Requests</div>
+                        <button class="btn btn-glass btn-sm" onclick="loadRequests()"><i class="fas fa-sync-alt"></i>
+                            Refresh</button>
+                    </div>
+                    <div class="req-filters">
+                        <select class="fs" id="reqFilter" onchange="loadRequests()" style="max-width:220px">
+                            <option value="">All Classrooms</option>
+                        </select>
+                        <button class="btn btn-success btn-sm" onclick="bulkAction('approve')"><i
+                                class="fas fa-check-double"></i> Approve All</button>
+                        <button class="btn btn-danger  btn-sm" onclick="bulkAction('reject')"><i
+                                class="fas fa-times"></i> Reject All</button>
+                    </div>
+                    <div id="reqList">
+                        <div class="empty">
+                            <div class="empty-ico">✅</div>
+                            <div class="empty-ttl">No pending requests</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALYTICS -->
+            <div class="tab-panel" id="panel-analytics">
+                <div class="card">
+                    <div class="card-hd">
+                        <div class="card-ttl"><i class="fas fa-chart-bar"></i> Analytics</div>
+                    </div>
+                    <div class="fg">
+                        <label class="fl">Select Classroom</label>
+                        <select class="fs" id="analyticsFilter" onchange="loadAnalytics()">
+                            <option value="">Choose a classroom...</option>
+                        </select>
+                    </div>
+                    <div id="analyticsContent">
+                        <div class="empty">
+                            <div class="empty-ico">📊</div>
+                            <div class="empty-ttl">Select a classroom</div>
+                            <div class="empty-sub">Analytics will appear here</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UPLOAD -->
+            <div class="tab-panel" id="panel-upload">
+                <div class="card">
+                    <div class="card-hd">
+                        <div class="card-ttl"><i class="fas fa-cloud-upload-alt"></i> Upload Content</div>
+                    </div>
+                    <form id="uploadForm">
+                        <div class="fg">
+                            <label class="fl">Target Classroom</label>
+                            <select class="fs" id="uploadSelect" required>
+                                <option value="">Select a classroom...</option>
+                            </select>
+                        </div>
+                        <div class="sub-tabs">
+                            <button type="button" class="sub-tab on" onclick="switchUpTab('material')"
+                                data-ut="material"><i class="fas fa-file-alt"></i> Material</button>
+                            <button type="button" class="sub-tab" onclick="switchUpTab('quiz')" data-ut="quiz"><i
+                                    class="fas fa-clipboard-check"></i> Quiz</button>
+                            <button type="button" class="sub-tab" onclick="switchUpTab('announce')"
+                                data-ut="announce"><i class="fas fa-bullhorn"></i> Announcement</button>
+                        </div>
+                        <input type="hidden" id="upType" value="material">
+                        <div id="f-material">
+                            <div class="fg"><label class="fl">Title</label><input type="text" class="fi" id="matTitle"
+                                    placeholder="e.g. Chapter 1 Notes"></div>
+                            <div class="fg">
+                                <div class="upload-zone" id="uploadZone"><i class="fas fa-cloud-upload-alt"></i>
+                                    <p style="font-size:.85rem;color:var(--t2)">Drag & drop or choose files (up to 10,
+                                        max 40MB each)</p>
+                                    <p style="font-size:.72rem;color:var(--t3);margin-top:.25rem">PDF, Images, Word,
+                                        PPT, Text files</p>
+                                    <input type="file" id="matFile" multiple
+                                        accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.gif,.webp,.svg">
+                                </div>
+                                <div id="fileList" style="margin-top:.75rem;display:none"></div>
+                                <div id="upProg"
+                                    style="display:none;margin-top:.75rem;color:var(--cyan);font-size:.82rem;text-align:center">
+                                    <i class="fas fa-spinner fa-spin"></i> Uploading...
+                                </div>
+                            </div>
+                        </div>
+                        <div id="f-quiz" style="display:none">
+                            <div class="fg"><label class="fl">Quiz Title</label><input type="text" class="fi"
+                                    id="quizTitle" placeholder="e.g. Unit Test 1"></div>
+                            <div class="fg"><label class="fl">Google Form Link</label><input type="url" class="fi"
+                                    id="quizLink" placeholder="https://forms.google.com/..."></div>
+                        </div>
+                        <div id="f-announce" style="display:none">
+                            <div class="fg"><label class="fl">Message</label><textarea class="fta" id="annMsg"
+                                    placeholder="Write your announcement..."></textarea></div>
+                            <div class="fg"><label class="fl">Tag</label><select class="fs" id="annTag">
+                                    <option>General</option>
+                                    <option>Urgent</option>
+                                    <option>Exam</option>
+                                    <option>Event</option>
+                                </select></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full" style="margin-top:.5rem"><i
+                                class="fas fa-rocket"></i> Publish Content</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- CREATE -->
+            <div class="tab-panel" id="panel-create">
+                <div class="card">
+                    <div class="card-hd">
+                        <div class="card-ttl"><i class="fas fa-plus-circle"></i> Create Classroom</div>
+                    </div>
+                    <form id="createForm" onsubmit="createClassroom(event)">
+                        <div class="fg"><label class="fl">Classroom Name</label><input type="text" class="fi" id="cName"
+                                placeholder="e.g. Advanced Physics 101" required></div>
+                        <div class="fr">
+                            <div class="fg"><label class="fl">Subject</label>
+                                <select class="fs" id="cSubject" required>
+                                    <optgroup label="🎓 CLASS 11–12 (Science Stream)">
+                                        <option value="Physics">Physics</option>
+                                        <option value="Chemistry">Chemistry</option>
+                                        <option value="Mathematics">Mathematics</option>
+                                        <option value="Biology">Biology</option>
+                                        <option value="Computer Science">Computer Science</option>
+                                        <option value="Information Technology">Information Technology</option>
+                                        <option value="Electronics">Electronics</option>
+                                        <option value="Statistics">Statistics</option>
+                                        <option value="Environmental Science">Environmental Science</option>
+                                        <option value="Psychology">Psychology</option>
+                                        <option value="Physical Education">Physical Education</option>
+                                    </optgroup>
+                                    <optgroup label="🎓 CLASS 11–12 (Commerce Stream)">
+                                        <option value="Accountancy">Accountancy</option>
+                                        <option value="Business Studies">Business Studies</option>
+                                        <option value="Economics">Economics</option>
+                                        <option value="Mathematics">Mathematics</option>
+                                        <option value="Informatics Practices">Informatics Practices</option>
+                                        <option value="Computer Science">Computer Science</option>
+                                        <option value="Entrepreneurship">Entrepreneurship</option>
+                                        <option value="Statistics">Statistics</option>
+                                    </optgroup>
+                                    <optgroup label="🎓 CLASS 11–12 (Arts / Humanities Stream)">
+                                        <option value="History">History</option>
+                                        <option value="Geography">Geography</option>
+                                        <option value="Political Science">Political Science</option>
+                                        <option value="Sociology">Sociology</option>
+                                        <option value="Psychology">Psychology</option>
+                                        <option value="Philosophy">Philosophy</option>
+                                        <option value="Economics">Economics</option>
+                                        <option value="Public Administration">Public Administration</option>
+                                        <option value="English">English</option>
+                                        <option value="Hindi / Marathi">Hindi / Marathi</option>
+                                        <option value="Fine Arts">Fine Arts</option>
+                                    </optgroup>
+                                    <optgroup label="🎓 DIPLOMA (Polytechnic – Engineering)">
+                                        <option value="Engineering Mathematics">Engineering Mathematics</option>
+                                        <option value="Engineering Physics">Engineering Physics</option>
+                                        <option value="Engineering Chemistry">Engineering Chemistry</option>
+                                        <option value="Basic Electrical Engineering">Basic Electrical Engineering
+                                        </option>
+                                        <option value="Engineering Drawing">Engineering Drawing</option>
+                                        <option value="Workshop Technology">Workshop Technology</option>
+                                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                        <option value="Civil Engineering">Civil Engineering</option>
+                                        <option value="Computer Engineering">Computer Engineering</option>
+                                        <option value="Electrical Engineering">Electrical Engineering</option>
+                                        <option value="Electronics Engineering">Electronics Engineering</option>
+                                        <option value="Information Technology">Information Technology</option>
+                                    </optgroup>
+                                    <optgroup label="🎓 B.E / B.Tech (Engineering)">
+                                        <option value="Engineering Mathematics">Engineering Mathematics</option>
+                                        <option value="Engineering Physics">Engineering Physics</option>
+                                        <option value="Engineering Chemistry">Engineering Chemistry</option>
+                                        <option value="Basic Electrical Engineering">Basic Electrical Engineering
+                                        </option>
+                                        <option value="Engineering Mechanics">Engineering Mechanics</option>
+                                        <option value="Engineering Drawing">Engineering Drawing</option>
+                                        <option value="Data Structures">Data Structures</option>
+                                        <option value="Algorithms">Algorithms</option>
+                                        <option value="Operating Systems">Operating Systems</option>
+                                        <option value="Database Management Systems">Database Management Systems</option>
+                                        <option value="Computer Networks">Computer Networks</option>
+                                        <option value="Artificial Intelligence">Artificial Intelligence</option>
+                                        <option value="Machine Learning">Machine Learning</option>
+                                        <option value="Cyber Security">Cyber Security</option>
+                                        <option value="Software Engineering">Software Engineering</option>
+                                        <option value="Cloud Computing">Cloud Computing</option>
+                                        <option value="Distributed Systems">Distributed Systems</option>
+                                        <option value="Thermodynamics">Thermodynamics</option>
+                                        <option value="Fluid Mechanics">Fluid Mechanics</option>
+                                        <option value="Heat Transfer">Heat Transfer</option>
+                                        <option value="Strength of Materials">Strength of Materials</option>
+                                        <option value="Machine Design">Machine Design</option>
+                                        <option value="Manufacturing Processes">Manufacturing Processes</option>
+                                        <option value="Robotics">Robotics</option>
+                                        <option value="Structural Analysis">Structural Analysis</option>
+                                        <option value="Geotechnical Engineering">Geotechnical Engineering</option>
+                                        <option value="Transportation Engineering">Transportation Engineering</option>
+                                        <option value="Environmental Engineering">Environmental Engineering</option>
+                                        <option value="Concrete Technology">Concrete Technology</option>
+                                        <option value="Construction Planning">Construction Planning</option>
+                                        <option value="Electrical Machines">Electrical Machines</option>
+                                        <option value="Power Systems">Power Systems</option>
+                                        <option value="Control Systems">Control Systems</option>
+                                        <option value="Power Electronics">Power Electronics</option>
+                                        <option value="Signals and Systems">Signals and Systems</option>
+                                        <option value="Analog Electronics">Analog Electronics</option>
+                                        <option value="Digital Electronics">Digital Electronics</option>
+                                        <option value="Microprocessors">Microprocessors</option>
+                                        <option value="Communication Systems">Communication Systems</option>
+                                        <option value="VLSI Design">VLSI Design</option>
+                                        <option value="Embedded Systems">Embedded Systems</option>
+                                    </optgroup>
+                                    <optgroup label="🎓 M.Tech (Master of Technology)">
+                                        <option value="Artificial Intelligence">Artificial Intelligence</option>
+                                        <option value="Machine Learning">Machine Learning</option>
+                                        <option value="Data Science">Data Science</option>
+                                        <option value="Cyber Security">Cyber Security</option>
+                                        <option value="Cloud Computing">Cloud Computing</option>
+                                        <option value="Software Engineering">Software Engineering</option>
+                                        <option value="Blockchain Technology">Blockchain Technology</option>
+                                        <option value="Internet of Things (IoT)">Internet of Things (IoT)</option>
+                                        <option value="Thermal Engineering">Thermal Engineering</option>
+                                        <option value="CAD/CAM">CAD/CAM</option>
+                                        <option value="Robotics">Robotics</option>
+                                        <option value="Manufacturing Engineering">Manufacturing Engineering</option>
+                                        <option value="Structural Engineering">Structural Engineering</option>
+                                        <option value="Construction Management">Construction Management</option>
+                                        <option value="Environmental Engineering">Environmental Engineering</option>
+                                        <option value="Geotechnical Engineering">Geotechnical Engineering</option>
+                                        <option value="Power Systems">Power Systems</option>
+                                        <option value="Control Systems">Control Systems</option>
+                                        <option value="Renewable Energy">Renewable Energy</option>
+                                        <option value="VLSI">VLSI</option>
+                                        <option value="Embedded Systems">Embedded Systems</option>
+                                        <option value="Communication Engineering">Communication Engineering</option>
+                                        <option value="Signal Processing">Signal Processing</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="fg"><label class="fl">Max Students (Plan Limit)</label><input type="number"
+                                    class="fi" id="cMax" readonly title="Determined by your organization's plan"></div>
+                        </div>
+                        <div class="fg"><label class="fl">Description</label><textarea class="fta" id="cDesc"
+                                placeholder="Brief overview..."></textarea></div>
+                        <button type="submit" class="btn btn-primary" id="createBtn"><i class="fas fa-plus"></i> Create
+                            Classroom</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-ov" id="modalOv">
+        <div class="modal">
+            <div class="modal-hd">
+                <h3 class="modal-ttl" id="modalTtl">Members</h3>
+                <button class="modal-x" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <div class="toast-wrap" id="toasts"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SB_URL = 'https://hukbgzdreghzidgzwxlj.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1a2JnemRyZWdoemlkZ3p3eGxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMzgyMjYsImV4cCI6MjA4NjkxNDIyNn0.iB3mmWQdnIUU0PaVo6UmwaW0V56BSeRSlyJ2_wrgsWs';
+        let sb = null;
+        try { if (window.supabase) sb = window.supabase.createClient(SB_URL, SB_KEY); } catch (e) { }
+
+        let token = localStorage.getItem('jwt_token');
+        let me = null, rooms = [], allReqs = [];
+        let isUploading = false; // Tracks if an upload is currently in progress
+        let activeUploadController = null;
+
+        // Cancel upload silently if user leaves the page
+        window.addEventListener('beforeunload', (e) => {
+            if (isUploading && activeUploadController) {
+                activeUploadController.abort();
+                if (Notification.permission === 'granted') {
+                    new Notification('Upload Cancelled', {
+                        body: 'Upload was cancelled because you left the page.',
+                        icon: '/Classgrid.png'
+                    });
+                }
+            }
+        });
+
+        /* ── THEME ── */
+        function setTheme(t) {
+            document.documentElement.setAttribute('data-theme', t);
+            localStorage.setItem('qc_theme', t);
+            document.querySelectorAll('.th').forEach(b => b.classList.remove('on'));
+            document.querySelectorAll(`.th[onclick*="'${t}'"]`).forEach(b => b.classList.add('on'));
+        }
+        setTheme(localStorage.getItem('qc_theme') || 'dark');
+
+        /* ── SIDEBAR ── */
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('on');
+            document.getElementById('sOverlay').classList.toggle('on');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('on');
+            document.getElementById('sOverlay').classList.remove('on');
+        }
+
+        /* ── API ── */
+        function api(url, opts = {}) {
+            const { timeout = 10000, ...rest } = opts;
+            const c = new AbortController(); const id = setTimeout(() => c.abort(), timeout);
+            return fetch(url, { ...rest, signal: c.signal, headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...(rest.headers || {}) }, credentials: 'include' }).finally(() => clearTimeout(id));
+        }
+        async function logout() { try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch (e) { } if (window.AppState) { window.AppState.clearAll(); } else { localStorage.removeItem('jwt_token'); sessionStorage.clear(); } window.location.replace('/login.html'); }
+
+        /* ── INIT ── */
+        async function init() {
+            token = localStorage.getItem('jwt_token');
+            if (!token || token === 'null' || token === 'undefined') { location.href = '/login.html'; return; }
+            try {
+                const r = await api('/api/auth/me', { timeout: 8000 });
+                if (r.status === 401) { logout(); return; }
+                const d = await r.json();
+                me = d.user || d;
+                localStorage.setItem('user', JSON.stringify(me));
+                const allowedRoles = ['faculty', 'teacher', 'admin', 'org_admin', 'super_admin'];
+                if (!allowedRoles.includes(me.role) && me.email !== 'nikhil.shinde@classgrid.in') { location.href = '/classroom.html'; return; }
+                const ini = (me.name && me.name[0]) ? me.name[0].toUpperCase() : '?';
+                set('navAv', ini); set('navName', me.name); set('navMenuName', me.name);
+                set('sName', me.name); set('sEmail', me.email);
+                const sav = document.getElementById('sAv');
+                if (sav) { if (me.profilePicture) sav.innerHTML = `<img src="${me.profilePicture}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`; else sav.textContent = ini; }
+                if (me.subject) { const b = document.getElementById('sBadge'); if (b) b.innerHTML = `<span style="font-size:.6rem;padding:.15rem .4rem;border-radius:4px;background:var(--purple-dim);color:var(--purple);border:1px solid rgba(168,85,247,.25);font-weight:700;text-transform:uppercase;letter-spacing:.5px">${esc(me.subject)}</span>`; }
+
+                // --- Plan Limits Enforcement ---
+                const p = me?.organization?.plan?.toUpperCase() || 'FREE';
+                const PLAN_LIMITS = { FREE: { maxRooms: 2, maxStudents: 60 }, PLUS: { maxRooms: 3, maxStudents: 120 }, PRO: { maxRooms: 5, maxStudents: 150 } };
+                window.currentPlanLimit = PLAN_LIMITS[p] || PLAN_LIMITS.FREE;
+                const cMaxInput = document.getElementById('cMax');
+                if (cMaxInput) { cMaxInput.max = window.currentPlanLimit.maxStudents; cMaxInput.value = window.currentPlanLimit.maxStudents; }
+
+                await loadRooms(); initUpload(); await loadRequests();
+            } catch (e) { toast('Connection error: ' + e.message, 'err'); }
+        }
+
+        /* ── TABS ── */
+        function switchTab(name) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+            const panel = document.getElementById('panel-' + name); if (panel) panel.classList.add('on');
+            const btn = document.querySelector(`.tab-btn[data-tab="${name}"]`); if (btn) { btn.classList.add('on'); btn.scrollIntoView({ inline: 'nearest', behavior: 'smooth' }); }
+            if (name === 'classrooms') loadRooms();
+            if (name === 'analytics') loadAnalytics();
+            if (name === 'requests') loadRequests();
+        }
+
+        /* ── CLASSROOMS ── */
+        async function loadRooms() {
+            const g = document.getElementById('ccGrid');
+            if (g) g.innerHTML = `<div class="loading"><i class="fas fa-circle-notch fa-spin"></i><p>Loading...</p></div>`;
+            try {
+                const r = await api('/api/classrooms'); if (r.status === 401) { logout(); return; }
+                const d = await r.json(); rooms = d.classrooms || [];
+                renderRooms(); updateDropdowns(); updateStats();
+            } catch (e) { toast('Failed to load classrooms', 'err'); if (document.getElementById('ccGrid')) document.getElementById('ccGrid').innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-ttl">Connection Error</div></div>`; }
+        }
+        function renderRooms() {
+            const g = document.getElementById('ccGrid'); if (!g) return;
+
+            // --- Enforce Plan Limits on Create Button ---
+            const createBtn = document.getElementById('createBtn');
+            const maxRooms = window.currentPlanLimit ? window.currentPlanLimit.maxRooms : 2;
+            if (createBtn) {
+                if (rooms.length >= maxRooms) {
+                    createBtn.disabled = true;
+                    createBtn.innerHTML = `<i class="fas fa-lock"></i> Plan Limit Reached (${maxRooms})`;
+                } else {
+                    createBtn.disabled = false;
+                    createBtn.innerHTML = '<i class="fas fa-plus"></i> Create Classroom';
+                }
+            }
+
+            if (!rooms.length) { g.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-ico">🏫</div><div class="empty-ttl">No classrooms yet</div><div class="empty-sub">Create your first classroom.</div></div>`; return; }
+            g.innerHTML = rooms.map(c => `
+    <div class="cc" onclick="openRoom('${c._id}')">
+      <div class="cc-top"><span class="cc-subj">${esc(c.subject)}</span><span class="cc-code">${esc(c.classCode) || '---'}</span></div>
+      <div class="cc-name">${esc(c.name)}</div>
+      <div class="cc-desc">${esc(c.description || 'No description.')}</div>
+      <div class="cc-meta">
+        <span><i class="fas fa-users"></i>${c.memberCount || 0} members</span>
+        <span><i class="fas fa-clock"></i>${ago(c.createdAt)}</span>
+        ${c.pendingRequests > 0 ? `<span style="color:var(--orange)"><i class="fas fa-user-clock"></i>${c.pendingRequests} pending</span>` : ''}
+      </div>
+      <div class="cc-acts">
+        <button class="btn btn-glass btn-sm" onclick="event.stopPropagation();viewMembers('${c._id}')"><i class="fas fa-users"></i> Members</button>
+        <button class="btn btn-glass btn-sm" onclick="event.stopPropagation();copyCode('${esc(c.classCode)}')"><i class="fas fa-copy"></i> Code</button>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();delRoom('${c._id}')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`).join('');
+        }
+
+        /* ── CREATE ── */
+        async function createClassroom(e) {
+            e.preventDefault();
+            const btn = document.getElementById('createBtn'); const orig = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            try {
+                const planMaxStudents = window.currentPlanLimit ? window.currentPlanLimit.maxStudents : 60;
+                const body = { name: document.getElementById('cName').value, subject: document.getElementById('cSubject').value, description: document.getElementById('cDesc').value, subjectSlug: document.getElementById('cSubject').value, settings: { maxStudents: planMaxStudents } };
+                const r = await api('/api/classrooms', { method: 'POST', body: JSON.stringify(body) });
+                const d = await r.json(); if (!r.ok) throw new Error(d.message || 'Creation failed');
+                toast('✅ Classroom created! Code: ' + (d.classroom?.classCode || 'N/A'), 'ok');
+
+                // Refresh user state (might have created an organization)
+                const meRes = await api('/api/auth/me');
+                if (meRes.ok) {
+                    const meData = await meRes.json();
+                    me = meData.user || meData;
+                    localStorage.setItem('user', JSON.stringify(me));
+                }
+
+                document.getElementById('createForm').reset(); await loadRooms(); switchTab('classrooms');
+            } catch (err) { toast(err.message, 'err'); } finally { btn.disabled = false; btn.innerHTML = orig; }
+        }
+
+        /* ── REQUESTS ── */
+        async function loadRequests() {
+            try {
+                const fid = document.getElementById('reqFilter')?.value || ''; allReqs = [];
+                const targets = fid ? rooms.filter(c => c._id === fid) : rooms;
+                for (const c of targets) { const r = await api(`/api/classrooms/${c._id}/requests?status=pending`); if (!r.ok) continue; const d = await r.json(); (d.requests || []).forEach(q => { q._rn = c.name; q._ri = c._id; }); allReqs.push(...(d.requests || [])); }
+                renderReqs();
+                const rb = document.getElementById('reqBadge'); const nb = document.getElementById('navBadge');
+                if (rb) { rb.textContent = allReqs.length; rb.classList.toggle('on', allReqs.length > 0); }
+                if (nb) { nb.textContent = allReqs.length; nb.classList.toggle('on', allReqs.length > 0); }
+                set('statPending', allReqs.length);
+            } catch (e) { console.error(e); }
+        }
+        function renderReqs() {
+            const l = document.getElementById('reqList'); if (!l) return;
+            if (!allReqs.length) { l.innerHTML = `<div class="empty"><div class="empty-ico">✅</div><div class="empty-ttl">All caught up!</div></div>`; return; }
+            l.innerHTML = allReqs.map(r => `
+    <div class="req-item" id="rq-${r._id}">
+      <div class="req-av">${(r.student?.name || '?')[0].toUpperCase()}</div>
+      <div class="req-info">
+        <div class="req-name">${esc(r.student?.name || 'Unknown')}</div>
+        <div class="req-meta">${esc(r.student?.email || '')} · ${esc(r._rn)}</div>
+        ${r.requestMessage ? `<div class="req-msg">"${esc(r.requestMessage)}"</div>` : ''}
+      </div>
+      <div class="req-acts">
+        <button class="btn btn-success btn-sm" onclick="handleReq('${r._ri}','${r._id}','approve')"><i class="fas fa-check"></i></button>
+        <button class="btn btn-danger  btn-sm" onclick="handleReq('${r._ri}','${r._id}','reject')"><i class="fas fa-times"></i></button>
+      </div>
+    </div>`).join('');
+        }
+        async function handleReq(cid, rid, action) {
+            try {
+                const r = await api(`/api/classrooms/${cid}/requests/${rid}`, { method: 'PUT', body: JSON.stringify({ action }) });
+                if (!r.ok) { const d = await r.json(); throw new Error(d.message); }
+                toast(`Request ${action}d`, 'ok');
+                const el = document.getElementById('rq-' + rid); if (el) el.remove();
+                allReqs = allReqs.filter(q => q._id !== rid);
+                const rb = document.getElementById('reqBadge'); if (rb) { rb.textContent = allReqs.length; rb.classList.toggle('on', allReqs.length > 0); }
+                set('statPending', allReqs.length); loadRooms();
+            } catch (e) { toast(e.message, 'err'); }
+        }
+        async function bulkAction(action) {
+            const fid = document.getElementById('reqFilter').value;
+            const reqs = allReqs.filter(r => !fid || r._ri === fid);
+            if (!reqs.length) return;
+            if (!confirm(`${action === 'approve' ? 'Approve' : 'Reject'} ${reqs.length} request(s)?`)) return;
+            const g = {}; reqs.forEach(r => { (g[r._ri] = g[r._ri] || []).push(r._id); });
+            for (const [cid, ids] of Object.entries(g)) await api(`/api/classrooms/${cid}/requests-bulk`, { method: 'PUT', body: JSON.stringify({ requestIds: ids, action }) });
+            toast(`${reqs.length} request(s) ${action}d`, 'ok'); await loadRequests(); await loadRooms();
+        }
+
+        /* ── MEMBERS ── */
+        async function viewMembers(cid) {
+            try {
+                const r = await api(`/api/classrooms/${cid}/members`); const d = await r.json();
+                const c = rooms.find(x => x._id === cid);
+                document.getElementById('modalTtl').textContent = `Members — ${c?.name || ''}`;
+                const mems = d.members || [];
+                document.getElementById('modalBody').innerHTML = !mems.length ? '<div class="empty"><div class="empty-sub">No members yet.</div></div>' : mems.map(m => `
+      <div class="mem-item">
+        <div class="mem-av">${(m.student?.name || '?')[0].toUpperCase()}</div>
+        <div class="mem-info"><div class="mem-name">${esc(m.student?.name)}</div><div class="mem-email">${m.student?.prn ? '<span style="font-weight:700;color:var(--cyan);margin-right:6px">' + esc(m.student.prn) + '</span>' : ''}${esc(m.student?.email)}</div></div>
+        <button class="btn btn-danger btn-sm" onclick="removeMember('${cid}','${m.student?._id}')"><i class="fas fa-user-minus"></i></button>
+      </div>`).join('');
+                openModal();
+            } catch (e) { toast('Error loading members', 'err'); }
+        }
+        async function removeMember(cid, uid) {
+            if (!confirm('Remove this student?')) return;
+            await api(`/api/classrooms/${cid}/members/${uid}`, { method: 'DELETE' });
+            toast('Member removed', 'ok'); viewMembers(cid); loadRooms();
+        }
+
+        /* ── ANALYTICS ── */
+        async function loadAnalytics() {
+            const cid = document.getElementById('analyticsFilter').value;
+            const con = document.getElementById('analyticsContent');
+            if (!cid) { con.innerHTML = `<div class="empty"><div class="empty-ico">📊</div><div class="empty-ttl">Select a classroom</div></div>`; return; }
+            con.innerHTML = `<div class="loading"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>`;
+            try {
+                const r = await api(`/api/activity/classroom/${cid}/analytics?days=30`); const d = await r.json(); const s = d.summary;
+                const pct = s.totalMembers > 0 ? Math.round((s.activeStudents / s.totalMembers) * 100) : 0;
+                con.innerHTML = `
+      <div class="stats" style="margin-bottom:1.25rem">
+        <div class="sc"><div class="sc-icon">👥</div><div class="sc-val">${s.totalMembers}</div><div class="sc-lbl">Members</div></div>
+        <div class="sc"><div class="sc-icon">🟢</div><div class="sc-val">${s.activeStudents}</div><div class="sc-lbl">Active</div></div>
+        <div class="sc"><div class="sc-icon">🔴</div><div class="sc-val">${s.inactiveStudents}</div><div class="sc-lbl">Inactive</div></div>
+        <div class="sc"><div class="sc-icon">📈</div><div class="sc-val">${s.totalInteractions}</div><div class="sc-lbl">Actions</div></div>
+      </div>
+      <div class="sec-lbl">Engagement Rate — Last 30 Days</div>
+      <div class="a-bar"><div class="a-bar-fill" style="width:${pct}%"></div></div>
+      <p style="font-size:.78rem;color:var(--t3);margin-bottom:1.25rem">${pct}% active</p>
+      ${d.studentAnalytics?.length ? `<div class="sec-lbl">Top Students</div><div>${d.studentAnalytics.slice(0, 10).map(sa => `<div class="eng-item"><div class="eng-av">${(sa.student?.name || '?')[0].toUpperCase()}</div><div><div style="font-weight:600;font-size:.85rem">${esc(sa.student?.name)}</div><div style="font-size:.72rem;color:var(--t3)">${esc(sa.student?.email)}</div></div><div class="eng-cnt">${sa.totalActions}</div></div>`).join('')}</div>` : ''}
+      ${d.inactiveStudents?.length ? `<div class="sec-lbl" style="color:var(--red)">⚠️ Inactive</div><div>${d.inactiveStudents.slice(0, 10).map(st => `<div class="eng-item"><div class="eng-av" style="background:var(--red-dim);color:var(--red)">${(st.name || '?')[0].toUpperCase()}</div><div><div style="font-weight:600;font-size:.85rem">${esc(st.name)}</div><div style="font-size:.72rem;color:var(--t3)">${esc(st.email)}</div></div><div class="eng-cnt" style="color:var(--red)">0</div></div>`).join('')}</div>` : ''}`;
+            } catch (e) { con.innerHTML = `<div class="empty"><div class="empty-ttl">Error loading analytics</div></div>`; }
+        }
+
+        /* ── DELETE ── */
+        async function delRoom(id) {
+            if (!confirm('Delete this classroom? Cannot be undone.')) return;
+            try { await api(`/api/classrooms/${id}`, { method: 'DELETE' }); toast('Classroom deleted', 'ok'); await loadRooms(); } catch (e) { toast('Error deleting', 'err'); }
+        }
+        function copyCode(c) { navigator.clipboard.writeText(c); toast('Code copied: ' + c, 'ok'); }
+        function openRoom(id) { window.location.href = `/view-classroom.html?id=${id}`; }
+
+        /* ── UPLOAD ── */
+        function switchUpTab(type) {
+            document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('on'));
+            const b = document.querySelector(`.sub-tab[data-ut="${type}"]`); if (b) b.classList.add('on');
+            ['material', 'quiz', 'announce'].forEach(t => { const el = document.getElementById(`f-${t}`); if (el) el.style.display = t === type ? 'block' : 'none'; });
+            const inp = document.getElementById('upType'); if (inp) inp.value = type;
+        }
+        let selectedUploadFiles = [];
+
+        function initUpload() {
+            const form = document.getElementById('uploadForm'); if (!form) return;
+
+            // File list preview
+            const matFileInput = document.getElementById('matFile');
+            const fileListEl = document.getElementById('fileList');
+
+            window.removeSelectedFile = function (index) {
+                selectedUploadFiles.splice(index, 1);
+                renderFileList();
+            };
+
+            const renderFileList = () => {
+                if (!selectedUploadFiles.length) { fileListEl.style.display = 'none'; fileListEl.innerHTML = ''; return; }
+                fileListEl.style.display = 'block';
+                let html = `<div style="font-size:.78rem;font-weight:700;color:var(--t2);margin-bottom:.4rem">${selectedUploadFiles.length} file(s) selected:</div>`;
+                for (let i = 0; i < selectedUploadFiles.length; i++) {
+                    const f = selectedUploadFiles[i];
+                    const sizeMB = (f.size / 1024 / 1024).toFixed(1);
+                    const isTooBig = f.size > 40 * 1024 * 1024;
+                    html += `<div style="display:flex;align-items:center;gap:.5rem;padding:.35rem .6rem;margin-bottom:.25rem;border-radius:8px;background:var(--elevated);border:1px solid ${isTooBig ? 'var(--red)' : 'var(--border)'}">`;
+                    html += `<i class="fas ${f.type.includes('pdf') ? 'fa-file-pdf' : f.type.includes('image') ? 'fa-file-image' : 'fa-file'}" style="color:${isTooBig ? 'var(--red)' : 'var(--cyan)'}; flex-shrink:0"></i>`;
+                    html += `<span style="font-size:.78rem;color:var(--t1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span>`;
+                    html += `<span style="font-size:.7rem;color:${isTooBig ? 'var(--red)' : 'var(--t3)'};flex-shrink:0">${sizeMB} MB${isTooBig ? ' ⚠️ Too large!' : ''}</span>`;
+                    html += `<button type="button" class="btn btn-glass btn-sm" onclick="removeSelectedFile(${i})" style="padding:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--t3);flex-shrink:0" title="Remove file"><i class="fas fa-times"></i></button>`;
+                    html += `</div>`;
+                }
+                fileListEl.innerHTML = html;
+            };
+
+            if (matFileInput && fileListEl) {
+                matFileInput.addEventListener('change', function () {
+                    const files = this.files;
+                    if (files && files.length) {
+                        for (let i = 0; i < files.length; i++) {
+                            const newFile = files[i];
+                            // Check for exact duplicate name and size
+                            if (!selectedUploadFiles.some(f => f.name === newFile.name && f.size === newFile.size)) {
+                                selectedUploadFiles.push(newFile);
+                            }
+                        }
+                    }
+                    renderFileList();
+                    matFileInput.value = '';
+                });
+            }
+
+            // Drag & drop support
+            const dropZone = document.getElementById('uploadZone');
+            if (dropZone) {
+                ['dragenter', 'dragover'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.style.borderColor = 'var(--cyan)'; dropZone.style.background = 'rgba(0,212,255,0.04)'; }));
+                ['dragleave', 'drop'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.style.borderColor = ''; dropZone.style.background = ''; }));
+                dropZone.addEventListener('drop', e => {
+                    const dt = e.dataTransfer;
+                    if (dt.files.length && matFileInput) {
+                        matFileInput.files = dt.files;
+                        matFileInput.dispatchEvent(new Event('change'));
+                    }
+                });
+            }
+
+            // Supabase Initialization (Main Database Instance)
+            let sbClient = sb;
+
+            form.addEventListener('submit', async e => {
+                e.preventDefault();
+                const type = document.getElementById('upType').value;
+                const cid = document.getElementById('uploadSelect').value; if (!cid) { toast('Select a classroom', 'err'); return; }
+
+                if (type === 'material') {
+                    const title = document.getElementById('matTitle').value.trim(); const fi = document.getElementById('matFile');
+                    if (!selectedUploadFiles.length) { toast('Select at least one file', 'err'); return; }
+
+                    // Validate file sizes
+                    for (let i = 0; i < selectedUploadFiles.length; i++) {
+                        if (selectedUploadFiles[i].size > 40 * 1024 * 1024) {
+                            toast(`File "${selectedUploadFiles[i].name}" exceeds 40MB limit`, 'err'); return;
+                        }
+                    }
+
+                    if (!sbClient) { toast('Supabase not loaded', 'err'); return; }
+
+                    // Ask for Notification permission so we can alert when background upload succeeds
+                    if ("Notification" in window && Notification.permission !== "granted") {
+                        Notification.requestPermission();
+                    }
+
+                    // Extract files before resetting
+                    const pendingFiles = [...selectedUploadFiles];
+                    const fileCount = pendingFiles.length;
+
+                    // Immediately reset form to allow background uploading
+                    form.reset();
+                    selectedUploadFiles = []; // clear queue
+                    switchUpTab('material');
+                    if (fileListEl) { fileListEl.style.display = 'none'; fileListEl.innerHTML = ''; }
+
+                    const w = document.getElementById('toasts');
+                    const pt = document.createElement('div');
+                    pt.className = 'toast ok';
+                    pt.innerHTML = `<i class="fas fa-spinner fa-spin" style="color:var(--cyan);flex-shrink:0"></i><span>Uploading ${fileCount} file(s) in background...</span>`;
+                    w.appendChild(pt);
+
+                    isUploading = true; // Set uploading flag
+                    activeUploadController = new AbortController();
+                    const signal = activeUploadController.signal;
+
+                    const uploadedData = [];
+
+                    // 1) Fetch secure signed upload URLs to bypass RLS
+                    const fileMeta = pendingFiles.map(f => ({ name: f.name }));
+                    try {
+                        const tokenRes = await fetch(`/api/classrooms/${cid}/upload-urls`, {
+                            method: 'POST',
+                            signal,
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ files: fileMeta })
+                        });
+
+                        if (!tokenRes.ok) throw new Error("Failed to secure upload permissions");
+                        const { urls } = await tokenRes.json();
+
+                        // 2) Upload each file directly to Supabase using its specific signed URL
+                        for (let i = 0; i < pendingFiles.length; i++) {
+                            const file = pendingFiles[i];
+                            const { signedUrl, publicUrl } = urls[i];
+
+                            // Direct PUT to signed URL — bypasses Supabase client project mismatch
+                            const uploadRes = await fetch(signedUrl, {
+                                method: 'PUT',
+                                signal,
+                                body: file,
+                                headers: { 'Content-Type': file.type || 'application/octet-stream' }
+                            });
+
+                            if (!uploadRes.ok) {
+                                toast(`❌ Failed: ${file.name}`, 'err');
+                                continue;
+                            }
+
+                            uploadedData.push({
+                                originalname: file.name,
+                                fileurl: publicUrl,
+                                fileExt: file.name.split('.').pop(),
+                                mimetype: file.type
+                            });
+                        }
+                    } catch (err) {
+                        pt.remove();
+                        isUploading = false; // Reset uploading flag
+                        activeUploadController = null;
+                        if (err.name === 'AbortError') return;
+                        toast(`❌ Upload failed: ${err.message}`, 'err');
+                        return;
+                    }
+
+                    // Send metadata JSON to backend API
+                    fetch(`/api/classrooms/${cid}/content/materials`, {
+                        method: 'POST',
+                        signal,
+                        headers: {
+
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ title, uploaded_files: uploadedData })
+                    }).then(async r => {
+                        pt.remove();
+                        const d = await r.json();
+                        if (!r.ok) throw new Error(d.message || 'Verification failed');
+
+                        const msg = `✅ ${uploadedData.length} files uploaded successfully!`;
+                        toast(msg, 'ok');
+
+                        // Show native browser notification
+                        if (Notification.permission === 'granted') {
+                            new Notification('Upload Successful 🎉', {
+                                body: 'Your files were uploaded successfully.',
+                                icon: '/Classgrid.png' // Using QC Logo
+                            });
+                        }
+                        isUploading = false; // Reset uploading flag
+                        activeUploadController = null;
+                    }).catch(err => {
+                        pt.remove();
+                        isUploading = false; // Reset uploading flag
+                        activeUploadController = null;
+                        if (err.name === 'AbortError') return;
+
+                        const errMsg = '❌ Final update failed: ' + err.message;
+                        toast(errMsg, 'err');
+
+                        // Show native browser notification for error
+                        if (Notification.permission === 'granted') {
+                            new Notification('Upload Failed', {
+                                body: 'An error occurred while publishing your materials.',
+                                icon: '/Classgrid.png'
+                            });
+                        }
+                    });
+
+                } else {
+                    const fd = new FormData();
+                    if (type === 'quiz') {
+                        const title = document.getElementById('quizTitle').value.trim(); const url = document.getElementById('quizLink').value.trim();
+                        if (!title) { toast('Enter quiz title', 'err'); return; }
+                        if (!url) { toast('Enter form link', 'err'); return; }
+                        fd.append('title', title);
+                        fd.append('link', url);
+                    } else {
+                        const msg = document.getElementById('annMsg').value.trim(); const tag = document.getElementById('annTag').value;
+                        if (!msg) { toast('Write a message', 'err'); return; }
+                        fd.append('message', msg);
+                        fd.append('tags', tag);
+                    }
+
+                    toast('📤 Publishing...', 'ok');
+                    form.reset(); switchUpTab('material');
+                    isUploading = true;
+                    activeUploadController = new AbortController();
+
+                    const backendType = type === 'quiz' ? 'quizzes' : 'announcements';
+                    fetch(`/api/classrooms/${cid}/content/${backendType}`, {
+                        method: 'POST',
+                        signal: activeUploadController.signal,
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: fd
+                    }).then(async r => {
+                        const d = await r.json();
+                        if (!r.ok) throw new Error(d.message || 'Upload failed');
+                        toast(`✅ Published successfully!`, 'ok');
+
+                        if (Notification.permission === 'granted') {
+                            new Notification('Upload Successful 🎉', {
+                                body: 'Your content was published successfully.',
+                                icon: '/Classgrid.png'
+                            });
+                        }
+
+                        isUploading = false;
+                        activeUploadController = null;
+                    }).catch(err => {
+                        isUploading = false;
+                        activeUploadController = null;
+                        if (err.name === 'AbortError') return;
+                        toast('❌ Publish failed: ' + err.message, 'err');
+                    });
+                }
+            });
+        }
+
+        /* ── HELPERS ── */
+        function updateDropdowns() {
+            const base = '<option value="">All Classrooms</option>' + rooms.map(c => `<option value="${c._id}">${esc(c.name)}</option>`).join('');
+            const af = document.getElementById('analyticsFilter'); if (af) af.innerHTML = '<option value="">Choose a classroom...</option>' + rooms.map(c => `<option value="${c._id}">${esc(c.name)}</option>`).join('');
+            const rf = document.getElementById('reqFilter'); if (rf) rf.innerHTML = base;
+            const uf = document.getElementById('uploadSelect'); if (uf) uf.innerHTML = '<option value="">Select a classroom...</option>' + rooms.map(c => `<option value="${c._id}">${esc(c.name)}</option>`).join('');
+        }
+        function updateStats() {
+            set('statClassrooms', rooms.length);
+            set('statStudents', rooms.reduce((s, c) => s + (c.memberCount || 0), 0));
+        }
+        function openModal() { document.getElementById('modalOv').classList.add('on'); }
+        function closeModal() { document.getElementById('modalOv').classList.remove('on'); }
+        function toast(msg, type = 'ok') {
+            const w = document.getElementById('toasts'); const t = document.createElement('div'); t.className = `toast ${type}`;
+            const ico = type === 'ok' ? 'check-circle' : 'exclamation-circle'; const col = type === 'ok' ? 'var(--green)' : 'var(--red)';
+            t.innerHTML = `<i class="fas fa-${ico}" style="color:${col};flex-shrink:0"></i><span>${msg}</span>`;
+            w.appendChild(t); setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(8px)'; t.style.transition = 'all .3s'; setTimeout(() => t.remove(), 300); }, 3200);
+        }
+        function set(id, v) { const e = document.getElementById(id); if (e) e.textContent = v ?? ''; }
+        function ago(d) { if (!d) return ''; const ms = Date.now() - new Date(d).getTime(), m = Math.floor(ms / 60000), h = Math.floor(ms / 3600000), dy = Math.floor(ms / 86400000); if (m < 1) return 'Just now'; if (m < 60) return m + 'm ago'; if (h < 24) return h + 'h ago'; if (dy < 7) return dy + 'd ago'; return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }); }
+        function esc(s) { if (s == null) return ''; return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+        document.getElementById('modalOv').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+
+</html>

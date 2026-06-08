@@ -1,0 +1,3351 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script>
+        /* Auth Guard — runs BEFORE CSS/content to prevent any flash of protected content */
+        (function () {
+            var t = null; var hasUrlToken = window.location.search.indexOf('token=') !== -1;
+            if (t || hasUrlToken) {
+                window.addEventListener('pageshow', function (e) { if (e.persisted && !null) window.location.replace('/login.html'); });
+                window.addEventListener('storage', function (e) { if (e.key === 'jwt_token' && !e.newValue) window.location.replace('/login.html'); });
+                return;
+            }
+            var _cs = document.createElement('style'); _cs.id = '_ag'; _cs.textContent = 'body>*:not(script):not(style){visibility:hidden!important}'; document.head.appendChild(_cs);
+            var _cb = location.origin.includes('localhost') ? 'http://localhost:3000' : '';
+            var _tok = localStorage.getItem('jwt_token'); var _hdrs = { 'Cache-Control': 'no-store' }; if (_tok && _tok !== 'null' && _tok !== 'undefined') { _hdrs['Authorization'] = 'Bearer ' + _tok; } fetch(_cb + '/api/auth/me', { credentials: 'include', cache: 'no-store', headers: _hdrs })
+                .then(function (r) { if (r.ok) return r.json().then(function (u) { window._cookieAuthUser = u; var e = document.getElementById('_ag'); if (e) e.remove(); }); throw 0; })
+                .catch(function () { window.location.replace('/login.html'); });
+        })();
+    </script>
+    <script src="/app-state.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Classgrid AI — Intelligent Academic Assistant</title>
+
+    <!-- Vercel Web Analytics -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+
+    <!-- Fonts — same as terms/features -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Marked.js for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        /* ═══════════════════════════════════════ RESET ═══════════════════════════════════════ */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ═══════════════════════════════════════ TOKENS — DARK MODE (default) ═══════════════════════════════════════ */
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --surface-alt: #181818;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hi: rgba(255, 255, 255, 0.16);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --text-2: rgba(255, 255, 255, 0.75);
+            --text-3: #888;
+            --text-muted: #555;
+            --input-bg: #0f0f0f;
+            --msg-user: rgba(74, 144, 245, 0.1);
+            --msg-user-border: rgba(74, 144, 245, 0.25);
+            --msg-ai: #0f0f0f;
+            --msg-ai-border: rgba(255, 255, 255, 0.08);
+            --code-bg: rgba(255, 255, 255, 0.05);
+            --header-height: 64px;
+            --font-head: 'Sora', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+        }
+
+        /* ═══════════════════════════════════════ LIGHT MODE ═══════════════════════════════════════ */
+        body.light {
+            --bg: #f7f7f5;
+            --surface: #ffffff;
+            --surface-alt: #f0f0f0;
+            --border: rgba(0, 0, 0, 0.08);
+            --border-hi: rgba(0, 0, 0, 0.16);
+            --text: #111111;
+            --text-2: #444444;
+            --text-3: #888888;
+            --text-muted: #aaaaaa;
+            --input-bg: #ffffff;
+            --msg-user: rgba(74, 144, 245, 0.08);
+            --msg-user-border: rgba(74, 144, 245, 0.2);
+            --msg-ai: #ffffff;
+            --msg-ai-border: rgba(0, 0, 0, 0.08);
+            --code-bg: rgba(0, 0, 0, 0.04);
+        }
+
+        /* ═══════════════════════════════════════ DVH SUPPORT ═══════════════════════════════════════ */
+        @supports (height: 100dvh) {
+            :root {
+                --vh: 100dvh;
+            }
+        }
+
+        @supports not (height: 100dvh) {
+            :root {
+                --vh: 100vh;
+            }
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+
+        body {
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            -webkit-text-size-adjust: 100%;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ═══════════════════════════════════════ LAYOUT ═══════════════════════════════════════ */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: var(--vh);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ═══════════════════════════════════════ HEADER ═══════════════════════════════════════ */
+        .chat-header {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            height: var(--header-height);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 9.5px;
+            background: var(--grad);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--bg);
+            border-radius: 7px;
+            z-index: 0;
+            transition: background 0.3s;
+        }
+
+        .logo-box img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-box:hover {
+            transform: scale(1.05);
+        }
+
+        .header-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-name {
+            font-family: var(--font-head);
+            font-size: 1.05rem;
+            font-weight: 700;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .app-tagline {
+            font-size: 0.68rem;
+            color: var(--text-3);
+            letter-spacing: 0.3px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Shared button style */
+        .hdr-btn {
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-2);
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 0 0.85rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .hdr-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        .hdr-btn.primary {
+            background: var(--grad);
+            color: #fff;
+            border: none;
+        }
+
+        .hdr-btn.primary:hover {
+            opacity: 0.85;
+        }
+
+        /* Segmented Theme Toggle */
+        .theme-segmented-ctrl {
+            display: flex;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3px;
+            gap: 2px;
+        }
+
+        .theme-seg-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-family: var(--font-body);
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-seg-btn:hover {
+            color: var(--text);
+        }
+
+        .theme-seg-btn.active {
+            background: var(--surface-alt);
+            color: var(--text);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--border-hi);
+        }
+
+        body.light .theme-seg-btn.active {
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        /* ═══════════════════════════════════════ MESSAGES AREA ═══════════════════════════════════════ */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1.5rem;
+            padding-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+
+        .messages-area>* {
+            flex-shrink: 0;
+        }
+
+        .messages-area::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .messages-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-area::-webkit-scrollbar-thumb {
+            background: var(--text-muted);
+            border-radius: 10px;
+        }
+
+        /* ═══════════════════════════════════════ WELCOME SCREEN ═══════════════════════════════════════ */
+        .welcome {
+            max-width: 680px;
+            margin: auto;
+            text-align: center;
+            padding: 1.5rem;
+            padding-bottom: 2.5rem;
+            width: 100%;
+        }
+
+        .welcome-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.25rem;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .welcome-logo::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 14px;
+            background: var(--grad);
+            z-index: 0;
+        }
+
+        .welcome-logo::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--bg);
+            border-radius: 12px;
+            z-index: 1;
+            transition: background 0.3s;
+        }
+
+        .welcome-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-title {
+            font-family: var(--font-head);
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.5px;
+            color: var(--text);
+        }
+
+        .welcome-title span {
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .welcome-sub {
+            font-size: 0.92rem;
+            color: var(--text-3);
+            margin-bottom: 2rem;
+            line-height: 1.65;
+        }
+
+        .prompt-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-chip {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .prompt-chip:hover {
+            border-color: var(--blue);
+            transform: translateY(-2px);
+        }
+
+        .prompt-chip-icon {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--blue);
+        }
+
+        .prompt-chip-text {
+            font-size: 0.84rem;
+            color: var(--text-2);
+            line-height: 1.45;
+        }
+
+        /* ═══════ CLASSROOM ACTIVITY CARDS ═══════ */
+        .classroom-activity {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .classroom-activity.show {
+            display: block;
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-2);
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.3px;
+        }
+
+        .activity-header i {
+            color: var(--blue);
+            font-size: 0.9rem;
+        }
+
+        .activity-section-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--dim);
+            letter-spacing: 0.8px;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .activity-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.82rem;
+            color: var(--text-2);
+            line-height: 1.5;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .activity-card:hover {
+            border-color: var(--blue);
+            transform: translateY(-1px);
+        }
+
+        .activity-card .card-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .activity-card .card-meta {
+            font-size: 0.72rem;
+            color: var(--dim);
+            margin-top: 3px;
+        }
+
+        .activity-card .card-icon {
+            margin-right: 6px;
+            color: var(--blue);
+        }
+
+        /* ═══════════════════════════════════════ MESSAGES ═══════════════════════════════════════ */
+        .message {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            animation: msgIn 0.4s ease;
+        }
+
+        @keyframes msgIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .msg-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.78rem;
+            color: #fff;
+        }
+
+        .message.assistant .msg-avatar {
+            background: var(--grad);
+        }
+
+        .message.user .msg-avatar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .msg-body {
+            max-width: 75%;
+            border-radius: 14px;
+            padding: 1rem 1.15rem;
+            position: relative;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-height: 70vh;
+            overflow-y: auto;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .msg-body::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .msg-body::-webkit-scrollbar-thumb {
+            background: var(--text-muted);
+            border-radius: 3px;
+        }
+
+        .message.assistant .msg-body {
+            background: var(--msg-ai);
+            border: 1px solid var(--msg-ai-border);
+        }
+
+        .message.user .msg-body {
+            background: var(--msg-user);
+            border: 1px solid var(--msg-user-border);
+        }
+
+        .msg-text {
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 0.92rem;
+        }
+
+        .msg-text p {
+            margin-bottom: 0.65rem;
+        }
+
+        .msg-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        .msg-text code {
+            background: var(--code-bg);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.84rem;
+            color: var(--blue-light);
+        }
+
+        .msg-text pre {
+            background: var(--code-bg);
+            padding: 0.85rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 0.65rem 0;
+        }
+
+        .msg-text pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-2);
+        }
+
+        .msg-text ul,
+        .msg-text ol {
+            margin: 0.5rem 0 0.5rem 1.2rem;
+            color: var(--text-2);
+        }
+
+        .msg-text li {
+            margin-bottom: 0.3rem;
+        }
+
+        .msg-text strong {
+            color: var(--text);
+        }
+
+        .msg-text h1,
+        .msg-text h2,
+        .msg-text h3 {
+            color: var(--text);
+            margin: 1rem 0 0.5rem;
+            font-family: var(--font-head);
+        }
+
+        .msg-actions {
+            display: flex;
+            gap: 0.4rem;
+            margin-top: 0.65rem;
+        }
+
+        .msg-action-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-3);
+            padding: 0.35rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .msg-action-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        @media (max-width: 768px) {
+            .msg-actions {
+                opacity: 1;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .msg-actions {
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
+
+            .message:hover .msg-actions {
+                opacity: 1;
+            }
+        }
+
+        /* Typing */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .typing-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.78rem;
+        }
+
+        .typing-body {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 0.85rem 1.1rem;
+        }
+
+        .typing-label {
+            color: var(--text-3);
+            font-size: 0.82rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .t-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--blue);
+            animation: dotBounce 1.4s infinite ease-in-out;
+        }
+
+        .t-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .t-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dotBounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+
+            30% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        /* ═══════════════════════════════════════ INPUT AREA ═══════════════════════════════════════ */
+        .input-area {
+            padding: 0.85rem 1rem;
+            flex-shrink: 0;
+            padding-bottom: max(0.85rem, env(safe-area-inset-bottom));
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        /* File preview */
+        .file-preview {
+            display: none;
+            max-width: 780px;
+            margin: 0 auto 0.5rem;
+            padding: 0.45rem 0.85rem;
+            background: rgba(74, 144, 245, 0.08);
+            border: 1px solid rgba(74, 144, 245, 0.15);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--blue);
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-preview.show {
+            display: flex;
+        }
+
+        .file-preview .remove {
+            cursor: pointer;
+            margin-left: auto;
+            opacity: 0.6;
+        }
+
+        .file-preview .remove:hover {
+            opacity: 1;
+        }
+
+        .input-row {
+            max-width: 780px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 0.65rem 0.85rem;
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .input-row:focus-within {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(74, 144, 245, 0.08);
+        }
+
+        .in-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .in-btn.tool {
+            background: var(--surface-alt);
+            color: var(--text-3);
+            border: 1px solid var(--border);
+        }
+
+        .in-btn.tool:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        .in-btn.send {
+            background: var(--grad);
+            color: #fff;
+        }
+
+        .in-btn.send:hover {
+            opacity: 0.85;
+        }
+
+        .in-btn.send:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        /* ═══════ MODE SELECTOR ═══════ */
+        .mode-bar {
+            max-width: 780px;
+            margin: 0 auto 0.5rem;
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .mode-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0.4rem 0.85rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-3);
+            font-size: 0.78rem;
+            font-family: var(--font-body);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .mode-chip:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+
+        .mode-chip.active {
+            background: var(--grad);
+            color: #fff;
+            border-color: transparent;
+            font-weight: 600;
+        }
+
+        .mode-chip i {
+            font-size: 0.72rem;
+        }
+
+        .in-btn.clear {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .in-btn.clear:hover {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        .input-field {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 0.92rem;
+            font-family: var(--font-body);
+            resize: none;
+            outline: none;
+            max-height: 140px;
+            min-height: 22px;
+            line-height: 1.5;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .input-field::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-note {
+            max-width: 780px;
+            margin: 0.45rem auto 0;
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .input-note a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        /* Scroll to bottom */
+        .scroll-btn {
+            position: fixed;
+            bottom: calc(100px + env(safe-area-inset-bottom));
+            right: 1.25rem;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--grad);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px rgba(74, 144, 245, 0.3);
+            transition: all 0.3s;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 100;
+            font-size: 0.8rem;
+        }
+
+        .scroll-btn.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Error */
+        .error-message {
+            background: rgba(231, 76, 60, 0.08);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            padding: 0.85rem;
+            border-radius: 10px;
+            margin: 0.75rem 0;
+            text-align: center;
+            font-size: 0.88rem;
+        }
+
+        /* ═══════════════════════════════════════ MOBILE ═══════════════════════════════════════ */
+        @media (max-width: 768px) {
+            :root {
+                --header-height: 54px;
+            }
+
+            .chat-header {
+                padding: 0 0.75rem;
+            }
+
+            .logo-box {
+                width: 32px;
+                height: 32px;
+            }
+
+            .logo-box img {
+                width: 24px;
+                height: 24px;
+            }
+
+            .app-name {
+                font-size: 0.9rem;
+            }
+
+            .app-tagline {
+                display: none;
+            }
+
+            .hdr-btn span {
+                display: none;
+            }
+
+            .hdr-btn {
+                padding: 0 0.55rem;
+            }
+
+            .messages-area {
+                padding: 0.85rem;
+            }
+
+            .msg-body {
+                max-width: 85%;
+                padding: 0.85rem 1rem;
+            }
+
+            .welcome-title {
+                font-size: 1.4rem;
+            }
+
+            .prompt-grid {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+
+            .prompt-chip {
+                padding: 0.85rem;
+            }
+
+            .input-area {
+                padding: 0.65rem 0.75rem;
+            }
+
+            .input-field {
+                font-size: 16px;
+            }
+
+            .scroll-btn {
+                bottom: calc(85px + env(safe-area-inset-bottom));
+                right: 0.85rem;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .app-name {
+                font-size: 0.82rem;
+            }
+
+            .msg-body {
+                max-width: 90%;
+            }
+        }
+
+        /* ═══════ MIC ACTIVE ═══════ */
+        .in-btn.tool.mic-active {
+            color: #e74c3c;
+            border-color: #e74c3c;
+            animation: micPulse 1.5s infinite;
+        }
+
+        @keyframes micPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(231, 76, 60, 0);
+            }
+        }
+
+        /* ═══════ VIVA SCORE CARD ═══════ */
+        .viva-score-card {
+            background: linear-gradient(135deg, rgba(74, 144, 245, 0.12), rgba(139, 111, 255, 0.12));
+            border: 1px solid rgba(74, 144, 245, 0.25);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .viva-score-card .score-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .viva-score-card .score-title {
+            font-family: var(--font-head);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+        }
+
+        .viva-score-card .score-value {
+            font-family: var(--font-head);
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .viva-score-card .score-bar-track {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border);
+            margin: 0.75rem 0;
+            overflow: hidden;
+        }
+
+        .viva-score-card .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--grad);
+            transition: width 1s ease;
+        }
+
+        .viva-score-card .score-label {
+            font-size: 0.82rem;
+            color: var(--text-3);
+        }
+
+        /* ═══════ VIVA STATUS BAR ═══════ */
+        .viva-status {
+            max-width: 780px;
+            margin: 0 auto 0.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 10px;
+            background: rgba(74, 144, 245, 0.08);
+            border: 1px solid rgba(74, 144, 245, 0.15);
+            font-size: 0.8rem;
+            color: var(--blue);
+        }
+
+        .viva-status.show {
+            display: flex;
+        }
+
+        .viva-status .viva-progress {
+            margin-left: auto;
+            font-weight: 600;
+        }
+
+        .viva-status .end-viva-btn {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.25);
+            color: #e74c3c;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .viva-status .end-viva-btn:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        .viva-status .skip-viva-btn {
+            background: rgba(74, 144, 245, 0.1);
+            border: 1px solid rgba(74, 144, 245, 0.25);
+            color: var(--blue);
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-right: 5px;
+        }
+
+        .viva-status .skip-viva-btn:hover {
+            background: rgba(74, 144, 245, 0.2);
+        }
+
+        /* ═══════ QUIZ MODE STYLES ═══════ */
+        .quiz-status {
+            max-width: 780px;
+            margin: 0 auto 0.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 10px;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            font-size: 0.8rem;
+            color: #10b981;
+        }
+
+        .quiz-status.show {
+            display: flex;
+        }
+
+        .quiz-status .quiz-progress {
+            margin-left: auto;
+            font-weight: 600;
+        }
+
+        .quiz-status .quiz-timer {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .quiz-status .end-quiz-btn {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.25);
+            color: #e74c3c;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .quiz-status .end-quiz-btn:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        .mcq-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            max-width: 500px;
+        }
+
+        .mcq-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--text);
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .mcq-option:hover {
+            border-color: var(--blue);
+            background: rgba(74, 144, 245, 0.06);
+        }
+
+        .mcq-option.selected {
+            border-color: var(--blue);
+            background: rgba(74, 144, 245, 0.1);
+            box-shadow: 0 0 0 2px rgba(74, 144, 245, 0.15);
+        }
+
+        .mcq-option.correct {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .mcq-option.wrong {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .mcq-option .opt-letter {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-hi);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .mcq-option.selected .opt-letter {
+            background: var(--blue);
+            color: #fff;
+            border-color: var(--blue);
+        }
+
+        .mcq-option.correct .opt-letter {
+            background: #10b981;
+            color: #fff;
+            border-color: #10b981;
+        }
+
+        .mcq-option.wrong .opt-letter {
+            background: #ef4444;
+            color: #fff;
+            border-color: #ef4444;
+        }
+
+        .quiz-submit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            background: var(--blue);
+            color: #fff;
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .quiz-submit-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .quiz-submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quiz-score-card {
+            text-align: center;
+            padding: 2rem;
+            margin: 1rem 0;
+            border-radius: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+
+        .quiz-score-card .score-emoji {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quiz-score-card .score-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .quiz-score-card .score-detail {
+            font-size: 0.85rem;
+            color: var(--text-2);
+            margin-bottom: 0.75rem;
+        }
+
+        .quiz-score-card .score-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--blue);
+            margin: 0.5rem 0;
+        }
+
+        .quiz-score-card .score-bar-track {
+            width: 80%;
+            max-width: 300px;
+            height: 8px;
+            background: var(--border);
+            border-radius: 99px;
+            margin: 0.75rem auto;
+            overflow: hidden;
+        }
+
+        .quiz-score-card .score-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: var(--blue);
+            transition: width 1s ease;
+        }
+
+        .quiz-score-card .score-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .quiz-score-card .score-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .quiz-score-card .score-stats .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .quiz-score-card .score-stats .stat-val {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .quiz-score-card .score-stats .stat-ok {
+            color: #10b981;
+        }
+
+        .quiz-score-card .score-stats .stat-bad {
+            color: #ef4444;
+        }
+
+        .quiz-review {
+            margin-top: 1rem;
+            text-align: left;
+        }
+
+        .quiz-review-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .quiz-review-item.correct-review {
+            border-left: 3px solid #10b981;
+        }
+
+        .quiz-review-item.wrong-review {
+            border-left: 3px solid #ef4444;
+        }
+
+        .quiz-review-item .review-q {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .quiz-review-item .review-ans {
+            color: var(--text-2);
+        }
+
+        .quiz-review-item .review-correct {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .quiz-review-item .review-explain {
+            color: var(--text-3);
+            margin-top: 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        .quiz-history-list {
+            margin-top: 0.5rem;
+        }
+
+        .quiz-history-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            cursor: default;
+        }
+
+        .quiz-history-item .qh-subject {
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .quiz-history-item .qh-score {
+            font-weight: 700;
+            color: var(--blue);
+        }
+
+        .quiz-history-item .qh-date {
+            font-size: 0.75rem;
+            color: var(--text-3);
+        }
+
+        .recommendation-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .rec-chip {
+            background-color: var(--bg-1);
+            color: var(--blue);
+            border: 1px solid var(--blue);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        body.dark-mode .rec-chip {
+            border-color: var(--border);
+            color: var(--blue-glow);
+        }
+
+        .rec-chip:hover {
+            background-color: var(--blue);
+            color: white;
+            border-color: var(--blue);
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ═══════ VOICE MODE ═══════ */
+        .voice-mode-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: inherit;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--dim);
+            transition: all 0.3s ease;
+        }
+
+        .voice-mode-btn.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(124, 58, 237, 0.15));
+            border-color: #00d4ff;
+            color: #00d4ff;
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.25);
+        }
+
+        .voice-mode-btn i {
+            font-size: 0.85rem;
+        }
+
+        #voiceBtn {
+            transition: color 0.3s ease;
+        }
+
+        #voiceBtn.voice-mode-active {
+            color: #ef4444 !important;
+        }
+
+        #voiceBtn.mic-active {
+            color: #ef4444 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="chat-container">
+
+        <!-- ═══════ HEADER ═══════ -->
+        <header class="chat-header">
+            <div class="header-left">
+                <div class="logo-box" onclick="window.location.href='/'">
+                    <img src="/Classgrid.png" alt="Classgrid">
+                </div>
+                <div class="header-title">
+                    <div class="app-name">Classgrid AI</div>
+                    <div class="app-tagline">Intelligent Academic Assistant</div>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="theme-segmented-ctrl">
+                    <button class="theme-seg-btn active" id="btnThemeDark" onclick="setTheme('dark')" title="Dark Mode">
+                        <i class="fas fa-moon"></i> Dark
+                    </button>
+                    <button class="theme-seg-btn" id="btnThemeLight" onclick="setTheme('light')" title="Light Mode">
+                        <i class="fas fa-sun"></i> Light
+                    </button>
+                </div>
+
+                <button class="hdr-btn" id="ttsToggle" onclick="toggleAutoSpeak()" title="Toggle voice">
+                    <i class="fas fa-volume-up" id="ttsIcon"></i>
+                </button>
+                <button class="hdr-btn primary" onclick="newChat()" title="New Chat">
+                    <i class="fas fa-plus"></i>
+                    <span>New Chat</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ═══════ MESSAGES ═══════ -->
+        <div class="messages-area" id="messagesContainer">
+            <div class="welcome" id="welcomeScreen">
+                <h1 class="welcome-title">Classgrid <span>AI</span></h1>
+                <p class="welcome-sub">Your AI-powered academic assistant for doubt resolution, quizzes, lecture
+                    summaries, and study help.</p>
+
+                <div class="prompt-grid">
+                    <div class="prompt-chip"
+                        onclick="setModeAndSend('explain', 'Explain a difficult topic from the recent class')">
+                        <div class="prompt-chip-icon"><i class="fas fa-lightbulb"></i></div>
+                        <div class="prompt-chip-text">Explain a difficult topic from the recent class</div>
+                    </div>
+                    <div class="prompt-chip"
+                        onclick="setModeAndSend('quiz', 'Generate a quick practice quiz for my upcoming test')">
+                        <div class="prompt-chip-icon"><i class="fas fa-tasks"></i></div>
+                        <div class="prompt-chip-text">Generate a quick practice quiz for my upcoming test</div>
+                    </div>
+                    <div class="prompt-chip"
+                        onclick="setModeAndSend('summary', 'Help me summarize my uploaded lecture notes')">
+                        <div class="prompt-chip-icon"><i class="fas fa-file-alt"></i></div>
+                        <div class="prompt-chip-text">Help me summarize my uploaded lecture notes</div>
+                    </div>
+                    <div class="prompt-chip"
+                        onclick="setModeAndSend('viva', 'Prepare me for a viva on Thermodynamics')">
+                        <div class="prompt-chip-icon"><i class="fas fa-microphone-alt"></i></div>
+                        <div class="prompt-chip-text">Prepare me for a viva on Thermodynamics</div>
+                    </div>
+                </div>
+
+                <!-- Classroom Activity Section (populated by JS on load) -->
+                <div class="classroom-activity" id="classroomActivity"></div>
+            </div>
+        </div>
+
+        <!-- Scroll to bottom -->
+        <button class="scroll-btn" id="scrollToBottom" onclick="scrollToBottom()" title="Scroll to bottom">
+            <i class="fas fa-arrow-down"></i>
+        </button>
+
+        <!-- ═══════ INPUT ═══════ -->
+        <div class="input-area">
+            <!-- Viva Status Bar -->
+            <div class="viva-status" id="vivaStatus">
+                <i class="fas fa-microphone-alt"></i>
+                <span id="vivaStatusText">Viva in progress...</span>
+                <span class="viva-progress" id="vivaProgress">Q 0/5</span>
+                <button class="skip-viva-btn" id="skipVivaBtn" onclick="skipVivaQuestion()"
+                    style="display:none;">Skip</button>
+                <button class="end-viva-btn" onclick="endVivaEarly()">End</button>
+            </div>
+
+            <!-- Quiz Status Bar -->
+            <div class="quiz-status" id="quizStatus">
+                <i class="fas fa-clipboard-list"></i>
+                <span id="quizStatusText">Quiz Setup</span>
+                <span class="quiz-timer" id="quizTimer" style="display:none;"></span>
+                <span class="quiz-progress" id="quizProgress"></span>
+                <button class="end-quiz-btn" onclick="endQuizEarly()">End Quiz</button>
+            </div>
+
+            <div class="mode-bar" id="modeBar">
+                <button class="mode-chip active" data-mode="chat" onclick="setMode('chat')"><i
+                        class="fas fa-comments"></i> Chat</button>
+                <button class="mode-chip" data-mode="explain"
+                    onclick="setModeAndSend('explain', 'Explain the most recent topic from my classroom')"><i
+                        class="fas fa-book-open"></i> Explain</button>
+                <button class="mode-chip" data-mode="quiz" onclick="setMode('quiz')"><i
+                        class="fas fa-clipboard-list"></i> Quiz</button>
+                <button class="mode-chip" data-mode="summary"
+                    onclick="setModeAndSend('summary', 'Summarize the latest material from my classroom')"><i
+                        class="fas fa-file-alt"></i> Summary</button>
+                <button class="mode-chip" data-mode="announcements"
+                    onclick="setModeAndSend('announcements', 'Read the latest announcement from my classroom')"><i
+                        class="fas fa-bullhorn"></i> Announcements</button>
+                <button class="mode-chip" data-mode="viva" onclick="setMode('viva')"><i
+                        class="fas fa-microphone-alt"></i> Viva</button>
+            </div>
+
+            <div class="file-preview" id="filePreview">
+                <i class="fas fa-file"></i>
+                <span id="fileName"></span>
+                <i class="fas fa-times remove" onclick="clearFile()"></i>
+            </div>
+
+            <div class="input-row">
+                <label for="fileInput" class="in-btn tool" title="Attach file" style="cursor:pointer;">
+                    <i class="fas fa-paperclip"></i>
+                </label>
+                <input type="file" id="fileInput" hidden accept="image/*,.pdf" onchange="handleFileSelect(this)">
+
+                <button class="in-btn tool" id="voiceBtn" onclick="toggleVoiceInput()" title="Voice input">
+                    <i class="fas fa-microphone"></i>
+                </button>
+
+                <textarea class="input-field" id="messageInput" placeholder="Ask anything academic..." rows="1"
+                    onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+
+                <button class="in-btn clear" id="clearBtn" onclick="clearInput()" title="Clear">
+                    <i class="fas fa-times"></i>
+                </button>
+                <button class="in-btn stop-voice" id="voiceStopBtn" onclick="toggleVoiceMode()" title="Stop Voice"
+                    style="display: none; color: #ef4444; width: auto; padding: 0 10px; font-weight: 500; font-size: 14px; border-radius: 6px; background: rgba(239, 68, 68, 0.1);">
+                    Stop
+                </button>
+                <button class="in-btn send" id="sendBtn" onclick="sendMessage()" title="Send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <div class="input-note">
+                Classgrid AI is configured for academic and study queries. Support:
+                <a href="mailto:support@classgrid.in">support@classgrid.in</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ═══════ THEME TOGGLE ═══════ */
+        function setTheme(theme) {
+            if (theme === 'light') {
+                document.body.classList.add('light');
+                document.getElementById('btnThemeLight').classList.add('active');
+                document.getElementById('btnThemeDark').classList.remove('active');
+                localStorage.setItem('cg-ai-theme', 'light');
+            } else {
+                document.body.classList.remove('light');
+                document.getElementById('btnThemeDark').classList.add('active');
+                document.getElementById('btnThemeLight').classList.remove('active');
+                localStorage.setItem('cg-ai-theme', 'dark');
+            }
+        }
+
+        // Restore saved theme
+        (function () {
+            const savedTheme = localStorage.getItem('cg-ai-theme') || 'dark';
+            setTheme(savedTheme);
+        })();
+
+        /* ═══════ FILE HANDLING ═══════ */
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('filePreview').classList.add('show');
+            }
+        }
+        function clearFile() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('filePreview').classList.remove('show');
+        }
+
+        /* ═══════ CONTINUOUS VOICE INPUT (English-only) + VOICE MODE ═══════ */
+        let recognition;
+        let isConversationActive = false;
+        let isListening = false;
+        let voiceModeEnabled = false;
+
+        function updateVoiceStatus(state, label) {
+            const messageInput = document.getElementById('messageInput');
+            if (!voiceModeEnabled || !messageInput) return;
+            // Update placeholder with current status
+            messageInput.placeholder = label || 'Listening...';
+        }
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                document.getElementById('voiceBtn').classList.add('mic-active');
+                if (voiceModeEnabled) updateVoiceStatus('listening', 'Listening...');
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                document.getElementById('voiceBtn').classList.remove('mic-active');
+                if (voiceModeEnabled && isConversationActive) {
+                    const isProcessing = document.getElementById('sendBtn').disabled;
+                    if (!synth.speaking && !isProcessing) {
+                        try { recognition.start(); } catch (e) { }
+                    } else if (isProcessing) {
+                        updateVoiceStatus('processing', 'Processing...');
+                    }
+                }
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+
+                // Prevent AI from hearing itself (ignore results if TTS is currently speaking)
+                if (synth.speaking) {
+                    console.log("Ignored transcript during AI speech:", transcript);
+                    return;
+                }
+
+                if (voiceModeEnabled) updateVoiceStatus('processing', 'Sending...');
+
+                if (vivaState.active) {
+                    addMessage(transcript, 'user');
+                    handleVivaAnswer(transcript);
+                } else if (quizState.active && quizState.stage === 'answering') {
+                    const q = quizState.questions[quizState.currentQuestion];
+                    if (q && q.type === 'mcq') {
+                        const letterMatch = transcript.trim().toUpperCase().match(/^[A-D]$/);
+                        if (letterMatch) {
+                            quizState.selectedOption = letterMatch[0];
+                            submitQuizAnswer();
+                            return;
+                        }
+                    }
+                    submitQuizAnswer(transcript);
+                } else {
+                    const input = document.getElementById('messageInput');
+                    input.value = transcript;
+                    autoResize(input);
+                    sendMessage();
+                }
+            };
+
+            recognition.onerror = (e) => {
+                console.warn('Speech recognition error:', e.error);
+                document.getElementById('voiceBtn').classList.remove('mic-active');
+                if (e.error === 'not-allowed') {
+                    isConversationActive = false;
+                    if (voiceModeEnabled) toggleVoiceMode(); // turn off voice mode
+                } else if (voiceModeEnabled && isConversationActive && e.error !== 'aborted') {
+                    // Auto-retry on transient errors
+                    updateVoiceStatus('ready', 'Retrying...');
+                    setTimeout(() => {
+                        if (isConversationActive && !isListening) {
+                            try { recognition.start(); } catch (ex) { }
+                        }
+                    }, 800);
+                }
+            };
+        }
+
+        /* Voice Mode Toggle — controls the full hands-free conversation loop */
+        function toggleVoiceMode() {
+            if (!recognition) { alert('Voice input is not supported in this browser.'); return; }
+
+            const voiceBtn = document.getElementById('voiceBtn');
+            const messageInput = document.getElementById('messageInput');
+            const voiceStopBtn = document.getElementById('voiceStopBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            const clearBtn = document.getElementById('clearBtn');
+
+            if (voiceModeEnabled) {
+                /* === TURN OFF === */
+                voiceModeEnabled = false;
+                isConversationActive = false;
+                if (synth.speaking) synth.cancel();
+                if (isListening) recognition.stop();
+
+                voiceBtn.classList.remove('voice-mode-active');
+
+                if (voiceStopBtn) voiceStopBtn.style.display = 'none';
+                if (sendBtn) sendBtn.style.display = '';
+                if (clearBtn) clearBtn.style.display = '';
+
+                // Restore placeholder based on current mode
+                const placeholders = {
+                    chat: 'Ask anything academic...',
+                    explain: 'What topic should I explain?',
+                    quiz: 'Quiz mode activated. Follow the prompts.',
+                    summary: 'What should I summarize?',
+                    announcements: 'Ask about classroom announcements...',
+                    viva: 'Viva mode activated. Follow the prompts.'
+                };
+                messageInput.placeholder = placeholders[currentMode] || 'Ask anything academic...';
+
+            } else {
+                /* === TURN ON === */
+                voiceModeEnabled = true;
+                isConversationActive = true;
+
+                // Auto-enable TTS when voice mode activates
+                if (!autoSpeak) {
+                    autoSpeak = true;
+                    const icon = document.getElementById('ttsIcon');
+                    const ttsBtn = document.getElementById('ttsToggle');
+                    icon.className = 'fas fa-volume-up';
+                    ttsBtn.style.borderColor = 'var(--blue)';
+                    ttsBtn.style.color = 'var(--blue)';
+                }
+
+                voiceBtn.classList.add('voice-mode-active');
+
+                if (voiceStopBtn) voiceStopBtn.style.display = 'block';
+                if (sendBtn) sendBtn.style.display = 'none';
+                if (clearBtn) clearBtn.style.display = 'none';
+
+                updateVoiceStatus('listening', 'Listening...');
+
+                // Cancel any current speech and start listening
+                if (synth.speaking) synth.cancel();
+                recognition.lang = 'en-US';
+                try { recognition.start(); } catch (e) { /* already started */ }
+            }
+        }
+
+        /* Legacy alias — old mic button still works */
+        function toggleVoiceInput() { toggleVoiceMode(); }
+
+        /* ═══════ RECOMMENDATIONS ═══════ */
+        const PREDEFINED_RECOMMENDATIONS = {
+            // ── Class 11 ──
+            "Class 11 Physics": ["Units & Measurements", "Motion in a Straight Line", "Motion in a Plane", "Laws of Motion", "Work, Energy & Power", "System of Particles & Rotational Motion", "Gravitation", "Mechanical Properties of Solids", "Mechanical Properties of Fluids", "Thermal Properties of Matter", "Thermodynamics", "Kinetic Theory", "Oscillations", "Waves"],
+            "Class 11 Chemistry (Physical)": ["Some Basic Concepts of Chemistry", "Structure of Atom", "States of Matter", "Thermodynamics", "Equilibrium"],
+            "Class 11 Chemistry (Inorganic)": ["Classification of Elements", "Chemical Bonding & Molecular Structure", "Hydrogen", "s-Block Elements", "p-Block Elements"],
+            "Class 11 Chemistry (Organic)": ["Basic Principles of Organic Chemistry", "Hydrocarbons", "Environmental Chemistry"],
+            "Class 11 Mathematics": ["Sets", "Relations & Functions", "Trigonometric Functions", "Complex Numbers & Quadratic Equations", "Linear Inequalities", "Permutations & Combinations", "Binomial Theorem", "Sequences & Series", "Straight Lines", "Conic Sections", "Introduction to 3D Geometry", "Limits & Derivatives", "Mathematical Reasoning", "Statistics", "Probability"],
+            "Class 11 Biology (Botany)": ["The Living World", "Biological Classification", "Plant Kingdom", "Morphology of Flowering Plants", "Anatomy of Flowering Plants"],
+            "Class 11 Biology (Zoology)": ["Animal Kingdom", "Structural Organization in Animals"],
+            "Class 11 Biology (Cell Biology)": ["Cell: The Unit of Life", "Biomolecules", "Cell Cycle & Cell Division"],
+            "Class 11 Biology (Plant Physiology)": ["Transport in Plants", "Mineral Nutrition", "Photosynthesis", "Respiration in Plants", "Plant Growth & Development"],
+            "Class 11 Computer Science": ["Computer Systems and Organisation", "Data Representation", "Boolean Logic", "Python Programming Basics", "Functions in Python", "Strings in Python", "Lists and Tuples"],
+
+            // ── Class 12 ──
+            "Class 12 Physics": ["Electric Charges & Fields", "Electrostatic Potential & Capacitance", "Current Electricity", "Moving Charges & Magnetism", "Magnetism & Matter", "Electromagnetic Induction", "Alternating Current", "Electromagnetic Waves", "Ray Optics", "Wave Optics", "Dual Nature of Radiation & Matter", "Atoms", "Nuclei", "Semiconductor Electronics"],
+            "Class 12 Chemistry (Physical)": ["Solid State", "Solutions", "Electrochemistry", "Chemical Kinetics", "Surface Chemistry"],
+            "Class 12 Chemistry (Inorganic)": ["p-Block Elements", "d & f Block Elements", "Coordination Compounds"],
+            "Class 12 Chemistry (Organic)": ["Haloalkanes & Haloarenes", "Alcohols, Phenols & Ethers", "Aldehydes & Ketones", "Carboxylic Acids", "Amines", "Biomolecules", "Polymers", "Chemistry in Everyday Life"],
+            "Class 12 Mathematics": ["Relations & Functions", "Inverse Trigonometric Functions", "Matrices", "Determinants", "Continuity & Differentiability", "Applications of Derivatives", "Integrals", "Applications of Integrals", "Differential Equations", "Vector Algebra", "Three Dimensional Geometry", "Linear Programming", "Probability"],
+            "Class 12 Biology (Reproduction)": ["Reproduction in Organisms", "Sexual Reproduction in Flowering Plants", "Human Reproduction", "Reproductive Health"],
+            "Class 12 Biology (Genetics)": ["Principles of Inheritance", "Molecular Basis of Inheritance"],
+            "Class 12 Biology (Evolution)": ["Evolution"],
+            "Class 12 Biology (Human Welfare)": ["Human Health & Disease", "Microbes in Human Welfare"],
+            "Class 12 Biology (Biotechnology)": ["Biotechnology Principles", "Biotechnology Applications"],
+            "Class 12 Biology (Ecology)": ["Organisms & Populations", "Ecosystem", "Biodiversity & Conservation"],
+            "Class 12 Computer Science": ["Python Revision Tour", "Functions", "Data File Handling", "Database Management", "SQL Queries", "Computer Networks"],
+
+            // ── Engineering ──
+            "Engineering Mathematics I": ["Matrices & Determinants", "Eigenvalues & Eigenvectors", "Systems of Linear Equations", "Rank of Matrix"],
+            "Engineering Mathematics II": ["Differential Calculus", "Partial Derivatives", "Multiple Integrals", "Jacobians"],
+            "Engineering Mathematics III": ["Ordinary Differential Equations", "Laplace Transform", "Fourier Series", "Fourier Transform"],
+            "Engineering Mathematics IV": ["Probability Theory", "Random Variables", "Statistics", "Numerical Methods"],
+            "Engineering Physics": ["Units & Measurements", "Oscillations & Waves", "Laser Physics", "Fiber Optics", "Quantum Mechanics", "Semiconductor Physics", "Superconductivity", "Nanotechnology", "Crystallography", "Dielectric & Magnetic Materials"],
+            "Engineering Chemistry": ["Atomic Structure", "Chemical Bonding", "Electrochemistry", "Corrosion & Prevention", "Water Technology", "Polymers", "Lubricants & Fuels", "Nanomaterials", "Spectroscopy", "Environmental Chemistry"],
+            "Basic Electrical Engineering": ["Electric Circuits", "Ohm's Law", "Kirchhoff's Laws", "Series & Parallel Circuits", "Network Theorems", "AC Fundamentals", "Transformers", "Electric Machines Basics", "Power Factor", "Three Phase Systems"],
+            "Electronics Engineering": ["Semiconductor Devices", "Diodes", "Bipolar Junction Transistors", "MOSFETs", "Amplifiers", "Oscillators", "Operational Amplifiers", "Analog Circuits", "Digital Electronics", "Integrated Circuits"],
+
+            // ── Programming / Computer Science ──
+            "Programming Fundamentals": ["Variables & Data Types", "Operators", "Conditional Statements", "Loops", "Functions"],
+            "C Programming": ["Arrays", "Strings", "Pointers", "Structures", "File Handling"],
+            "Object Oriented Programming": ["Classes & Objects", "Inheritance", "Polymorphism", "Encapsulation", "Abstraction"],
+            "Data Structures": ["Arrays", "Linked Lists", "Stacks", "Queues", "Trees", "Binary Trees", "Binary Search Trees", "AVL Trees", "Graphs", "Hash Tables", "Heap"],
+            "Algorithms": ["Time Complexity", "Sorting Algorithms", "Searching Algorithms", "Recursion", "Divide & Conquer", "Greedy Algorithms", "Dynamic Programming"],
+            "Database Management Systems": ["Introduction to DBMS", "ER Model", "Relational Model", "SQL", "Joins", "Normalization", "Transactions", "Concurrency Control", "Indexing"],
+            "Operating Systems": ["Process Management", "Threads", "CPU Scheduling", "Deadlocks", "Memory Management", "Paging & Segmentation", "Virtual Memory", "File Systems"],
+            "Computer Networks": ["OSI Model", "TCP/IP Model", "Data Link Layer", "Network Layer", "Transport Layer", "Routing Algorithms", "Congestion Control", "HTTP / HTTPS", "DNS", "Network Security"],
+            "Software Engineering": ["Software Development Life Cycle", "Agile Methodology", "Waterfall Model", "Requirement Analysis", "System Design", "UML Diagrams", "Software Testing", "Version Control"],
+            "Artificial Intelligence": ["Introduction to AI", "Intelligent Agents", "Search Algorithms", "Knowledge Representation", "Machine Learning Basics", "Neural Networks", "Natural Language Processing"],
+            "Machine Learning": ["Supervised Learning", "Unsupervised Learning", "Regression", "Classification", "Decision Trees", "Random Forest", "Neural Networks", "Model Evaluation"],
+            "Cybersecurity": ["Cryptography", "Encryption Algorithms", "Network Security", "Authentication", "Digital Signatures", "Firewalls", "Ethical Hacking", "Malware Analysis"],
+
+            // ── Other Engineering Branches ──
+            "Mechanical Engineering": ["Engineering Mechanics", "Thermodynamics", "Fluid Mechanics", "Heat Transfer", "Machine Design", "Manufacturing Processes", "Kinematics of Machines"],
+            "Civil Engineering": ["Structural Engineering", "Strength of Materials", "Fluid Mechanics", "Surveying", "Geotechnical Engineering", "Transportation Engineering", "Environmental Engineering"]
+        };
+
+        function renderRecommendationChips(options) {
+            let html = '<div class="recommendation-chips">';
+            options.forEach(opt => {
+                html += `<button class="rec-chip" onclick="submitRecommendation('${opt}')">${opt}</button>`;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function submitRecommendation(text) {
+            document.getElementById('messageInput').value = text;
+            sendMessage();
+        }
+
+        /* ═══════ VIVA STATE ENGINE ═══════ */
+        let vivaState = {
+            active: false,
+            stage: "idle", // idle | subject | topic | count | questioning | finished
+            subject: "",
+            topic: "",
+            totalQuestions: 0,
+            currentQuestion: 0,
+            questions: [],
+            score: 0
+        };
+
+        function initViva() {
+            vivaState.active = true;
+            vivaState.stage = "subject";
+            vivaState.subject = "";
+            vivaState.topic = "";
+            vivaState.totalQuestions = 0;
+            vivaState.currentQuestion = 0;
+            vivaState.questions = [];
+            vivaState.score = 0;
+
+            updateVivaStatusUI();
+
+            let subjectMsg = "What **subject** would you like to have your viva on?\n\nYou can select a popular subject below or type your own.";
+            const defaultSubjects = ["Class 11 Physics", "Class 12 Mathematics", "Engineering Mathematics", "Data Structures", "Computer Programming"];
+
+            addMessage(subjectMsg + renderRecommendationChips(defaultSubjects), 'assistant');
+            speakText("What subject would you like to have your viva on?");
+        }
+
+        function updateVivaStatusUI() {
+            const bar = document.getElementById('vivaStatus');
+            const text = document.getElementById('vivaStatusText');
+            const progress = document.getElementById('vivaProgress');
+            const skipBtn = document.getElementById('skipVivaBtn');
+
+            if (vivaState.active && (vivaState.stage === 'questioning' || vivaState.stage === 'finished')) {
+                bar.classList.add('show');
+                text.textContent = `Viva: ${vivaState.subject} — ${vivaState.topic}`;
+                progress.textContent = `Q ${Math.min(vivaState.currentQuestion + 1, vivaState.totalQuestions)}/${vivaState.totalQuestions}`;
+                skipBtn.style.display = vivaState.stage === 'questioning' ? 'inline-block' : 'none';
+            } else if (vivaState.active) {
+                bar.classList.add('show');
+                text.textContent = "Viva Setup";
+                progress.textContent = "";
+                skipBtn.style.display = 'none';
+            } else {
+                bar.classList.remove('show');
+            }
+        }
+
+        function handleVivaSubject(subject) {
+            vivaState.subject = subject;
+            vivaState.stage = "topic";
+
+            let msg = `Subject: **${subject}**\n\nSelect a **topic** below or type your own:`;
+
+            // Find best matching predefined topics
+            let recommendedTopics = [];
+            const subjKeys = Object.keys(PREDEFINED_RECOMMENDATIONS);
+            const match = subjKeys.find(k => k.toLowerCase() === subject.toLowerCase());
+
+            if (match) {
+                recommendedTopics = PREDEFINED_RECOMMENDATIONS[match];
+            }
+
+            if (recommendedTopics.length > 0) {
+                // Show ALL topics in a scrollable block
+                msg += renderRecommendationChips(recommendedTopics);
+            } else {
+                msg += "\n\n_Example: Current Electricity, Integration, Data Structures..._";
+            }
+
+            addMessage(msg, 'assistant');
+            speakText("Now, what topic would you like?");
+        }
+
+        function handleVivaTopic(topic) {
+            vivaState.topic = topic;
+            vivaState.stage = "count";
+            const msg = "How many questions would you like? (Maximum 20)";
+            addMessage(msg, 'assistant');
+            speakText(msg);
+        }
+
+        function handleVivaCount(countStr) {
+            const count = parseInt(countStr);
+            if (isNaN(count) || count < 1 || count > 20) {
+                const msg = "Please enter a valid number between 1 and 20.";
+                addMessage(msg, 'assistant');
+                speakText(msg);
+                return;
+            }
+            vivaState.totalQuestions = count;
+            vivaState.stage = "questioning";
+
+            updateVivaStatusUI();
+            generateAllVivaQuestions();
+        }
+
+        async function generateAllVivaQuestions() {
+            showTyping();
+            sendBtn.disabled = true;
+
+            try {
+                const prompt = `Generate exactly ${vivaState.totalQuestions} oral viva questions on the topic "${vivaState.topic}" for the subject "${vivaState.subject}".
+Number them clearly from 1 to ${vivaState.totalQuestions} (e.g., "1. What is...").
+Do not include answers.
+Keep them short, conceptual, and well-structured for an oral examination.
+Return ONLY the numbered questions, separated by newlines.`;
+
+                const payload = {
+                    message: prompt,
+                    mode: 'viva'
+                };
+                if (cachedClassroomId) payload.classroomId = cachedClassroomId;
+                if (userProfile._id || userProfile.id) payload.userId = userProfile._id || userProfile.id;
+                if (userProfile.name) payload.userName = userProfile.name;
+
+                const res = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                hideTyping();
+
+                const responseText = data.reply || data.response || '';
+
+                // Parse questions based on numbered bullet points or newlines
+                // This assumes the AI follows the "1. question?" format
+                const rawLines = responseText.split('\n');
+                const parsedQuestions = [];
+                for (const line of rawLines) {
+                    const trimmed = line.trim();
+                    if (trimmed && /^\d+[\.\)]?\s/.test(trimmed)) {
+                        // Strip the leading number
+                        parsedQuestions.push(trimmed.replace(/^\d+[\.\)]?\s*/, '').replace(/\*+/g, '').trim());
+                    } else if (trimmed && trimmed.length > 10) {
+                        // Fallback for un-numbered but valid looking lines
+                        parsedQuestions.push(trimmed.replace(/^\s*[-•*]\s*/, '').replace(/\*+/g, '').trim());
+                    }
+                }
+
+                if (parsedQuestions.length === 0) {
+                    throw new Error('Could not parse any questions');
+                }
+
+                // If AI generated more or fewer questions, just take what we have up to max
+                vivaState.questions = parsedQuestions.slice(0, Math.max(vivaState.totalQuestions, parsedQuestions.length));
+                vivaState.totalQuestions = vivaState.questions.length;
+                vivaState.currentQuestion = 0;
+
+                updateVivaStatusUI();
+                askCurrentVivaQuestion();
+
+            } catch (err) {
+                console.error('Viva generation error:', err);
+                hideTyping();
+                addMessage('⚠️ Could not generate questions. Please try again later or restart the Viva.', 'assistant');
+                vivaState.active = false;
+                vivaState.stage = "idle";
+                updateVivaStatusUI();
+            } finally {
+                sendBtn.disabled = false;
+                vivaState.isProcessing = false;
+            }
+        }
+
+        function askCurrentVivaQuestion() {
+            if (vivaState.currentQuestion >= vivaState.totalQuestions) {
+                endViva();
+                return;
+            }
+
+            updateVivaStatusUI();
+
+            const questionText = vivaState.questions[vivaState.currentQuestion];
+            const msg = `**Question ${vivaState.currentQuestion + 1}/${vivaState.totalQuestions}:** ${questionText}`;
+            addMessage(msg, 'assistant');
+            speakText(questionText);
+        }
+
+        async function evaluateVivaAnswer(studentAnswer) {
+            showTyping();
+            sendBtn.disabled = true;
+            vivaState.isProcessing = true;
+
+            const questionText = vivaState.questions[vivaState.currentQuestion];
+
+            try {
+                const evalPrompt = `You are evaluating a student's answer in an oral viva on "${vivaState.topic}" for the subject "${vivaState.subject}".
+
+Question: "${questionText}"
+Student's Answer: "${studentAnswer}"
+
+Evaluate the answer briefly in 2-3 lines.
+Then give a score out of 5 based on correctness and conceptual understanding.
+
+Format your response EXACTLY like this:
+Feedback: [your evaluation]
+Score: [number]`;
+
+                const payload = {
+                    message: evalPrompt,
+                    mode: 'viva'
+                };
+                if (cachedClassroomId) payload.classroomId = cachedClassroomId;
+                if (userProfile._id || userProfile.id) payload.userId = userProfile._id || userProfile.id;
+                if (userProfile.name) payload.userName = userProfile.name;
+
+                const res = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                hideTyping();
+
+                const evaluation = data.reply || data.response || 'Feedback: Could not evaluate neatly. Score: 0';
+
+                /* Extract score robustly, ignoring markdown asterisks or "/5" formats */
+                const scoreMatch = evaluation.match(/Score[^0-9]*(\d+)/i);
+                const score = scoreMatch ? parseInt(scoreMatch[1], 10) : 0;
+                vivaState.score += Math.min(score, 5); // cap at 5 just in case
+
+                addMessage(evaluation, 'assistant');
+                speakText(evaluation);
+
+                /* Move to next question */
+                vivaState.currentQuestion++;
+
+                const waitForSpeech = autoSpeak ? 3000 : 1500;
+                setTimeout(() => {
+                    if (vivaState.currentQuestion < vivaState.totalQuestions) {
+                        askCurrentVivaQuestion();
+                    } else {
+                        endViva();
+                    }
+                }, waitForSpeech);
+
+            } catch (err) {
+                console.error('Viva evaluation error:', err);
+                hideTyping();
+                addMessage('⚠️ Could not evaluate. Moving to next question.', 'assistant');
+                vivaState.currentQuestion++;
+                setTimeout(() => {
+                    if (vivaState.currentQuestion < vivaState.totalQuestions) {
+                        askCurrentVivaQuestion();
+                    } else {
+                        endViva();
+                    }
+                }, 1500);
+            } finally {
+                sendBtn.disabled = false;
+                vivaState.isProcessing = false;
+            }
+        }
+
+        function endViva(earlyExit = false) {
+            const title = earlyExit ? 'Viva Ended Early' : 'Viva Completed!';
+            const total = vivaState.score;
+            const max = (earlyExit ? vivaState.currentQuestion : vivaState.totalQuestions) * 5;
+            const pct = max > 0 ? Math.round((total / max) * 100) : 0;
+
+            let emoji = earlyExit ? '🛑' : '🏆';
+            if (!earlyExit) {
+                if (pct >= 80) emoji = '🏆';
+                else if (pct >= 60) emoji = '👏';
+                else if (pct >= 40) emoji = '📚';
+                else emoji = '💪';
+            }
+
+            const attemptText = earlyExit ? `<div class="score-label" style="font-size:1rem;font-weight:bold;margin-top:10px;">Questions Attempted: ${vivaState.currentQuestion} / ${vivaState.totalQuestions}</div>` : '';
+            const scoreValText = earlyExit ? `Score: ${total} / ${max}` : `${total} / ${max}`;
+            const pctLabelText = earlyExit ? `Partial Score: ${pct}%` : `${pct}% — ${pct >= 80 ? 'Excellent!' : pct >= 60 ? 'Good job!' : pct >= 40 ? 'Keep practicing!' : 'Needs improvement'}`;
+
+            const scoreCardHTML = `
+<div class="viva-score-card">
+    <div class="score-emoji">${emoji}</div>
+    <div class="score-title">${title}</div>
+    ${attemptText}
+    <div class="score-value" style="${earlyExit ? 'font-size: 1.6rem; margin-top: 5px;' : ''}">${scoreValText}</div>
+    <div class="score-bar-track">
+        <div class="score-bar-fill" style="width: ${pct}%"></div>
+    </div>
+    <div class="score-label">${pctLabelText}</div>
+    <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.9;">Topic: ${vivaState.topic}</div>
+</div>`;
+
+            if (welcomeScreen.style.display !== 'none') welcomeScreen.style.display = 'none';
+            const msg = document.createElement('div');
+            msg.className = 'message assistant';
+            const avatar = document.createElement('div');
+            avatar.className = 'msg-avatar';
+            avatar.innerHTML = '<i class="fas fa-robot"></i>';
+            const body = document.createElement('div');
+            body.className = 'msg-body';
+            body.innerHTML = `<div class="msg-text">${scoreCardHTML}</div>`;
+            msg.appendChild(avatar);
+            msg.appendChild(body);
+            messagesContainer.appendChild(msg);
+            setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 10);
+
+            const summaryText = earlyExit ? `Viva ended early. You attempted ${vivaState.currentQuestion} questions and scored ${total} out of ${max}.` : `Viva completed! Your score is ${total} out of ${max}. ${pct >= 80 ? 'Excellent performance!' : pct >= 60 ? 'Good job, keep it up!' : 'Keep practicing to improve!'}`;
+            speakText(summaryText);
+
+            resetVivaState();
+            updateVivaStatusUI(); // Hide the UI bars after reset
+        }
+
+        function resetVivaState() {
+            vivaState = {
+                active: false,
+                stage: "idle",
+                subject: "",
+                topic: "",
+                totalQuestions: 0,
+                currentQuestion: 0,
+                questions: [],
+                score: 0,
+                isProcessing: false
+            };
+        }
+
+        function skipVivaQuestion() {
+            if (vivaState.stage !== 'questioning' || vivaState.isProcessing) return;
+            vivaState.isProcessing = true;
+
+            const txt = "Question skipped. Score: 0";
+            addMessage(txt, 'assistant');
+            speakText(txt);
+
+            vivaState.currentQuestion++;
+
+            const waitForSpeech = autoSpeak ? 2000 : 500;
+            setTimeout(() => {
+                vivaState.isProcessing = false;
+                if (vivaState.currentQuestion < vivaState.totalQuestions) {
+                    askCurrentVivaQuestion();
+                } else {
+                    endViva();
+                }
+            }, waitForSpeech);
+        }
+
+        function endVivaEarly() {
+            if (vivaState.active && vivaState.stage === 'questioning') {
+                endViva(true);
+            } else if (vivaState.active) {
+                // Cancelled before answering anything
+                addMessage("Viva cancelled.", 'assistant');
+                speakText("Viva cancelled.");
+                resetVivaState();
+                updateVivaStatusUI();
+            }
+        }
+
+        /* ═══════ QUIZ STATE ENGINE ═══════ */
+        let quizState = {
+            active: false,
+            stage: 'idle', // idle | subject | topic | count | difficulty | generating | answering | finished
+            subject: '',
+            topic: '',
+            difficulty: 'medium',
+            totalQuestions: 0,
+            currentQuestion: 0,
+            questions: [],      // [{type, question, options, correctAnswer, explanation}]
+            studentAnswers: [],  // [{answer, isCorrect}]
+            selectedOption: '',
+            score: 0,
+            timerInterval: null,
+            timerSeconds: 0,
+            isProcessing: false
+        };
+
+        function initQuiz() {
+            quizState.active = true;
+            quizState.stage = 'subject';
+            quizState.subject = '';
+            quizState.topic = '';
+            quizState.difficulty = 'medium';
+            quizState.totalQuestions = 0;
+            quizState.currentQuestion = 0;
+            quizState.questions = [];
+            quizState.studentAnswers = [];
+            quizState.selectedOption = '';
+            quizState.score = 0;
+            quizState.isProcessing = false;
+            if (quizState.timerInterval) { clearInterval(quizState.timerInterval); quizState.timerInterval = null; }
+            quizState.timerSeconds = 0;
+            updateQuizStatusUI();
+
+            const defaultSubjects = ["Class 11 Physics", "Class 12 Mathematics", "Engineering Mathematics", "Data Structures", "Computer Programming"];
+            const subjectMsg = 'What **subject** would you like to be quizzed on?\n\nYou can select a popular subject below or type your own.' + renderRecommendationChips(defaultSubjects);
+            addMessage(subjectMsg, 'assistant');
+            speakText("What subject would you like to be quizzed on?");
+        }
+
+        function updateQuizStatusUI() {
+            const bar = document.getElementById('quizStatus');
+            const text = document.getElementById('quizStatusText');
+            const progress = document.getElementById('quizProgress');
+            const timer = document.getElementById('quizTimer');
+
+            if (quizState.active && quizState.stage === 'answering') {
+                bar.classList.add('show');
+                text.textContent = `${quizState.subject} — ${quizState.topic}`;
+                progress.textContent = `Q ${quizState.currentQuestion + 1}/${quizState.totalQuestions}`;
+                timer.style.display = 'inline';
+            } else if (quizState.active) {
+                bar.classList.add('show');
+                text.textContent = quizState.stage === 'generating' ? 'Generating quiz...' : 'Quiz Setup';
+                progress.textContent = '';
+                timer.style.display = 'none';
+            } else {
+                bar.classList.remove('show');
+                timer.style.display = 'none';
+            }
+        }
+
+        function startQuizTimer() {
+            quizState.timerSeconds = 0;
+            const timerEl = document.getElementById('quizTimer');
+            timerEl.style.display = 'inline';
+            quizState.timerInterval = setInterval(() => {
+                quizState.timerSeconds++;
+                const m = Math.floor(quizState.timerSeconds / 60);
+                const s = quizState.timerSeconds % 60;
+                timerEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function handleQuizSubject(subject) {
+            quizState.subject = subject;
+            quizState.stage = 'topic';
+
+            let msg = `Subject: **${subject}**\n\nSelect a **topic** below or type your own:`;
+
+            let recommendedTopics = [];
+            const subjKeys = Object.keys(PREDEFINED_RECOMMENDATIONS);
+            const match = subjKeys.find(k => k.toLowerCase() === subject.toLowerCase());
+
+            if (match) {
+                recommendedTopics = PREDEFINED_RECOMMENDATIONS[match];
+            }
+
+            if (recommendedTopics.length > 0) {
+                msg += renderRecommendationChips(recommendedTopics);
+            } else {
+                msg += "\n\n_Example: Current Electricity, Integration, Data Structures..._";
+            }
+
+            addMessage(msg, 'assistant');
+            speakText("Now, what topic would you like?");
+        }
+
+        function handleQuizTopic(topic) {
+            quizState.topic = topic;
+            quizState.stage = 'count';
+            addMessage(`Topic: **${topic}**\n\nHow many questions? (1 to 20)`, 'assistant');
+            speakText("How many questions? 1 to 20.");
+        }
+
+        function handleQuizCount(countStr) {
+            const count = parseInt(countStr);
+            if (isNaN(count) || count < 1 || count > 20) {
+                addMessage('Please enter a valid number between 1 and 20.', 'assistant');
+                speakText("Please enter a valid number between 1 and 20.");
+                return;
+            }
+            quizState.totalQuestions = count;
+            quizState.stage = 'difficulty';
+            addMessage(`Questions: **${count}**\n\nChoose difficulty:\n\n• **Easy** — Basic recall\n• **Medium** — Conceptual understanding\n• **Hard** — Application & analysis\n\n_Type Easy, Medium, or Hard (or press Enter for Medium)_`, 'assistant');
+            speakText("Choose difficulty: Easy, Medium, or Hard.");
+        }
+
+        function handleQuizDifficulty(diff) {
+            const d = diff.toLowerCase().trim();
+            if (d === 'easy' || d === 'medium' || d === 'hard') {
+                quizState.difficulty = d;
+            } else {
+                quizState.difficulty = 'medium';
+            }
+            quizState.stage = 'generating';
+            updateQuizStatusUI();
+            generateQuizQuestions();
+        }
+
+        async function generateQuizQuestions() {
+            showTyping();
+            sendBtn.disabled = true;
+            quizState.isProcessing = true;
+
+            try {
+                const prompt = `Generate exactly ${quizState.totalQuestions} quiz questions on the topic "${quizState.topic}" for subject "${quizState.subject}" at ${quizState.difficulty} difficulty level.
+
+Return ONLY a valid JSON array, no markdown, no code fences, no explanation. Each element must follow this EXACT format:
+[
+  { "type": "mcq", "question": "What is...?", "options": ["A) Option1", "B) Option2", "C) Option3", "D) Option4"], "correctAnswer": "B", "explanation": "Because..." },
+  { "type": "written", "question": "Define...?", "correctAnswer": "The answer is...", "explanation": "Because..." }
+]
+
+Rules:
+- Mix 70% MCQ and 30% written-answer questions
+- For MCQ, correctAnswer must be ONLY the letter (A, B, C, or D)
+- For written, correctAnswer should be a concise model answer (1-2 sentences)
+- Each question must include an explanation
+- Return ONLY the JSON array, nothing else`;
+
+                const payload = { message: prompt, mode: 'quiz' };
+                if (cachedClassroomId) payload.classroomId = cachedClassroomId;
+                if (userProfile._id || userProfile.id) payload.userId = userProfile._id || userProfile.id;
+                if (userProfile.name) payload.userName = userProfile.name;
+
+                const res = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                hideTyping();
+
+                let responseText = data.reply || data.response || '';
+                // Strip markdown code fences if present
+                responseText = responseText.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+
+                let parsed;
+                try {
+                    parsed = JSON.parse(responseText);
+                } catch (e) {
+                    // Try extracting JSON array from response
+                    const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                    if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+                    else throw new Error('Could not parse quiz JSON');
+                }
+
+                if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('Empty quiz array');
+
+                quizState.questions = parsed.slice(0, quizState.totalQuestions).map(q => ({
+                    type: q.type === 'written' ? 'written' : 'mcq',
+                    question: q.question,
+                    options: q.options || [],
+                    correctAnswer: q.correctAnswer || '',
+                    explanation: q.explanation || ''
+                }));
+                quizState.totalQuestions = quizState.questions.length;
+                quizState.currentQuestion = 0;
+                quizState.studentAnswers = [];
+                quizState.stage = 'answering';
+
+                updateQuizStatusUI();
+                startQuizTimer();
+                addMessage(`Quiz ready! **${quizState.totalQuestions} questions** on **${quizState.topic}** (${quizState.difficulty}).\n\nLet's begin!`, 'assistant');
+                speakText("Quiz ready! Let's begin!");
+                setTimeout(() => showCurrentQuizQuestion(), 1500);
+
+            } catch (err) {
+                console.error('Quiz generation error:', err);
+                hideTyping();
+                addMessage('Could not generate quiz questions. Please try again or choose a different topic.', 'assistant');
+                resetQuizState();
+                updateQuizStatusUI();
+            } finally {
+                sendBtn.disabled = false;
+                quizState.isProcessing = false;
+            }
+        }
+
+        function showCurrentQuizQuestion() {
+            if (quizState.currentQuestion >= quizState.totalQuestions) { endQuiz(); return; }
+            updateQuizStatusUI();
+            const q = quizState.questions[quizState.currentQuestion];
+            const qNum = quizState.currentQuestion + 1;
+
+            if (welcomeScreen.style.display !== 'none') welcomeScreen.style.display = 'none';
+
+            const msg = document.createElement('div');
+            msg.className = 'message assistant';
+            const avatar = document.createElement('div');
+            avatar.className = 'msg-avatar';
+            avatar.innerHTML = '<i class="fas fa-robot"></i>';
+            const body = document.createElement('div');
+            body.className = 'msg-body';
+
+            let html = `<div class="msg-text"><strong>Question ${qNum}/${quizState.totalQuestions}</strong><br>${q.question}</div>`;
+
+            if (q.type === 'mcq' && q.options.length > 0) {
+                html += '<div class="mcq-options" id="mcqOptions">';
+                const letters = ['A', 'B', 'C', 'D'];
+                q.options.forEach((opt, i) => {
+                    const letter = letters[i] || String.fromCharCode(65 + i);
+                    const optText = opt.replace(/^[A-D][).]\s*/i, '');
+                    html += `<button class="mcq-option" onclick="selectMCQOption('${letter}', this)">
+                        <span class="opt-letter">${letter}</span>
+                        <span>${optText}</span>
+                    </button>`;
+                });
+                html += '</div>';
+                html += '<button class="quiz-submit-btn" id="quizSubmitBtn" onclick="submitQuizAnswer()" disabled><i class="fas fa-check"></i> Submit Answer</button>';
+            } else {
+                html += '<div style="margin: 0.75rem 0;"><em>Type your answer below and press Send.</em></div>';
+            }
+
+            body.innerHTML = html;
+            msg.appendChild(avatar);
+            msg.appendChild(body);
+            messagesContainer.appendChild(msg);
+            setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 10);
+
+            quizState.selectedOption = '';
+            speakText(q.question);
+        }
+
+        function selectMCQOption(letter, btn) {
+            if (quizState.stage !== 'answering') return;
+            document.querySelectorAll('#mcqOptions .mcq-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            quizState.selectedOption = letter;
+            const submitBtn = document.getElementById('quizSubmitBtn');
+            if (submitBtn) submitBtn.disabled = false;
+        }
+
+        function submitQuizAnswer(writtenAnswer) {
+            if (quizState.isProcessing) return;
+            const q = quizState.questions[quizState.currentQuestion];
+            let studentAnswer = '';
+            let isCorrect = false;
+
+            if (q.type === 'mcq') {
+                studentAnswer = quizState.selectedOption;
+                if (!studentAnswer) return;
+                isCorrect = studentAnswer.toUpperCase() === q.correctAnswer.toUpperCase();
+
+                // Visually show correct / wrong
+                document.querySelectorAll('#mcqOptions .mcq-option').forEach(btn => {
+                    const letter = btn.querySelector('.opt-letter').textContent;
+                    if (letter === q.correctAnswer.toUpperCase()) btn.classList.add('correct');
+                    if (letter === studentAnswer.toUpperCase() && !isCorrect) btn.classList.add('wrong');
+                    btn.style.pointerEvents = 'none';
+                });
+                const submitBtn = document.getElementById('quizSubmitBtn');
+                if (submitBtn) submitBtn.remove();
+
+                // Show feedback
+                const feedbackText = isCorrect
+                    ? `Correct! ${q.explanation}`
+                    : `Wrong. The correct answer is **${q.correctAnswer}**. ${q.explanation}`;
+                addMessage(feedbackText, 'assistant');
+                speakText(feedbackText);
+
+            } else {
+                studentAnswer = writtenAnswer || '';
+                if (!studentAnswer) return;
+                // Simple keyword match for written answers
+                const correctWords = q.correctAnswer.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+                const answerWords = studentAnswer.toLowerCase().split(/\s+/);
+                const matchCount = correctWords.filter(w => answerWords.some(a => a.includes(w))).length;
+                isCorrect = correctWords.length > 0 ? (matchCount / correctWords.length) >= 0.4 : false;
+
+                const feedbackText = isCorrect
+                    ? `Good answer! Model answer: *${q.correctAnswer}*\n\n${q.explanation}`
+                    : `Not quite. Model answer: **${q.correctAnswer}**\n\n${q.explanation}`;
+                addMessage(feedbackText, 'assistant');
+                speakText(isCorrect ? `Good answer! ${q.explanation}` : `Not quite. ${q.explanation}`);
+            }
+
+            quizState.studentAnswers.push({ answer: studentAnswer, isCorrect });
+            if (isCorrect) quizState.score++;
+            quizState.currentQuestion++;
+
+            setTimeout(() => {
+                if (quizState.currentQuestion < quizState.totalQuestions) {
+                    showCurrentQuizQuestion();
+                } else {
+                    endQuiz();
+                }
+            }, 1500);
+        }
+
+        function endQuiz(earlyExit = false) {
+            if (quizState.timerInterval) { clearInterval(quizState.timerInterval); quizState.timerInterval = null; }
+            const attempted = earlyExit ? quizState.currentQuestion : quizState.totalQuestions;
+            const correct = quizState.score;
+            const wrong = attempted - correct;
+            const pct = attempted > 0 ? Math.round((correct / attempted) * 100) : 0;
+
+            let emoji = '🏆';
+            if (earlyExit) emoji = '🛑';
+            else if (pct >= 80) emoji = '🏆';
+            else if (pct >= 60) emoji = '👏';
+            else if (pct >= 40) emoji = '📚';
+            else emoji = '💪';
+
+            const pctLabel = pct >= 80 ? 'Excellent!' : pct >= 60 ? 'Good job!' : pct >= 40 ? 'Keep practicing!' : 'Needs improvement';
+
+            // Build review HTML
+            let reviewHTML = '<div class="quiz-review">';
+            quizState.questions.slice(0, attempted).forEach((q, i) => {
+                const sa = quizState.studentAnswers[i];
+                const cls = sa && sa.isCorrect ? 'correct-review' : 'wrong-review';
+                const icon = sa && sa.isCorrect ? '<span style="color:#10b981;">✓</span>' : '<span style="color:#ef4444;">✗</span>';
+                reviewHTML += `<div class="quiz-review-item ${cls}">
+                    <div class="review-q">${icon} Q${i + 1}. ${q.question}</div>
+                    <div class="review-ans">Your answer: ${sa ? sa.answer : '—'}</div>
+                    <div class="review-correct">Correct: ${q.correctAnswer}</div>
+                    <div class="review-explain">${q.explanation}</div>
+                </div>`;
+            });
+            reviewHTML += '</div>';
+
+            const scoreCardHTML = `
+<div class="quiz-score-card">
+    <div class="score-emoji">${emoji}</div>
+    <div class="score-title">${earlyExit ? 'Quiz Ended Early' : 'Quiz Completed!'}</div>
+    <div class="score-detail">${quizState.subject} — ${quizState.topic} (${quizState.difficulty})</div>
+    <div class="score-value">${correct} / ${attempted}</div>
+    <div class="score-bar-track"><div class="score-bar-fill" style="width: ${pct}%"></div></div>
+    <div class="score-label">${pct}% — ${pctLabel}</div>
+    <div class="score-stats">
+        <div class="stat"><span class="stat-val stat-ok">${correct}</span><span>Correct</span></div>
+        <div class="stat"><span class="stat-val stat-bad">${wrong}</span><span>Wrong</span></div>
+        <div class="stat"><span class="stat-val">${Math.floor(quizState.timerSeconds / 60)}:${(quizState.timerSeconds % 60).toString().padStart(2, '0')}</span><span>Time</span></div>
+    </div>
+    ${reviewHTML}
+</div>`;
+
+            if (welcomeScreen.style.display !== 'none') welcomeScreen.style.display = 'none';
+            const msg = document.createElement('div');
+            msg.className = 'message assistant';
+            const avatar = document.createElement('div');
+            avatar.className = 'msg-avatar';
+            avatar.innerHTML = '<i class="fas fa-robot"></i>';
+            const body = document.createElement('div');
+            body.className = 'msg-body';
+            body.innerHTML = `<div class="msg-text">${scoreCardHTML}</div>`;
+            msg.appendChild(avatar);
+            msg.appendChild(body);
+            messagesContainer.appendChild(msg);
+            setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 10);
+
+            speakText(earlyExit ?
+                `Quiz ended early. You attempted ${attempted} questions and got ${correct} correct.` :
+                `Quiz completed! Your score is ${correct} out of ${attempted}. ${pctLabel}`);
+
+            // Save to backend
+            saveQuizResult(attempted, correct, wrong, pct);
+
+            resetQuizState();
+            updateQuizStatusUI();
+        }
+
+        async function saveQuizResult(attempted, correct, wrong, pct) {
+            try {
+                const token = localStorage.getItem('jwt_token');
+                const questionsData = quizState.questions.slice(0, attempted).map((q, i) => ({
+                    type: q.type,
+                    question: q.question,
+                    options: q.options,
+                    correctAnswer: q.correctAnswer,
+                    studentAnswer: quizState.studentAnswers[i] ? quizState.studentAnswers[i].answer : '',
+                    isCorrect: quizState.studentAnswers[i] ? quizState.studentAnswers[i].isCorrect : false,
+                    explanation: q.explanation
+                }));
+
+                await fetch(`${API_BASE}/api/quiz/save`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        subject: quizState.subject,
+                        topic: quizState.topic,
+                        difficulty: quizState.difficulty,
+                        totalQuestions: attempted,
+                        questions: questionsData,
+                        score: correct,
+                        percentage: pct,
+                        timeTaken: quizState.timerSeconds,
+                        classroomId: cachedClassroomId || ''
+                    })
+                });
+                console.log('Quiz saved to backend');
+            } catch (err) {
+                console.error('Failed to save quiz:', err);
+            }
+        }
+
+        function resetQuizState() {
+            if (quizState.timerInterval) clearInterval(quizState.timerInterval);
+            quizState = {
+                active: false, stage: 'idle', subject: '', topic: '', difficulty: 'medium',
+                totalQuestions: 0, currentQuestion: 0, questions: [], studentAnswers: [],
+                selectedOption: '', score: 0, timerInterval: null, timerSeconds: 0, isProcessing: false
+            };
+        }
+
+        function endQuizEarly() {
+            if (quizState.active && quizState.stage === 'answering') {
+                endQuiz(true);
+            } else if (quizState.active) {
+                addMessage('Quiz cancelled.', 'assistant');
+                resetQuizState();
+                updateQuizStatusUI();
+            }
+        }
+
+        /* ═══════ CORE CHAT LOGIC ═══════ */
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const sendBtn = document.getElementById('sendBtn');
+        const scrollToBottomBtn = document.getElementById('scrollToBottom');
+        const API_BASE = window.location.origin;
+
+        // Initialize Marked
+        if (typeof marked !== 'undefined') { marked.setOptions({ breaks: true, gfm: true }); }
+
+        // iOS zoom prevention
+        if (isMobile) {
+            const vp = document.querySelector('meta[name="viewport"]');
+            if (vp) {
+                messageInput.addEventListener('focus', () => vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'));
+                messageInput.addEventListener('blur', () => vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'));
+            }
+            let lastH = window.innerHeight;
+            window.addEventListener('resize', () => {
+                if (lastH - window.innerHeight > 150) setTimeout(scrollToBottom, 100);
+                lastH = window.innerHeight;
+            });
+        }
+
+        // Scroll tracking
+        messagesContainer.addEventListener('scroll', () => {
+            const atBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 100;
+            if (atBottom) scrollToBottomBtn.classList.remove('visible');
+            else if (messagesContainer.children.length > 1 || welcomeScreen.style.display === 'none') scrollToBottomBtn.classList.add('visible');
+        });
+
+        function scrollToBottom() { messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' }); }
+        function autoResize(ta) { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, isMobile ? 120 : 140) + 'px'; }
+        function handleKeyDown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+        function clearInput() { messageInput.value = ''; messageInput.style.height = 'auto'; messageInput.focus(); }
+        function sendPrompt(text) { messageInput.value = text; sendMessage(); }
+
+        function setModeAndSend(mode, text) {
+            setMode(mode);
+            messageInput.value = text;
+            sendMessage();
+        }
+
+        /* ═══════ MODE SELECTOR ═══════ */
+        let currentMode = 'chat';
+        // cachedClassroomId: from URL param first, auto-set to first classroom later
+        let cachedClassroomId = new URLSearchParams(window.location.search).get('classroomId')
+            || localStorage.getItem('cg_last_classroom')
+            || '';
+        let userProfile = {};
+        let messageCount = 0; /* Track messages per session for greeting control */
+
+        /* Load user profile from cookie-based auth (AppState) with fallbacks */
+        (async function loadUserProfile() {
+            try {
+                if (window.AppState && window.AppState.getUser) {
+                    const user = await window.AppState.getUser();
+                    if (user && user.name) { userProfile = user; }
+                }
+            } catch (e) { /* non-critical */ }
+
+            // Fallback: auth guard may have already fetched user data
+            if (!userProfile.name && window._cookieAuthUser && window._cookieAuthUser.name) {
+                userProfile = window._cookieAuthUser;
+            } else if (!userProfile.name) {
+                // Last resort: try localStorage (may have data from older sessions)
+                try { userProfile = JSON.parse(localStorage.getItem('user') || '{}'); } catch (e) { }
+            }
+
+            // Map organization.name → organizationName for chat context
+            if (!userProfile.organizationName && userProfile.organization && userProfile.organization.name) {
+                userProfile.organizationName = userProfile.organization.name;
+            }
+        })();
+
+        /* ═══════ CLASSROOM CONTEXT AUTO-FETCH ═══════ */
+        (async function loadClassroomContext() {
+            try {
+                const _apiBase = window.AppState ? window.AppState.API_BASE : '';
+
+                // If no classroomId, auto-detect from student's enrolled classrooms
+                if (!cachedClassroomId && window.AppState && window.AppState.getClassrooms) {
+                    try {
+                        const classrooms = await window.AppState.getClassrooms();
+                        if (classrooms && classrooms.length > 0) {
+                            cachedClassroomId = String(classrooms[0]._id || classrooms[0].id || '');
+                        }
+                    } catch (e) { /* non-critical */ }
+                }
+
+                if (!cachedClassroomId) return;
+
+                const res = await fetch(`${_apiBase}/api/chat/classroom-context/${cachedClassroomId}`, {
+                    credentials: 'include'
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+
+                const container = document.getElementById('classroomActivity');
+                if (!container) return;
+
+                let html = '';
+                const classLabel = data.classroom && data.classroom.name
+                    ? `<i class="fas fa-chalkboard-teacher"></i> ${data.classroom.name}${data.classroom.subject ? ' &mdash; ' + data.classroom.subject : ''}`
+                    : '<i class="fas fa-chalkboard-teacher"></i> Your Classroom';
+                html += `<div class="activity-header">${classLabel}</div>`;
+
+                // Announcements
+                if (data.announcements && data.announcements.length) {
+                    html += '<div class="activity-section-title"><i class="fas fa-bullhorn"></i>&nbsp; Recent Announcements</div>';
+                    data.announcements.slice(0, 2).forEach(function (a) {
+                        const msg = (a.message || '').substring(0, 120) + ((a.message || '').length > 120 ? '...' : '');
+                        const date = a.created_at ? new Date(a.created_at).toLocaleDateString() : '';
+                        html += '<div class="activity-card" onclick="setModeAndSend(\'announcements\', \'Tell me about the latest announcements\')">'
+                            + '<div class="card-title"><span class="card-icon"><i class="fas fa-bullhorn"></i></span>Announcement</div>'
+                            + '<div>' + msg + '</div>'
+                            + (date ? '<div class="card-meta">' + date + '</div>' : '')
+                            + '</div>';
+                    });
+                }
+
+                // Notes / Materials
+                if (data.materials && data.materials.length) {
+                    html += '<div class="activity-section-title"><i class="fas fa-file-alt"></i>&nbsp; Recent Notes</div>';
+                    data.materials.slice(0, 3).forEach(function (m) {
+                        const date = m.created_at ? new Date(m.created_at).toLocaleDateString() : '';
+                        const safeTitle = (m.title || 'Untitled').replace(/'/g, '');
+                        html += '<div class="activity-card" onclick="setModeAndSend(\'summary\', \'Summarize the notes: ' + safeTitle + '\')">'
+                            + '<div class="card-title"><span class="card-icon"><i class="fas fa-file-alt"></i></span>' + (m.title || 'Untitled') + '</div>'
+                            + (m.description ? '<div>' + m.description.substring(0, 80) + '</div>' : '')
+                            + (date ? '<div class="card-meta">' + date + '</div>' : '')
+                            + '</div>';
+                    });
+                }
+
+                // Quizzes
+                if (data.quizzes && data.quizzes.length) {
+                    html += '<div class="activity-section-title"><i class="fas fa-clipboard-list"></i>&nbsp; Recent Quizzes</div>';
+                    data.quizzes.slice(0, 3).forEach(function (q) {
+                        const date = q.created_at ? new Date(q.created_at).toLocaleDateString() : '';
+                        const safeTitle = (q.title || 'Quiz').replace(/'/g, '');
+                        html += '<div class="activity-card" onclick="setModeAndSend(\'quiz\', \'Help me practice for the quiz: ' + safeTitle + '\')">'
+                            + '<div class="card-title"><span class="card-icon"><i class="fas fa-clipboard-list"></i></span>' + (q.title || 'Untitled Quiz') + '</div>'
+                            + (q.description ? '<div>' + q.description.substring(0, 80) + '</div>' : '')
+                            + '<div class="card-meta">' + (q.duration || 30) + ' min' + (date ? ' &bull; ' + date : '') + '</div>'
+                            + '</div>';
+                    });
+                }
+
+                if (html.indexOf('activity-card') !== -1) {
+                    container.innerHTML = html;
+                    container.classList.add('show');
+                }
+            } catch (e) {
+                console.warn('Could not load classroom context:', e.message);
+            }
+        })();
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.mode === mode);
+            });
+            const placeholders = {
+                chat: 'Ask anything academic...',
+                explain: 'What topic should I explain?',
+                quiz: 'Quiz mode activated. Follow the prompts.',
+                summary: 'What should I summarize?',
+                announcements: 'Ask about classroom announcements...',
+                viva: 'Viva mode activated. Follow the prompts.'
+            };
+            messageInput.placeholder = placeholders[mode] || placeholders.chat;
+            messageInput.focus();
+
+            if (mode === 'viva' && !vivaState.active) {
+                initViva();
+            } else if (mode !== 'viva' && vivaState.active) {
+                vivaState.active = false;
+                vivaState.stage = "idle";
+                updateVivaStatusUI();
+            }
+
+            if (mode === 'quiz' && !quizState.active) {
+                initQuiz();
+            } else if (mode !== 'quiz' && quizState.active) {
+                resetQuizState();
+                updateQuizStatusUI();
+            }
+        }
+
+        function newChat() {
+            /* Reset viva if active */
+            if (vivaState.active) {
+                vivaState.active = false;
+                vivaState.stage = "idle";
+                updateVivaStatusUI();
+            }
+            /* Reset quiz if active */
+            if (quizState.active) {
+                resetQuizState();
+                updateQuizStatusUI();
+            }
+            messagesContainer.innerHTML = '';
+            messagesContainer.appendChild(welcomeScreen);
+            welcomeScreen.style.display = 'block';
+            messageInput.value = ''; messageInput.style.height = 'auto';
+            scrollToBottomBtn.classList.remove('visible');
+            messageCount = 0; /* Reset so next session gets a greeting */
+        }
+
+        function addMessage(text, type) {
+            if (welcomeScreen.style.display !== 'none') welcomeScreen.style.display = 'none';
+            const atBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 100;
+
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'msg-avatar';
+            avatar.innerHTML = type === 'assistant' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+
+            const body = document.createElement('div');
+            body.className = 'msg-body';
+
+            const textEl = document.createElement('div');
+            textEl.className = 'msg-text';
+            if (type === 'assistant' && typeof marked !== 'undefined') textEl.innerHTML = marked.parse(text);
+            else textEl.textContent = text;
+            body.appendChild(textEl);
+
+            if (type === 'assistant') {
+                const actions = document.createElement('div');
+                actions.className = 'msg-actions';
+                actions.innerHTML = `
+                    <button class="msg-action-btn" onclick="copyMessage(this)"><i class="far fa-copy"></i> Copy</button>
+                    <button class="msg-action-btn" onclick="readMessageAloud(this)"><i class="fas fa-volume-up"></i> Read Aloud</button>
+                    <button class="msg-action-btn" onclick="regenerateResponse(this)"><i class="fas fa-redo"></i> Regenerate</button>
+                `;
+                body.appendChild(actions);
+            }
+
+            msg.appendChild(avatar);
+            msg.appendChild(body);
+            messagesContainer.appendChild(msg);
+
+            if (atBottom) setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 10);
+        }
+
+        function showTyping() {
+            const atBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 100;
+            const el = document.createElement('div');
+            el.className = 'typing-indicator'; el.id = 'typingIndicator';
+            el.innerHTML = `
+                <div class="typing-avatar"><i class="fas fa-robot"></i></div>
+                <div class="typing-body">
+                    <div class="typing-label">${vivaState.active ? 'Evaluating your answer...' : quizState.active ? 'Generating quiz...' : 'Classgrid is thinking...'}</div>
+                    <div class="typing-dots"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>
+                </div>
+            `;
+            messagesContainer.appendChild(el);
+            if (atBottom) setTimeout(() => { messagesContainer.scrollTop = messagesContainer.scrollHeight; }, 10);
+        }
+
+        function hideTyping() { const t = document.getElementById('typingIndicator'); if (t) t.remove(); }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            /* ── VIVA: intercept send ── */
+            if (currentMode === 'viva' && vivaState.active) {
+                if (vivaState.isProcessing) return;
+
+                vivaState.isProcessing = true;
+                addMessage(message, 'user');
+                messageInput.value = ''; messageInput.style.height = 'auto';
+
+                if (vivaState.stage === 'subject') {
+                    handleVivaSubject(message);
+                    vivaState.isProcessing = false;
+                } else if (vivaState.stage === 'topic') {
+                    handleVivaTopic(message);
+                    vivaState.isProcessing = false;
+                } else if (vivaState.stage === 'count') {
+                    handleVivaCount(message);
+                    if (vivaState.stage !== 'questioning') vivaState.isProcessing = false;
+                } else if (vivaState.stage === 'questioning') {
+                    evaluateVivaAnswer(message);
+                }
+                return;
+            }
+
+            /* ── QUIZ: intercept send ── */
+            if (currentMode === 'quiz' && quizState.active) {
+                if (quizState.isProcessing) return;
+
+                addMessage(message, 'user');
+                messageInput.value = ''; messageInput.style.height = 'auto';
+
+                if (quizState.stage === 'subject') {
+                    handleQuizSubject(message);
+                } else if (quizState.stage === 'topic') {
+                    handleQuizTopic(message);
+                } else if (quizState.stage === 'count') {
+                    handleQuizCount(message);
+                } else if (quizState.stage === 'difficulty') {
+                    handleQuizDifficulty(message);
+                } else if (quizState.stage === 'answering') {
+                    // Written answer submitted via text
+                    const q = quizState.questions[quizState.currentQuestion];
+                    if (q && q.type === 'written') {
+                        submitQuizAnswer(message);
+                    }
+                }
+                return;
+            }
+
+            addMessage(message, 'user');
+            messageInput.value = ''; messageInput.style.height = 'auto';
+            sendBtn.disabled = true;
+            showTyping();
+            if (isMobile) messageInput.blur();
+
+            try {
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                let body, headers = {};
+
+                if (file) {
+                    const fd = new FormData();
+                    fd.append('message', message); fd.append('file', file);
+                    fd.append('mode', currentMode);
+                    if (cachedClassroomId) fd.append('classroomId', cachedClassroomId);
+                    if (userProfile._id || userProfile.id) fd.append('userId', userProfile._id || userProfile.id);
+                    if (userProfile.name) fd.append('userName', userProfile.name);
+                    if (userProfile.prn) fd.append('userPrn', userProfile.prn);
+                    if (userProfile.role) fd.append('userRole', userProfile.role);
+                    if (userProfile.department) fd.append('userDept', userProfile.department);
+                    if (userProfile.organizationName) fd.append('userOrg', userProfile.organizationName);
+                    fd.append('isFirstMessage', messageCount === 0 ? 'true' : 'false');
+                    body = fd;
+                } else {
+                    const payload = { message, mode: currentMode };
+                    if (cachedClassroomId) payload.classroomId = cachedClassroomId;
+                    if (userProfile._id || userProfile.id) payload.userId = userProfile._id || userProfile.id;
+                    if (userProfile.name) payload.userName = userProfile.name;
+                    if (userProfile.prn) payload.userPrn = userProfile.prn;
+                    if (userProfile.role) payload.userRole = userProfile.role;
+                    if (userProfile.department) payload.userDept = userProfile.department;
+                    if (userProfile.organizationName) payload.userOrg = userProfile.organizationName;
+                    payload.isFirstMessage = messageCount === 0;
+                    body = JSON.stringify(payload);
+                    headers['Content-Type'] = 'application/json';
+                }
+
+                const res = await fetch(`${API_BASE}/api/chat`, { method: 'POST', headers, body });
+                fileInput.value = '';
+                document.getElementById('filePreview').classList.remove('show');
+
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                const data = await res.json();
+                hideTyping();
+                const reply = data.reply || data.response || "I apologize, but I couldn't generate a response. Please try again.";
+                addMessage(reply, 'assistant');
+                speakText(reply);
+                messageCount++; /* Increment after successful response */
+            } catch (err) {
+                console.error('Chat error:', err);
+                hideTyping();
+                addMessage(`I'm having trouble connecting right now. This could be because:\n\n• The server is temporarily unavailable\n• There's a network connectivity issue\n\n**Support:** support@classgrid.in\n\nPlease try again later.`, 'assistant');
+            } finally {
+                sendBtn.disabled = false;
+                if (!isMobile) messageInput.focus();
+            }
+        }
+
+        function copyMessage(btn) {
+            const text = btn.closest('.msg-body').querySelector('.msg-text').textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => showCopyFeedback(btn)).catch(() => fallbackCopy(text, btn));
+            } else fallbackCopy(text, btn);
+        }
+        function fallbackCopy(text, btn) {
+            const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+            document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); showCopyFeedback(btn); } catch (e) { }
+            document.body.removeChild(ta);
+        }
+        function showCopyFeedback(btn) {
+            const orig = btn.innerHTML; btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => btn.innerHTML = orig, 2000);
+        }
+        function regenerateResponse(btn) {
+            const msgDiv = btn.closest('.message');
+            const prev = msgDiv.previousElementSibling;
+            if (prev && prev.classList.contains('user')) {
+                const userText = prev.querySelector('.msg-text').textContent;
+                msgDiv.remove(); messageInput.value = userText; sendMessage();
+            }
+        }
+
+        function readMessageAloud(btn) {
+            const _synth = window.speechSynthesis;
+            if (!_synth) return;
+
+            if (_synth.speaking) {
+                _synth.cancel();
+                btn.innerHTML = '<i class="fas fa-volume-up"></i> Read Aloud';
+                return;
+            }
+
+            const text = btn.closest('.msg-body').querySelector('.msg-text').textContent;
+            if (!text) return;
+
+            const clean = text.replace(/[*#`]/g, '').replace(/\p{Extended_Pictographic}/gu, '').trim();
+            const u = new SpeechSynthesisUtterance(clean);
+            u.rate = 1; u.pitch = 1; u.lang = 'en-US';
+
+            const allVoices = _synth.getVoices();
+            const pref = allVoices.find(v => v.name.includes('Google US English')) || allVoices.find(v => v.name.includes('Microsoft David')) || allVoices.find(v => v.lang.startsWith('en-US'));
+            if (pref) u.voice = pref;
+
+            btn.innerHTML = '<i class="fas fa-stop" style="color:#e74c3c"></i> Stop';
+            u.onend = () => { btn.innerHTML = '<i class="fas fa-volume-up"></i> Read Aloud'; };
+            u.onerror = () => { btn.innerHTML = '<i class="fas fa-volume-up"></i> Read Aloud'; };
+
+            _synth.speak(u);
+        }
+
+        /* ═══════ TTS (English only) ═══════ */
+        let synth = window.speechSynthesis;
+        let voices = [];
+        let autoSpeak = true;
+
+        function toggleAutoSpeak() {
+            autoSpeak = !autoSpeak;
+            const icon = document.getElementById('ttsIcon');
+            const btn = document.getElementById('ttsToggle');
+            if (autoSpeak) {
+                icon.className = 'fas fa-volume-up';
+                btn.style.borderColor = 'var(--blue)';
+                btn.style.color = 'var(--blue)';
+            } else {
+                icon.className = 'fas fa-volume-mute';
+                btn.style.borderColor = '';
+                btn.style.color = '';
+                synth.cancel();
+            }
+        }
+
+        function speakText(text) {
+            if (!autoSpeak || !text) return;
+            const clean = text.replace(/[*#`]/g, '').replace(/\p{Extended_Pictographic}/gu, '').trim();
+            synth.cancel();
+            const u = new SpeechSynthesisUtterance(clean);
+
+            // Prevent garbage collection bugs in some browsers destroying the onend event
+            window._currentUtterance = u;
+
+            u.rate = 1; u.pitch = 1; u.lang = 'en-US';
+            voices = synth.getVoices();
+            const pref = voices.find(v => v.name.includes('Google US English')) || voices.find(v => v.name.includes('Microsoft David')) || voices.find(v => v.lang.startsWith('en-US'));
+            if (pref) u.voice = pref;
+
+            // Show speaking status in Voice Mode
+            if (voiceModeEnabled) updateVoiceStatus('speaking', 'AI Speaking...');
+
+            /* Auto-restart mic after AI finishes speaking (if loop is active, in viva questioning, or quiz answering) */
+            u.onend = () => {
+                const isVivaActive = vivaState.active && vivaState.stage === 'questioning';
+                const isQuizActive = quizState.active && quizState.stage === 'answering';
+
+                if ((isConversationActive || voiceModeEnabled || isVivaActive || isQuizActive) && recognition && !isListening) {
+                    if (voiceModeEnabled) updateVoiceStatus('listening', 'Listening...');
+                    setTimeout(() => {
+                        if (isVivaActive || isQuizActive || voiceModeEnabled) {
+                            isConversationActive = true;
+                        }
+                        if (isConversationActive) {
+                            try { recognition.start(); } catch (e) { }
+                        }
+                    }, 400);
+                } else if (voiceModeEnabled && isListening) {
+                    updateVoiceStatus('listening', 'Listening...');
+                } else if (voiceModeEnabled) {
+                    updateVoiceStatus('ready', 'Ready');
+                }
+                window._currentUtterance = null;
+            };
+
+            // Fallback for TTS errors to ensure mic restarts
+            u.onerror = () => {
+                if (voiceModeEnabled && recognition && !isListening) {
+                    try { recognition.start(); } catch (e) { }
+                }
+                window._currentUtterance = null;
+            };
+
+            synth.speak(u);
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => { voices = window.speechSynthesis.getVoices(); };
+        }
+
+        // Focus on load (desktop)
+        window.addEventListener('load', () => { if (!isMobile) messageInput.focus(); });
+        // Orientation change
+        if (isMobile) { window.addEventListener('orientationchange', () => setTimeout(scrollToBottom, 300)); }
+    </script>
+
+    <script>
+        // Disable right click & inspect
+        document.addEventListener("contextmenu", e => e.preventDefault());
+        document.addEventListener("keydown", e => {
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I", "C", "J"].includes(e.key)) || (e.ctrlKey && e.key === "U")) e.preventDefault();
+        });
+    </script>
+</body>
+
+</html>

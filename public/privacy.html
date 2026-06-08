@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- Primary SEO -->
+    <title>Privacy Policy | Classgrid – AI Classroom Platform</title>
+    <meta name="description"
+        content="Classgrid Privacy Policy — How we collect, use, and protect your personal information on our AI-powered classroom platform." />
+    <meta name="keywords"
+        content="Classgrid privacy policy, data protection, education platform privacy, student data security" />
+    <meta name="author" content="Nikhil Shinde" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://classgrid.in/privacy" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Privacy Policy – Classgrid" />
+    <meta property="og:description" content="How Classgrid collects, uses, and protects your personal information." />
+    <meta property="og:url" content="https://classgrid.in/privacy" />
+    <meta property="og:image" content="https://classgrid.in/images/classgrid-preview.png" />
+    <meta property="og:site_name" content="Classgrid" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* WebView Fix: prevent horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        :root {
+            --bg: #000000;
+            --surface: #0f0f0f;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hi: rgba(255, 255, 255, 0.16);
+            --blue: #4a90f5;
+            --blue-light: #7eb8ff;
+            --grad-bp: linear-gradient(135deg, #4a90f5 0%, #8b6fff 100%);
+            --text: #ffffff;
+            --muted: #888888;
+            --dim: #444444;
+            --sidebar-w: 240px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: #000;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            overflow-y: auto;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1.5rem 1.4rem 1.3rem;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 9.5px;
+            background: var(--grad-bp);
+            z-index: -1;
+        }
+
+        .logo-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #000;
+            border-radius: 7px;
+            z-index: 0;
+        }
+
+        .logo-box img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-name {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .brand-name em {
+            font-style: normal;
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-section {
+            padding: 1.2rem 1rem 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dim);
+            padding: 0 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 1px;
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(74, 144, 245, 0.1);
+            color: #fff;
+        }
+
+        .nav-item.active i {
+            color: var(--blue-light);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.6rem 1rem;
+        }
+
+        .toc-item {
+            display: block;
+            padding: 0.45rem 0.9rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 1px;
+            border-left: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            color: #ccc;
+            border-left-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .toc-item.active-toc {
+            color: #fff;
+            border-left-color: var(--blue);
+            background: rgba(74, 144, 245, 0.06);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-size: 0.73rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .sidebar-badge strong {
+            color: #aaa;
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.76rem;
+        }
+
+        /* Hamburger */
+        .ham {
+            display: none;
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 200;
+            flex-direction: column;
+            gap: 5px;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            cursor: pointer;
+        }
+
+        .ham span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all 0.28s ease;
+        }
+
+        .ham.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .ham.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .ham.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* Reading progress */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: 2px;
+            z-index: 200;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: var(--grad-bp);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+        }
+
+        .page-hero {
+            padding: 3.5rem 4rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            background: #000;
+        }
+
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue);
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            color: #fff;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+        }
+
+        .page-title span {
+            background: var(--grad-bp);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Content */
+        .content-wrap {
+            padding: 3rem 4rem 5rem;
+            max-width: 780px;
+        }
+
+        .policy-section {
+            margin-bottom: 3.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .policy-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-num {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #4a90f5, #a855f7, #ec4899, #f5a623);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .policy-section p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.92);
+            line-height: 1.9;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .policy-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .sub-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 1.75rem 0 0.65rem;
+        }
+
+        .note-block {
+            border-left: 2px solid rgba(74, 144, 245, 0.4);
+            padding: 0.85rem 1.2rem;
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .note-block p {
+            font-size: 0.875rem !important;
+            color: rgba(255, 255, 255, 0.45) !important;
+            margin: 0 !important;
+            line-height: 1.8 !important;
+        }
+
+        .warn-block {
+            border-left: 2px solid rgba(255, 200, 0, 0.3);
+            padding: 0.85rem 1.2rem;
+            margin-top: 1rem;
+            background: rgba(255, 200, 0, 0.02);
+        }
+
+        .warn-block p {
+            font-size: 0.875rem !important;
+            color: rgba(255, 200, 0, 0.5) !important;
+            margin: 0 !important;
+            line-height: 1.8 !important;
+        }
+
+        .contact-block {
+            margin-top: 1.5rem;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .contact-block h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-block p {
+            color: var(--muted);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-email {
+            display: inline-block;
+            color: var(--blue-light);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(74, 144, 245, 0.3);
+            padding-bottom: 1px;
+            transition: border-color 0.2s;
+        }
+
+        .contact-email:hover {
+            border-color: var(--blue-light);
+        }
+
+        .back-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            background: #111;
+            border: 1px solid var(--border-hi);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 50;
+            font-size: 0.8rem;
+        }
+
+        .back-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-top:hover {
+            background: #1a1a1a;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .reading-progress {
+                left: 0;
+            }
+
+            .ham {
+                display: flex;
+            }
+
+            .content-wrap {
+                padding: 2rem 1.5rem 3rem;
+            }
+
+            .page-hero {
+                padding: 4rem 1.5rem 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-wrap {
+                padding: 1.5rem 1.2rem 3rem;
+            }
+
+            .page-hero {
+                padding: 3.5rem 1.2rem 1.5rem;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-hero-inner {
+            animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="reading-progress">
+        <div class="reading-progress-bar" id="progressBar"></div>
+    </div>
+    <button class="ham" id="hamBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <a href="index" class="sidebar-logo">
+            <div class="logo-box"><img src="/Classgrid.png" alt="Classgrid"></div>
+            <span class="brand-name">Class<em>grid</em></span>
+        </a>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Navigation</div>
+            <a href="index" class="nav-item"><i class="fas fa-house"></i> Home</a>
+            <a href="features" class="nav-item"><i class="fas fa-bolt"></i> Features</a>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Legal</div>
+            <a href="privacy" class="nav-item active"><i class="fas fa-shield-halved"></i> Privacy Policy</a>
+            <a href="terms" class="nav-item"><i class="fas fa-file-contract"></i> Terms of Service</a>
+            <a href="contact" class="nav-item"><i class="fas fa-envelope"></i> Contact</a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-badge">
+                <strong>Your Privacy Matters</strong>
+                We collect only what's necessary to run the platform.
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="page-hero">
+            <div class="page-hero-inner">
+                <div class="page-badge"><span class="badge-dot"></span>Legal Document</div>
+                <h1 class="page-title">Privacy <span>Policy</span></h1>
+                <div class="page-meta">
+                    <span>Last Updated: February 2026</span>
+                    <span>Classgrid Platform</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-wrap">
+
+            <div class="policy-section" id="s1">
+                <div class="section-header">
+                    <div class="section-num">01</div>
+                    <div class="section-title">Introduction</div>
+                </div>
+                <p>Welcome to ClassGrid. ClassGrid ("we", "our", "us") provides an AI-enabled classroom management
+                    platform designed for educational institutions, coaching centers, faculty members, and students.</p>
+                <p>This Privacy Policy explains how we collect, use, disclose, store, and protect personal information
+                    when you use the ClassGrid platform, website, and related services (collectively, the "Services").
+                </p>
+                <p>By accessing or using ClassGrid, you agree to the practices described in this Privacy Policy.</p>
+            </div>
+
+            <div class="policy-section" id="s2">
+                <div class="section-header">
+                    <div class="section-num">02</div>
+                    <div class="section-title">Scope of This Policy</div>
+                </div>
+                <p>This Privacy Policy applies to all individuals who interact with the ClassGrid platform, including
+                    students enrolled in ClassGrid-powered classrooms, faculty members managing courses and content,
+                    organization administrators overseeing institutions, super administrators managing the platform, and
+                    visitors to our website.</p>
+                <p>This policy does not apply to third-party services that may be linked from our platform. We encourage
+                    you to review the privacy policies of any external services you access through or alongside
+                    ClassGrid.</p>
+            </div>
+
+            <div class="policy-section" id="s3">
+                <div class="section-header">
+                    <div class="section-num">03</div>
+                    <div class="section-title">Information We Collect</div>
+                </div>
+                <p>We collect only the information necessary to operate and improve the platform. The categories of
+                    information we collect are described below.</p>
+
+                <div class="sub-title">Account Information</div>
+                <p>When you create an account, we collect your full name, email address, your assigned role within the
+                    platform such as student, faculty, or organization admin, and your organization affiliation. If you
+                    sign up using Gmail, GitHub, or LinkedIn, we also automatically import your name and profile image
+                    directly from that account. You do not need to upload a profile photo manually — it is pulled from
+                    whichever service you use to sign in.</p>
+
+                <div class="sub-title">Authentication Information</div>
+                <p>When you log in using email and password or through a third-party provider such as Google, GitHub, or
+                    LinkedIn, we collect your email address, basic profile information including your name and profile
+                    image, authentication metadata such as login timestamps, and device and session information. We do
+                    not access or store your Google, GitHub, or LinkedIn password. We only request the basic profile
+                    information necessary to authenticate you securely on the platform.</p>
+
+                <div class="sub-title">Classroom & Academic Data</div>
+                <p>When you use ClassGrid for teaching or learning, we store the notes you upload, messages sent in
+                    classrooms, join requests, quiz answers, and any work you submit. This data is stored on ClassGrid's
+                    servers, but ClassGrid does not browse or manage your content. Only the organization that set up
+                    your classroom — and the people they authorize, like teachers and admins — can access it. ClassGrid
+                    will only look at this data if there is a serious security issue or a legal requirement to do so.
+                </p>
+
+                <div class="sub-title">User-Generated Content & Ownership</div>
+                <p>When you upload academic materials—such as study notes, PDFs, assignments, or classroom
+                    announcements—we store these files securely on our servers. <strong>We do not claim any ownership
+                        over your intellectual property.</strong> The visibility and access to this content are strictly
+                    governed by the permissions set by your organization and classroom structures. ClassGrid acts only
+                    as a secure hosting provider to facilitate education; we do not sell, share, or commercially exploit
+                    any user-generated academic content under any circumstances.</p>
+
+                <div class="sub-title">AI Interaction Data</div>
+                <p>When you interact with AI features on the platform, we collect the questions or prompts you submit,
+                    the AI-generated responses returned to you, and usage logs maintained for system performance and
+                    abuse prevention purposes.</p>
+                <div class="warn-block">
+                    <p>AI responses are generated automatically and may not always be accurate. Users should exercise
+                        their own judgment when relying on AI-generated content for academic or professional decisions.
+                    </p>
+                </div>
+
+                <div class="sub-title">Technical & Usage Information</div>
+                <p>We automatically collect certain technical data to maintain platform stability and security. This
+                    includes your IP address, browser type, device information, session tokens, login activity logs,
+                    error logs, the amount of time spent on the platform, and feature usage statistics. This information
+                    is used solely for operational and security purposes.</p>
+
+                <div class="sub-title">Payment Information (Razorpay)</div>
+                <p>When users make payments, limited information such as name, email, phone number, and transaction
+                    details may be shared with Razorpay for payment processing. Classgrid only stores necessary
+                    transaction references (payment ID, order ID) for billing and support. Sensitive payment details are
+                    handled directly by Razorpay and not stored on Classgrid servers.</p>
+            </div>
+
+            <div class="policy-section" id="s4">
+                <div class="section-header">
+                    <div class="section-num">04</div>
+                    <div class="section-title">How We Use Information</div>
+                </div>
+                <p>We use the information we collect to provide authentication and account access, deliver classroom
+                    functionality, and enable communication between users on the platform. We also use it to improve
+                    system performance, detect and prevent fraud and misuse, enforce organization-level access controls,
+                    maintain system security, provide technical support, and comply with applicable legal obligations.
+                </p>
+                <div class="note-block">
+                    <p>We do not use personal data for advertising purposes. ClassGrid is an ad-free platform and we do
+                        not allow advertisers to influence the experience we provide to users.</p>
+                </div>
+            </div>
+
+            <div class="policy-section" id="s5">
+                <div class="section-header">
+                    <div class="section-num">05</div>
+                    <div class="section-title">Third-Party Sign-In Data Usage</div>
+                </div>
+                <p>If you choose to sign in using Google, GitHub, or LinkedIn, we request only basic profile and email
+                    access from that service. We do not access your private data such as emails, repositories, or
+                    connections beyond what is needed for authentication. We do not sell or transfer your data from any
+                    of these third-party providers to anyone, and all such data is used strictly for the purpose of
+                    authenticating your identity on the ClassGrid platform. We comply with the data usage policies of
+                    Google, GitHub, and LinkedIn respectively.</p>
+            </div>
+
+            <div class="policy-section" id="s6">
+                <div class="section-header">
+                    <div class="section-num">06</div>
+                    <div class="section-title">Organization-Level Data Responsibility</div>
+                </div>
+                <p>ClassGrid operates as a platform infrastructure provider. Each organization using ClassGrid is
+                    independently responsible for managing the content uploaded by their faculty, all classroom
+                    materials, student management and enrollment, academic integrity, and user moderation within their
+                    organization.</p>
+                <p>ClassGrid does not actively review or monitor every classroom interaction unless required for
+                    security or compliance purposes. Educational oversight and content responsibility remain with the
+                    organizations that administer their classrooms through our platform.</p>
+            </div>
+
+            <div class="policy-section" id="s7">
+                <div class="section-header">
+                    <div class="section-num">07</div>
+                    <div class="section-title">Data Sharing & Disclosure</div>
+                </div>
+                <p>We do not sell, rent, or trade personal information. We may disclose information only in limited and
+                    specific circumstances — to comply with legal obligations, to respond to lawful requests from
+                    governmental authorities, to enforce our Terms of Service, to prevent fraud or misuse of the
+                    platform, or to protect the rights, property, or safety of our users and the public.</p>
+                <p>Where necessary for operating the platform, information may be processed by trusted third-party
+                    service providers. Such providers are bound by strict confidentiality agreements and are permitted
+                    to process data only to the extent required to deliver their services to us.</p>
+            </div>
+
+            <div class="policy-section" id="s8">
+                <div class="section-header">
+                    <div class="section-num">08</div>
+                    <div class="section-title">Data Security</div>
+                </div>
+                <p>We implement reasonable technical and organizational safeguards to protect your data. These measures
+                    include encrypted HTTPS communication across all platform interactions, secure session management,
+                    password hashing, role-based access controls, organization-level data isolation, and token-based
+                    authentication using JWT standards.</p>
+                <div class="warn-block">
+                    <p>No system is completely secure. Users are responsible for maintaining the confidentiality of
+                        their own account credentials and should notify us immediately of any suspected unauthorized
+                        access to their account.</p>
+                </div>
+            </div>
+
+            <div class="policy-section" id="s9">
+                <div class="section-header">
+                    <div class="section-num">09</div>
+                    <div class="section-title">Data Retention</div>
+                </div>
+                <p>We retain personal data for as long as your account remains active, for as long as required to meet
+                    our security and compliance obligations, and for as long as necessary to resolve disputes or enforce
+                    our agreements with users and organizations. Organizations may submit a formal request for deletion
+                    of their institutional data. Certain system logs may be retained for a longer period solely for
+                    security auditing purposes.</p>
+            </div>
+
+            <div class="policy-section" id="s10">
+                <div class="section-header">
+                    <div class="section-num">10</div>
+                    <div class="section-title">User Rights</div>
+                </div>
+                <p>Depending on the laws applicable in your jurisdiction, you may have the right to request access to
+                    the personal information we hold about you, correction of any inaccurate or incomplete data,
+                    deletion of your account and associated personal data, or data portability where such rights are
+                    recognized under applicable law. To submit any of these requests, please contact us using the
+                    information provided in the Contact section of this policy.</p>
+            </div>
+
+            <div class="policy-section" id="s11">
+                <div class="section-header">
+                    <div class="section-num">11</div>
+                    <div class="section-title">Children's Privacy</div>
+                </div>
+                <p>ClassGrid may be used by students who are minors, under the supervision of their educational
+                    institutions. Organizations that deploy ClassGrid are responsible for obtaining any parental or
+                    guardian consent required by applicable law before enrolling minor students on the platform. We do
+                    not knowingly collect personal information directly from children without appropriate institutional
+                    oversight in place.</p>
+
+                <div class="sub-title">International Data Transfers</div>
+                <p>If the platform is accessed from outside India, your data may be processed in jurisdictions where our
+                    infrastructure operates. These jurisdictions may have different data protection laws than your home
+                    country. By using ClassGrid, you consent to such processing as described in this policy.</p>
+            </div>
+
+            <div class="policy-section" id="s12">
+                <div class="section-header">
+                    <div class="section-num">12</div>
+                    <div class="section-title">Changes to This Policy</div>
+                </div>
+                <p>We may update this Privacy Policy from time to time to reflect changes in our practices, technology,
+                    legal requirements, or other relevant factors. When we do, we will post the updated version on this
+                    page with a revised "Last Updated" date. Your continued use of the ClassGrid platform after any such
+                    changes constitutes your acceptance of the updated policy. We recommend reviewing this page
+                    periodically to stay informed of how we protect your information.</p>
+            </div>
+
+            <div class="policy-section" id="s13">
+                <div class="section-header">
+                    <div class="section-num">13</div>
+                    <div class="section-title">Payment Information & Financial Data</div>
+                </div>
+                <p>When you purchase a subscription or make any payment to upgrade to the Pro Plan on ClassGrid, your
+                    payment is processed securely via supported UPI gateways, payment links, or verified third-party
+                    payment processors (e.g., Razorpay).</p>
+
+                <div class="sub-title">What We Do Not Store</div>
+                <p>We do NOT process, handle, or store full credit card numbers, debit card details, UPI PINs, or
+                    banking passwords on ClassGrid servers at any time. All sensitive financial transactions are managed
+                    directly by your banking app or the secure third-party payment gateway.</p>
+
+                <div class="sub-title">What We May Store</div>
+                <p>To verify and provision your subscription, maintain accurate billing records, and provide customer
+                    support, we may collect and store non-sensitive transaction data. This includes your Transaction ID
+                    (e.g., UPI Reference Number), uploaded payment screenshots (used solely for payment verification),
+                    the payer's name associated with the UPI ID, your billing email address, and subscription metadata
+                    (such as plan type, amount paid, and activation/expiry dates).</p>
+
+                <div class="sub-title">Protection & Compliance</div>
+                <p>We implement strict access controls and data protection measures to secure any stored billing
+                    metadata and payment proofs. We and our required payment partners comply with applicable financial
+                    regulations and data protection laws, including data localization guidelines mandated by the Reserve
+                    Bank of India (RBI) for payment processing.</p>
+            </div>
+
+            <div class="policy-section" id="s14">
+                <div class="section-header">
+                    <div class="section-num">14</div>
+                    <div class="section-title">Contact Us</div>
+                </div>
+                <p>If you have any questions, concerns, or requests relating to this Privacy Policy or the handling of
+                    your personal information, please reach out to us. We are committed to addressing your concerns
+                    promptly and transparently.</p>
+                <div class="contact-block">
+                    <h3>Get In Touch</h3>
+                    <p>Our team is available to help with any privacy-related concerns or data requests.</p>
+                    <a href="mailto:support@classgrid.in" class="contact-email">support@classgrid.in</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        const ham = document.getElementById('hamBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        ham.addEventListener('click', () => { ham.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+        overlay.addEventListener('click', () => { ham.classList.remove('open'); sidebar.classList.remove('open'); overlay.classList.remove('show'); });
+
+        function scrollTo(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+        const progressBar = document.getElementById('progressBar');
+        const backTop = document.getElementById('backTop');
+        const sections = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10', 's11', 's12', 's13', 's14'];
+        const tocItems = document.querySelectorAll('.toc-item');
+
+        function highlightToc() {
+            let active = 0;
+            sections.forEach((id, i) => { const el = document.getElementById(id); if (el && window.scrollY >= el.offsetTop - 140) active = i; });
+            tocItems.forEach((item, i) => item.classList.toggle('active-toc', i === active));
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docH = document.documentElement.scrollHeight - window.innerHeight;
+            progressBar.style.width = (scrollTop / docH * 100) + '%';
+            backTop.classList.toggle('show', scrollTop > 300);
+            highlightToc();
+        }, { passive: true });
+
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.policy-section').forEach(el => io.observe(el));
+    </script>
+</body>
+
+</html>
