@@ -422,6 +422,16 @@ export async function sendAttendanceStartedEmails({ classroom, faculty }) {
             `[EmailNotification] Attendance started emails queued: jobsCreated=${jobs.length}`,
             { classroomId: classroom._id?.toString() }
         );
+
+        // ── INSTANT TRIGGER (Fire & Forget) ────────
+        // Forces Vercel to spin up the worker instantly in a separate process
+        try {
+            fetch(`${FRONTEND_URL()}/api/cron/process-email-queue?secret=cg_cron_k8x2mP9qR4vL7nW3`)
+                .catch(() => {}); // Ignore fetch errors
+        } catch (err) {
+            // Ignore synchronous fetch errors
+        }
+
         return { emailAttempted: true, jobsCreated: jobs.length };
     } catch (err) {
         console.error("[EmailNotification] attendance started emails failed:", {
