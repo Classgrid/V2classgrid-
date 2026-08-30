@@ -27,7 +27,7 @@ import cronRoutes from "../src/routes/cron.routes.js";
 import demoRoutes from "../src/routes/demo.routes.js";
 import quizRoutes from "../src/routes/quiz.routes.js";
 import marksRoutes from "../src/routes/marks.routes.js";
-import { sendEmail } from "../src/services/brevo.service.js";
+import { sendEmail } from "../src/services/aws-ses.service.js";
 import { metricsMiddleware, startMetricsFlush } from "../src/middleware/metrics.middleware.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -36,9 +36,28 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 console.log("BUILD VERSION: 2026-AUDIT");
-console.log("SMTP HOST:", process.env.BREVO_SMTP_HOST);
-console.log("SMTP USER:", process.env.BREVO_SMTP_USER);
-console.log("SMTP SENDER:", process.env.BREVO_SENDER_EMAIL);
+console.log("SMTP HOST:", process.env.AWS_SES_SMTP_HOST);
+console.log("SMTP USER:", process.env.AWS_SES_SMTP_USER);
+console.log("SMTP SENDER:", process.env.AWS_SES_SENDER_EMAIL);
+
+// 🔍 ENV VAR TYPO CHECKER
+const keysToCheck = [
+  "MONGO_URI", "AWS_SES_SMTP_USER", "AWS_SES_SMTP_PASS", 
+  "AWS_S3_ERP_ACCESS_KEY", "AWS_S3_ERP_SECRET_KEY", 
+  "GROQ_API_KEY", "GEMINI_API_KEY"
+];
+console.log("--- ENV TYPO CHECK ---");
+keysToCheck.forEach(key => {
+  const val = process.env[key];
+  if (val && val.startsWith("=")) {
+    console.error(`🚨 WARNING: Environment variable ${key} starts with an '=' sign! You probably made a typo in Vercel.`);
+  } else if (val) {
+    console.log(`✅ ${key} looks good (no leading '=')`);
+  } else {
+    console.log(`⚠️ ${key} is missing or empty`);
+  }
+});
+console.log("----------------------");
 
 /* ---------- DB ---------- */
 connectDB().catch(err => console.error("Initial DB connect error:", err));
