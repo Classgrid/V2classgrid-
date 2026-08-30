@@ -604,14 +604,29 @@ router.post(
 
             // ── Capture Vercel Network Metadata ──────────────────
             const isVpn = suspicionReasons.includes("vpn_suspected");
-            const rawCity = req.headers["x-vercel-ip-city"];
-            const rawCountry = req.headers["x-vercel-ip-country"];
+            let rawCity = req.headers["x-vercel-ip-city"];
+            let rawCountry = req.headers["x-vercel-ip-country"];
+            let rawRegion = req.headers["x-vercel-ip-country-region"] || "";
+            let rawIsp = "";
+            const rawIp = req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.ip || "Unknown IP";
+
+            // ── VPN Fallback: If Vercel drops city, query IP-API ──
+            if (!rawCity || isVpn) {
+                const ipData = await fetchIpLocation(rawIp.split(',')[0]); // Use first IP if proxied
+                if (ipData) {
+                    rawCity = ipData.city || rawCity;
+                    rawCountry = ipData.country || rawCountry;
+                    rawRegion = ipData.region || rawRegion;
+                    rawIsp = ipData.isp ? ` (${ipData.isp})` : "";
+                    console.log(`[Attendance] Resolved VPN IP ${rawIp} to ${rawCity}, ${rawCountry}${rawIsp}`);
+                }
+            }
 
             const deviceMetadata = {
-                ip: req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.ip || "Unknown IP",
-                city: isVpn ? "VPN Server / Datacenter" : (rawCity || "City Hidden"),
+                ip: rawIp,
+                city: isVpn ? `VPN / Datacenter in ${rawCity || "City Hidden"}${rawIsp}` : (rawCity || "City Hidden"),
                 country: rawCountry || "Unknown Country",
-                region: req.headers["x-vercel-ip-country-region"] || "",
+                region: rawRegion,
                 userAgent: req.headers["user-agent"] || "Unknown Device"
             };
 
