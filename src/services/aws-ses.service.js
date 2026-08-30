@@ -27,10 +27,12 @@ export const sendEmail = async ({ to, subject, html, text }) => {
 
     const senderName = process.env.AWS_SES_SENDER_NAME || "Classgrid";
     const senderEmail = process.env.AWS_SES_SENDER_EMAIL || "noreply@classgrid.in";
+    const replyToEmail = process.env.AWS_SES_REPLY_TO || "support@classgrid.in";
 
     console.log("=== CALLING transporter.sendMail ===");
     const info = await transporter.sendMail({
       from: `"${senderName}" <${senderEmail}>`,
+      replyTo: replyToEmail,
       to,
       subject,
       text, // Ensures deliverability by including plain text version
