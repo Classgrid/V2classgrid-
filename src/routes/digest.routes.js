@@ -13,9 +13,10 @@ const router = express.Router();
 
 // GET /api/digest/daily — Vercel Cron endpoint
 router.get("/daily", async (req, res) => {
-    // Verify cron secret
+    // Verify cron secret (header OR query param)
     const secret = req.headers["authorization"]?.replace("Bearer ", "");
-    if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+    const querySecret = req.query.secret;
+    if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET && querySecret !== process.env.CRON_SECRET) {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
