@@ -25,9 +25,12 @@ export const sendEmail = async ({ to, subject, html, text }) => {
     console.log("SUBJECT:", subject);
     console.log(`[SMTP] Attempting to send email to: ${to}`);
 
+    const senderName = process.env.AWS_SES_SENDER_NAME || "Classgrid";
+    const senderEmail = process.env.AWS_SES_SENDER_EMAIL || "noreply@classgrid.in";
+
     console.log("=== CALLING transporter.sendMail ===");
     const info = await transporter.sendMail({
-      from: `"${process.env.AWS_SES_SENDER_NAME}" <${process.env.AWS_SES_SENDER_EMAIL}>`,
+      from: `"${senderName}" <${senderEmail}>`,
       to,
       subject,
       text, // Ensures deliverability by including plain text version
