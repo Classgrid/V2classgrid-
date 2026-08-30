@@ -11,9 +11,10 @@
 import EmailJob from "../models/EmailJob.js";
 import { sendEmail } from "./aws-ses.service.js";
 
-const MAX_BATCH_SIZE = 10;
-const MAX_RUNTIME_MS = 8000; // 8 seconds — leave 2s buffer for Vercel's 10s limit
+const MAX_BATCH_SIZE = 112; // 14 emails/sec * 8 seconds
+const MAX_RUNTIME_MS = 8000; // 8 seconds buffer
 const BACKOFF_BASE_MS = 30_000; // 30 seconds
+const CHUNK_SIZE = 14; // Send 14 emails at a time (SES rate limit)
 
 // ─────────────────────────────────────────────────
 // ENQUEUE: Create a single email job
@@ -101,89 +102,74 @@ export async function processEmailQueue(batchSize = MAX_BATCH_SIZE) {
     try {
         console.log(`[EmailQueue] Processing started (batchSize=${effectiveBatch})`);
 
-        for (let i = 0; i < effectiveBatch; i++) {
-            // ── Time guard: stop if approaching Vercel limit ──
+        // Fetch jobs in bulk
+        const jobsToProcess = await EmailJob.find({
+            status: { $in: ["pending", "failed"] },
+            nextRetryAt: { $lte: new Date() },
+            attempts: { $lt: 3 },
+        }).sort({ nextRetryAt: 1 }).limit(effectiveBatch);
+
+        if (!jobsToProcess.length) {
+            return stats;
+        }
+
+        stats.fetched = jobsToProcess.length;
+        const jobIds = jobsToProcess.map(j => j._id);
+
+        // Lock them all at once
+        await EmailJob.updateMany(
+            { _id: { $in: jobIds } },
+            { $set: { status: "processing" }, $inc: { attempts: 1 } }
+        );
+
+        // Process in chunks of 14 to respect SES rate limits (14 emails per second)
+        for (let i = 0; i < jobsToProcess.length; i += CHUNK_SIZE) {
             const elapsed = Date.now() - startTime;
             if (elapsed >= MAX_RUNTIME_MS) {
-                console.log(
-                    `[EmailQueue] Time guard hit at ${elapsed}ms — stopping after ${stats.sent + stats.failed} jobs`
-                );
+                console.log(`[EmailQueue] Time guard hit at ${elapsed}ms — stopping.`);
                 break;
             }
 
-            // ── Atomic lock: pending → processing ────────────
-            const job = await EmailJob.findOneAndUpdate(
-                {
-                    status: { $in: ["pending", "failed"] },
-                    nextRetryAt: { $lte: new Date() },
-                    attempts: { $lt: 3 },
-                },
-                {
-                    $set: { status: "processing" },
-                    $inc: { attempts: 1 },
-                },
-                {
-                    sort: { nextRetryAt: 1 }, // oldest first
-                    returnDocument: "after",
+            const chunk = jobsToProcess.slice(i, i + CHUNK_SIZE);
+            
+            // Execute chunk in parallel
+            await Promise.all(chunk.map(async (job) => {
+                job.attempts = (job.attempts || 0) + 1; // Since we inc'd in DB
+                try {
+                    await sendEmail({
+                        to: job.to,
+                        subject: job.subject,
+                        html: job.html,
+                        text: job.text,
+                    });
+                    
+                    await EmailJob.updateOne(
+                        { _id: job._id },
+                        { $set: { status: "sent", processedAt: new Date(), error: null } }
+                    );
+                    stats.sent++;
+                } catch (sendErr) {
+                    const isLastAttempt = job.attempts >= 3;
+                    const nextStatus = isLastAttempt ? "failed" : "pending";
+                    const backoffMs = Math.pow(2, job.attempts) * BACKOFF_BASE_MS;
+                    
+                    await EmailJob.updateOne(
+                        { _id: job._id },
+                        {
+                            $set: {
+                                status: nextStatus,
+                                error: sendErr.message || "Unknown error",
+                                nextRetryAt: isLastAttempt ? job.nextRetryAt : new Date(Date.now() + backoffMs),
+                            }
+                        }
+                    );
+                    stats.failed++;
                 }
-            );
+            }));
 
-            if (!job) {
-                // No more jobs to process
-                break;
-            }
-
-            stats.fetched++;
-
-            try {
-                // ── Send the email ────────────────────────────
-                await sendEmail({
-                    to: job.to,
-                    subject: job.subject,
-                    html: job.html,
-                    text: job.text,
-                });
-
-                // ── Mark as sent ─────────────────────────────
-                await EmailJob.updateOne(
-                    { _id: job._id },
-                    {
-                        $set: {
-                            status: "sent",
-                            processedAt: new Date(),
-                            error: null,
-                        },
-                    }
-                );
-                stats.sent++;
-                console.log(
-                    `[EmailQueue] ✅ Sent: ${job._id} → ${job.to} (attempt ${job.attempts})`
-                );
-            } catch (sendErr) {
-                // ── Handle send failure ───────────────────────
-                const isLastAttempt = job.attempts >= job.maxAttempts;
-                const nextStatus = isLastAttempt ? "failed" : "pending";
-                const backoffMs = Math.pow(2, job.attempts) * BACKOFF_BASE_MS;
-                const nextRetry = isLastAttempt
-                    ? job.nextRetryAt
-                    : new Date(Date.now() + backoffMs);
-
-                await EmailJob.updateOne(
-                    { _id: job._id },
-                    {
-                        $set: {
-                            status: nextStatus,
-                            error: sendErr.message || "Unknown error",
-                            nextRetryAt: nextRetry,
-                        },
-                    }
-                );
-
-                stats.failed++;
-                console.error(
-                    `[EmailQueue] ❌ Failed: ${job._id} → ${job.to} (attempt ${job.attempts}/${job.maxAttempts})`,
-                    { error: sendErr.message, nextStatus, nextRetry: nextRetry.toISOString() }
-                );
+            // Pause for 1 second between chunks to strictly enforce 14/sec limit
+            if (i + CHUNK_SIZE < jobsToProcess.length) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
         }
     } catch (err) {
