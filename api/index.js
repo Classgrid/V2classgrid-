@@ -101,9 +101,9 @@ app.use(
 // Skip JSON body parsing for Razorpay webhook — it needs the raw body for signature verification
 app.use((req, res, next) => {
   if (req.originalUrl === '/api/payments/webhook') return next();
-  express.json({ limit: '2mb' })(req, res, next);
+  express.json({ limit: '10mb' })(req, res, next);
 });
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser(process.env.COOKIE_SECRET)); // Use cookie parser
 app.use(passport.initialize());
 
