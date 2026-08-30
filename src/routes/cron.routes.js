@@ -138,6 +138,37 @@ router.get("/process-email-queue", async (req, res) => {
 
         await connectDB();
 
+        // ── 1. GLOBAL ATTENDANCE SWEEP ──
+        // Check for ANY attendance sessions that expired while Vercel was asleep
+        const AttendanceSession = (await import("../models/AttendanceSession.js")).default;
+        const Classroom = (await import("../models/Classroom.js")).default;
+        const { sendAbsenceNotificationEmails } = await import("../services/notification-email.service.js");
+
+        const staleSessions = await AttendanceSession.find({
+            status: "active",
+            expiresAt: { $lte: new Date() }
+        }).lean();
+
+        if (staleSessions.length > 0) {
+            console.log(`[Cron] Found ${staleSessions.length} globally expired attendance sessions.`);
+            await AttendanceSession.updateMany(
+                { _id: { $in: staleSessions.map(s => s._id) } },
+                { $set: { status: "expired" } }
+            );
+
+            for (const session of staleSessions) {
+                const classroom = await Classroom.findById(session.classroom).select("name").lean();
+                if (classroom) {
+                    try {
+                        await sendAbsenceNotificationEmails({ classroom, session });
+                    } catch (err) {
+                        console.error("[Cron] Absence email queue error:", err.message);
+                    }
+                }
+            }
+        }
+
+        // ── 2. PROCESS EMAIL QUEUE ──
         const { processEmailQueue } = await import("../services/email-queue.service.js");
 
         console.log("[Cron] Email queue processing triggered");
