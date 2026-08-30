@@ -80,7 +80,7 @@ router.post("/", isAuthenticated, async (req, res) => {
         res.status(201).json({ message: "Note uploaded successfully and is pending review.", note: data });
     } catch (err) {
         console.error("Student note create error:", err);
-        res.status(500).json({ message: "Server error saving note" });
+        res.status(500).json({ message: err.message || "Server error saving note", error: err });
     }
 });
 

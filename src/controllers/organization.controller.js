@@ -1465,6 +1465,64 @@ export const createOrganizationAnnouncement = async (req, res) => {
 
             logAdminAction(req, 'create_announcement', 'announcement', announcement.id, title);
 
+            // ---------------------------------------------------------
+            // EMAIL NOTIFICATION SYSTEM
+            // ---------------------------------------------------------
+            try {
+                const { enqueueBulkEmails } = await import('../services/email-queue.service.js');
+                const org = await Organization.findById(organization_id).select('name').lean();
+                
+                let targetEmails = [];
+                if (target_type === 'all') {
+                    const students = await User.find({ 
+                        organization_id, 
+                        role: 'student', 
+                        status: 'active',
+                        'emailNotifications.global': { $ne: false },
+                        'emailNotifications.announcements': { $ne: false }
+                    }).select('email').lean();
+                    targetEmails = students.map(s => s.email);
+                } else if (target_classrooms && target_classrooms.length > 0) {
+                    const memberships = await ClassroomMembership.find({ 
+                        classroom: { $in: target_classrooms }, 
+                        status: 'approved' 
+                    }).populate('student', 'email status emailNotifications').lean();
+                    
+                    targetEmails = memberships
+                        .map(m => m.student)
+                        .filter(s => s && s.status === 'active' && s.emailNotifications?.global !== false && s.emailNotifications?.announcements !== false)
+                        .map(s => s.email);
+                }
+
+                // Deduplicate emails
+                targetEmails = [...new Set(targetEmails)];
+
+                if (targetEmails.length > 0) {
+                    const emailPayloads = targetEmails.map(email => ({
+                        to: email,
+                        subject: `📢 New Announcement: ${title} — ${org?.name || 'Classgrid'}`,
+                        html: `
+                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                                <h2 style="color: #2c3e50;">${title}</h2>
+                                <p style="color: #666; font-size: 14px;">Posted by ${req.user.name || 'Admin'}</p>
+                                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+                                <div style="color: #333; line-height: 1.6; white-space: pre-wrap;">${content}</div>
+                                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+                                <p style="font-size: 12px; color: #999;">This is an automated announcement from ${org?.name}. Login to your dashboard to view attachments or more details.</p>
+                            </div>
+                        `,
+                        type: 'announcement',
+                        organizationId: organization_id
+                    }));
+                    
+                    // Fire and forget so we don't block the request
+                    enqueueBulkEmails(emailPayloads).catch(err => console.error("Failed to enqueue bulk emails", err));
+                    console.log(`[Announcements] Queued ${emailPayloads.length} emails for ${title}`);
+                }
+            } catch (emailSysErr) {
+                console.error("Email system error in org announcements:", emailSysErr);
+            }
+
             res.status(201).json({ message: 'Announcement created successfully', announcement });
         } catch (limitErr) {
             if (limitErr.message && limitErr.message.startsWith('PLAN_LIMIT_REACHED')) {
