@@ -74,7 +74,8 @@ async function lazyPurge() {
 router.get('/cleanup', async (req, res) => {
     // Verify cron secret to prevent unauthorized access
     const secret = req.headers['authorization']?.replace('Bearer ', '');
-    if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+    const querySecret = req.query.secret;
+    if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET && querySecret !== process.env.CRON_SECRET) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 

@@ -22,9 +22,10 @@ router.get("/plan-expiry-check", async (req, res) => {
     try {
         // Verify cron secret (skip in dev if not set)
         const cronSecret = process.env.CRON_SECRET;
+        const querySecret = req.query.secret;
         const authHeader = req.headers["authorization"];
 
-        if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+        if (cronSecret && querySecret !== cronSecret && authHeader !== `Bearer ${cronSecret}`) {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
