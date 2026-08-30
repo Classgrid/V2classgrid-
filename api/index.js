@@ -40,28 +40,42 @@ console.log("SMTP HOST:", process.env.AWS_SES_SMTP_HOST);
 console.log("SMTP USER:", process.env.AWS_SES_SMTP_USER);
 console.log("SMTP SENDER:", process.env.AWS_SES_SENDER_EMAIL);
 
-// 🔍 ENV VAR TYPO CHECKER
+// 🔍 ENV VAR TYPO CHECKER & MASKED LOGS
 const keysToCheck = [
   "MONGO_URI", "AWS_SES_SMTP_USER", "AWS_SES_SMTP_PASS", 
   "AWS_S3_ERP_ACCESS_KEY", "AWS_S3_ERP_SECRET_KEY", 
-  "GROQ_API_KEY", "GEMINI_API_KEY"
+  "AWS_S3_ERP_BUCKET_NAME", "AWS_CLOUDFRONT_ERP_DOMAIN",
+  "AWS_SES_SENDER_EMAIL", "AWS_SES_SENDER_NAME"
 ];
-console.log("--- ENV TYPO CHECK ---");
+console.log("--- 🔐 AWS & SYSTEM ENV CHECK ---");
 keysToCheck.forEach(key => {
   const val = process.env[key];
   if (val && val.startsWith("=")) {
-    console.error(`🚨 WARNING: Environment variable ${key} starts with an '=' sign! You probably made a typo in Vercel.`);
+    console.error(`🚨 WARNING: ${key} starts with an '=' sign! Fix this in Vercel.`);
   } else if (val) {
-    console.log(`✅ ${key} looks good (no leading '=')`);
+    const masked = val.length > 8 ? `${val.substring(0, 4)}****${val.substring(val.length - 4)}` : "****";
+    console.log(`✅ ${key}: ${masked}`);
   } else {
-    console.log(`⚠️ ${key} is missing or empty`);
+    console.log(`⚠️ ${key} is MISSING`);
   }
 });
-console.log("----------------------");
+console.log("---------------------------------");
 
-/* ---------- DB ---------- */
+/* ---------- DB & S3 CONNECTION CHECKS ---------- */
 connectDB().catch(err => console.error("Initial DB connect error:", err));
 startMetricsFlush(); // Start buffered metrics flush loop (60s interval)
+
+// Verify S3 Connection
+import("../src/services/s3-storage.service.js")
+  .then(async ({ s3Storage }) => {
+    try {
+      await s3Storage.listFiles("connection-test", 1);
+      console.log("✅ AWS S3 / CDN connected successfully");
+    } catch (err) {
+      console.error("❌ AWS S3 connection error:", err.message);
+    }
+  })
+  .catch(err => console.error("Failed to load S3 module:", err.message));
 
 /* ---------- CONFIG ---------- */
 passportConfig(); // Initialize passport strategies
