@@ -1,12 +1,12 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: process.env.AWS_SES_SMTP_HOST?.trim(),
+  host: process.env.AWS_SES_SMTP_HOST?.replace(/^=/, "")?.trim(),
   port: Number(process.env.AWS_SES_SMTP_PORT),
   secure: false, // true for 465, false for other ports
   auth: {
-    user: process.env.AWS_SES_SMTP_USER?.trim(),
-    pass: process.env.AWS_SES_SMTP_PASS?.trim(),
+    user: process.env.AWS_SES_SMTP_USER?.replace(/^=/, "")?.trim(),
+    pass: process.env.AWS_SES_SMTP_PASS?.replace(/^=/, "")?.trim(),
   },
 });
 
@@ -25,9 +25,10 @@ export const sendEmail = async ({ to, subject, html, text }) => {
     console.log("SUBJECT:", subject);
     console.log(`[SMTP] Attempting to send email to: ${to}`);
 
-    const senderName = (process.env.AWS_SES_SENDER_NAME || "Classgrid").trim();
-    const senderEmail = (process.env.AWS_SES_SENDER_EMAIL || "noreply@classgrid.in").trim();
-    const replyToEmail = (process.env.AWS_SES_REPLY_TO || "support@classgrid.in").trim();
+    const cleanEnv = (val, defaultVal) => (val || defaultVal).replace(/^=/, "").trim();
+    const senderName = cleanEnv(process.env.AWS_SES_SENDER_NAME, "Classgrid");
+    const senderEmail = cleanEnv(process.env.AWS_SES_SENDER_EMAIL, "noreply@classgrid.in");
+    const replyToEmail = cleanEnv(process.env.AWS_SES_REPLY_TO, "support@classgrid.in");
 
     console.log("=== CALLING transporter.sendMail ===");
     const info = await transporter.sendMail({
