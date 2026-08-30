@@ -3401,7 +3401,15 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                         </button>
                     </div>
                     <div id="stopAttError" style="display:none;margin-top:10px;padding:10px;border-radius:8px;background:rgba(255,71,87,.08);color:var(--rd);font-size:13px;font-weight:600"></div>
-                    ${s.requiresGPS ? `<div style="display:flex;justify-content:center;margin-top:16px;"><div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,142,255,0.1);color:var(--ac);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;"><i class="fas fa-location-arrow"></i> Teacher Location: ${s.teacherLat.toFixed(5)}, ${s.teacherLng.toFixed(5)}</div></div>` : ''}
+                    
+                    <div style="margin-top:20px;border-top:1px solid var(--bd);padding-top:20px;">
+                        <div style="font-size:11px;font-weight:700;color:var(--mt);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;text-align:center;">Your Session Identity (Vercel Tracking)</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            ${s.requiresGPS ? `<div style="background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:10px;font-size:12px;"><div style="color:var(--mt);font-size:10px;margin-bottom:2px;">GPS Location</div><div style="color:var(--tx);font-weight:600;"><i class="fas fa-location-arrow" style="color:var(--ac);margin-right:4px;"></i> ${s.teacherLat.toFixed(5)}, ${s.teacherLng.toFixed(5)}</div></div>` : ''}
+                            ${s.teacherMetadata && s.teacherMetadata.city ? `<div style="background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:10px;font-size:12px;"><div style="color:var(--mt);font-size:10px;margin-bottom:2px;">Network Location</div><div style="color:var(--tx);font-weight:600;"><i class="fas fa-globe" style="color:var(--ac);margin-right:4px;"></i> ${s.teacherMetadata.city}, ${s.teacherMetadata.country}</div></div>` : ''}
+                            ${s.teacherMetadata && s.teacherMetadata.ip ? `<div style="background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:10px;font-size:12px;grid-column: 1 / -1;"><div style="color:var(--mt);font-size:10px;margin-bottom:2px;">IP Address</div><div style="color:var(--tx);font-weight:600;"><i class="fas fa-network-wired" style="color:var(--ac);margin-right:4px;"></i> ${s.teacherMetadata.ip}</div></div>` : ''}
+                        </div>
+                    </div>
                 </div>`;
                 startCountdown(s.expiresAt);
                 if (ATT_REFRESH) clearInterval(ATT_REFRESH);

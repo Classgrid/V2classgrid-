@@ -55,6 +55,11 @@ const attendanceSessionSchema = new mongoose.Schema(
             type: Number,
             default: null,
         },
+        // Captured from Vercel headers for the teacher
+        teacherMetadata: {
+            type: Object,
+            default: {},
+        },
 
         // ── Configurable radius (default 25m, test in real classroom first) ──
         radiusMeters: {

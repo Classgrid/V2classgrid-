@@ -141,7 +141,7 @@ router.get("/process-email-queue", async (req, res) => {
         const { processEmailQueue } = await import("../services/email-queue.service.js");
 
         console.log("[Cron] Email queue processing triggered");
-        const stats = await processEmailQueue(10);
+        const stats = await processEmailQueue(112);
 
         const totalDuration = Date.now() - cronStart;
         console.log(
