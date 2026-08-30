@@ -421,6 +421,13 @@ router.post(
             session.expiresAt = new Date(); // Expire immediately
             await session.save();
 
+            // Fire absent emails for the manually stopped session
+            try {
+                await sendAbsenceNotificationEmails({ classroom: req.classroom, session });
+            } catch (err) {
+                console.error("[Attendance] Absence email queue error on manual stop:", err.message);
+            }
+
             res.json({ message: "Attendance session stopped successfully." });
         } catch (err) {
             console.error("[Attendance] Stop error:", err);
