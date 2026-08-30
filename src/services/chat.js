@@ -214,7 +214,7 @@ async function getGroqReply(message, modePrompt = '') {
   try {
     const fullSystemPrompt = modePrompt ? `${SYSTEM_PROMPT}\n\n${modePrompt}` : SYSTEM_PROMPT;
     const response = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'openai/gpt-oss-120b',
       messages: [
         { role: 'system', content: fullSystemPrompt },
         { role: 'user', content: message },
@@ -258,7 +258,7 @@ async function getGeminiReply(message, modePrompt = '') {
     const prompt = `${fullSystemPrompt}\n\nUser Question: ${message}\n\nProvide a clear, academic response:`;
 
     const response = await genAI.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.5-flash',
       contents: prompt,
     });
 
@@ -338,7 +338,7 @@ export async function getVisionReply(message, base64Image, mimeType, modelArg = 
     console.log("Sending image to Gemini Vision...");
 
     const response = await genAI.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.5-flash',
       contents: [
         { text: prompt },
         {
@@ -366,8 +366,8 @@ export async function getVisionReply(message, base64Image, mimeType, modelArg = 
 export async function checkModelAvailability() {
   const status = {
     timestamp: new Date().toISOString(),
-    groq: { available: false, model: 'llama-3.3-70b-versatile', responseTime: null },
-    gemini: { available: false, model: 'gemini-1.5-flash', responseTime: null },
+    groq: { available: false, model: 'openai/gpt-oss-120b', responseTime: null },
+    gemini: { available: false, model: 'gemini-3.5-flash', responseTime: null },
     recommendedModel: 'groq'
   };
 
@@ -375,7 +375,7 @@ export async function checkModelAvailability() {
   try {
     const groqStart = Date.now();
     await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'openai/gpt-oss-120b',
       messages: [{ role: 'user', content: 'ping' }],
       max_tokens: 1
     });
@@ -428,13 +428,13 @@ export async function testModels() {
 export const MODEL_CONFIG = {
   PRIMARY: {
     provider: 'Groq',
-    model: 'llama-3.3-70b-versatile',
+    model: 'openai/gpt-oss-120b',
     temperature: 0.6,
     maxTokens: 1000
   },
   FALLBACK: {
     provider: 'Google AI',
-    model: 'gemini-1.5-flash',
+    model: 'gemini-3.5-flash',
     temperature: 0.6,
     maxTokens: 1000
   },
