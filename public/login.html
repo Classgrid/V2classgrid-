@@ -1589,20 +1589,20 @@
       if (role === 'teacher') {
         if (stuOAuth) stuOAuth.style.display = 'none';
         if (facOAuth) facOAuth.style.display = '';
-        at.classList.add('faculty-mode');
+        if (at) at.classList.add('faculty-mode');
         if (lt) lt.click();
         if (loginTitle) loginTitle.textContent = 'Faculty Login';
         if (loginSubtitle) loginSubtitle.textContent = 'Sign in to your faculty account';
       } else {
         if (stuOAuth) stuOAuth.style.display = '';
         if (facOAuth) facOAuth.style.display = 'none';
-        at.classList.remove('faculty-mode');
+        if (at) at.classList.remove('faculty-mode');
         if (loginTitle) loginTitle.textContent = 'Welcome to Classgrid';
         if (loginSubtitle) loginSubtitle.textContent = 'Sign in to your Classgrid account';
       }
     }
 
-    // â”€â”€ EMAIL CONTINUE BUTTON â”€â”€
+    // ——— EMAIL CONTINUE BUTTON ———
     const emailContinueBtn = document.getElementById('emailContinueBtn');
     if (emailContinueBtn) emailContinueBtn.addEventListener('click', async () => {
       const emailEl = document.getElementById('loginEmail');
