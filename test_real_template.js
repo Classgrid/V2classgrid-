@@ -1,5 +1,5 @@
 import "./env.js";
-import { sendEmail } from "./src/services/brevo.service.js";
+import { sendEmail } from "./src/services/aws-ses.service.js";
 import { getPasswordResetEmailHtml, getPasswordResetEmailPlainText } from "./src/services/email-templates.service.js";
 
 const run = async () => {

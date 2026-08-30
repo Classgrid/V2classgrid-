@@ -119,26 +119,21 @@ router.post("/create-order-for-application", async (req, res) => {
         // Upload logo to Supabase if provided
         let finalLogoUrl = "";
         if (logo_base64) {
-            if (logo_base64.length > 680000) {
-                return res.status(400).json({ message: "Logo file exceeds 500 KB limit." });
+            // 100MB limit
+            if (logo_base64.length > 137000000) {
+                return res.status(400).json({ message: "Logo file exceeds 100 MB limit." });
             }
             const match = logo_base64.match(/^data:image\/(png|jpeg|webp);base64,/);
             if (!match) {
                 return res.status(400).json({ message: "Invalid image type. Only PNG, JPEG, and WEBP are allowed." });
             }
             try {
-                const { studentNotesClient } = await import("../config/supabaseClient.js");
+                const { s3Storage } = await import("../services/s3-storage.service.js");
                 const ext = match[1];
                 const base64Data = logo_base64.replace(/^data:image\/\w+;base64,/, "");
                 const buffer = Buffer.from(base64Data, "base64");
                 const filename = `org_${Date.now()}.${ext}`;
-                const { error: uploadError } = await studentNotesClient.storage
-                    .from('notes-files')
-                    .upload('logos/' + filename, buffer, { contentType: `image/${ext}`, upsert: false });
-                if (uploadError) throw uploadError;
-                const { data: { publicUrl } } = studentNotesClient.storage
-                    .from('notes-files')
-                    .getPublicUrl('logos/' + filename);
+                const { publicUrl } = await s3Storage.uploadFile(`logos/${filename}`, buffer, `image/${ext}`);
                 finalLogoUrl = publicUrl;
             } catch (storageErr) {
                 console.error("[Payment] Logo upload error:", storageErr.message);
@@ -270,7 +265,7 @@ router.post("/verify", isAuthenticated, async (req, res) => {
         console.log(`[Payment] Org ${org._id} upgraded to ${normalized} via checkout verify`);
 
         // Send emails (non-blocking — don't fail the response if emails fail)
-        const { sendEmail } = await import("../services/brevo.service.js");
+        const { sendEmail } = await import("../services/aws-ses.service.js");
         const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || "nikhil.shinde@classgrid.in";
 
         // Email 1: Super admin notification
@@ -357,7 +352,7 @@ router.post("/webhook", express.raw({ type: "application/json" }), async (req, r
             }
 
             await connectDB();
-            const { sendEmail } = await import("../services/brevo.service.js");
+            const { sendEmail } = await import("../services/aws-ses.service.js");
             const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || "nikhil.shinde@classgrid.in";
 
             const payerEmail = payment.email || "N/A";

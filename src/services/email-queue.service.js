@@ -9,7 +9,7 @@
  */
 
 import EmailJob from "../models/EmailJob.js";
-import { sendEmail } from "./brevo.service.js";
+import { sendEmail } from "./aws-ses.service.js";
 
 const MAX_BATCH_SIZE = 10;
 const MAX_RUNTIME_MS = 8000; // 8 seconds — leave 2s buffer for Vercel's 10s limit

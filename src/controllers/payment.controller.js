@@ -3,7 +3,7 @@ import OrganizationPending from "../models/OrganizationPending.js";
 import Organization from "../models/Organization.js";
 import User from "../models/User.js";
 import { PLANS } from "../config/plan.config.js";
-import { sendEmail } from "../services/brevo.service.js";
+import { sendEmail } from "../services/aws-ses.service.js";
 import { getPlanActivationHtml, getPlanActivationPlainText } from "../services/email-templates.service.js";
 import connectDB from "../../config/db.js";
 

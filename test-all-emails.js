@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 async function runTest() {
-    const { sendEmail } = await import('./src/services/brevo.service.js');
+    const { sendEmail } = await import('./src/services/aws-ses.service.js');
     const temp = await import('./src/services/email-templates.service.js');
 
     const recipients = ["support@classgrid.in", "sunitasubhashsun123@gmail.com"];

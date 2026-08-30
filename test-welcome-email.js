@@ -4,7 +4,7 @@ dotenv.config();
 import fs from 'fs';
 
 async function runTest() {
-    const { sendEmail } = await import('./src/services/brevo.service.js');
+    const { sendEmail } = await import('./src/services/aws-ses.service.js');
     const { getFacultyWelcomeEmailHtml, getFacultyWelcomePlainText, getStudentWelcomeEmailHtml, getStudentWelcomePlainText, getPlanActivationHtml, getPlanActivationPlainText } = await import('./src/services/email-templates.service.js');
 
     const facultyUserName = "Danny Perna (Faculty Test)";

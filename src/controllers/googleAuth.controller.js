@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import Verification from "../models/Verification.js";
-import { sendEmail } from "../services/brevo.service.js";
+import { sendEmail } from "../services/aws-ses.service.js";
 import {
     getFacultyWelcomeEmailHtml,
     getFacultyWelcomePlainText,

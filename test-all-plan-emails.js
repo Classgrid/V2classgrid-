@@ -4,7 +4,7 @@ dotenv.config();
 const TO = "nikhilsubsun321@gmail.com";
 
 async function runAllPlanEmails() {
-    const { sendEmail } = await import('./src/services/brevo.service.js');
+    const { sendEmail } = await import('./src/services/aws-ses.service.js');
     const templates = await import('./src/services/email-templates.service.js');
 
     const now = new Date();

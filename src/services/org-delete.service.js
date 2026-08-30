@@ -10,6 +10,7 @@ import Quiz from "../models/Quiz.js";
 import OrganizationPending from "../models/OrganizationPending.js";
 import Verification from "../models/Verification.js";
 import { classroomClient, studentNotesClient } from "../config/supabaseClient.js";
+import { s3Storage } from "./s3-storage.service.js";
 import { createClient } from "@supabase/supabase-js";
 import mongoose from "mongoose";
 import connectDB from "../../config/db.js";
@@ -119,7 +120,13 @@ export async function hardDeleteOrganization(orgId) {
     // 4C. Delete storage files (notes-files bucket)
     try {
         // Delete org logo if exists
-        if (org.logo_url && org.logo_url.includes("notes-files")) {
+        if (org.logo_url && org.logo_url.includes("cdn.classgrid.in")) {
+            const logoPath = org.logo_url.split("cdn.classgrid.in/")[1];
+            if (logoPath) {
+                await s3Storage.deleteFile(logoPath);
+            }
+        } else if (org.logo_url && org.logo_url.includes("notes-files")) {
+            // Keep supabase fallback for older orgs that haven't migrated yet
             const logoPath = org.logo_url.split("/notes-files/")[1];
             if (logoPath) {
                 await studentNotesClient.storage.from("notes-files").remove([logoPath]);
@@ -129,12 +136,11 @@ export async function hardDeleteOrganization(orgId) {
         // Delete classroom-related files (each classroom may have uploaded files)
         for (const cid of classroomIdStrings) {
             try {
-                const { data: files } = await studentNotesClient.storage
-                    .from("notes-files")
-                    .list(`classroom/${cid}`);
+                // Delete from S3
+                const { data: files, hasMore } = await s3Storage.listFiles(`classroom/${cid}/`);
                 if (files && files.length > 0) {
                     const paths = files.map(f => `classroom/${cid}/${f.name}`);
-                    await studentNotesClient.storage.from("notes-files").remove(paths);
+                    await s3Storage.deleteFiles(paths);
                 }
             } catch (e) {
                 // Non-fatal — folder may not exist

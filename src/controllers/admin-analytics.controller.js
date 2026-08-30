@@ -1,9 +1,10 @@
-﻿import SystemSettings from "../models/SystemSettings.js";
+import SystemSettings from "../models/SystemSettings.js";
 import Organization from "../models/Organization.js";
 import User from "../models/User.js";
 import EmailJob from "../models/EmailJob.js";
 import Classroom from "../models/Classroom.js";
 import { studentNotesClient } from "../config/supabaseClient.js";
+import { s3Storage } from "../services/s3-storage.service.js";
 
 // GET /api/admin/system-settings
 export const getSystemSettings = async (req, res) => {
@@ -43,35 +44,27 @@ export const getOrgUsage = async (req, res) => {
         // 1. Supabase Storage (list files in bucket with pagination)
         let totalStorageBytes = 0;
         let fileCount = 0;
-        let offset = 0;
-        const limit = 1000;
+        let continuationToken = null;
         let hasMore = true;
 
         while (hasMore) {
-            const { data: files, error: storageError } = await studentNotesClient.storage
-                .from('notes-files')
-                .list(`student-notes/${orgId}`, { limit, offset });
-
-            if (storageError) {
-                console.error("Supabase Storage Error:", storageError);
-                break; // Stop pagination on error, return what we have
-            }
-
-            if (!files || files.length === 0) {
-                hasMore = false;
-            } else {
-                files.forEach(f => {
-                    if (f.metadata && f.metadata.size) {
-                        totalStorageBytes += f.metadata.size;
-                        fileCount++;
-                    }
-                });
-
-                if (files.length < limit) {
-                    hasMore = false;
-                } else {
-                    offset += limit;
+            try {
+                const { data: files, nextContinuationToken, hasMore: more } = await s3Storage.listFiles(`student-notes/${orgId}/`, 1000, continuationToken);
+                
+                if (files && files.length > 0) {
+                    files.forEach(f => {
+                        if (f.metadata && f.metadata.size) {
+                            totalStorageBytes += f.metadata.size;
+                            fileCount++;
+                        }
+                    });
                 }
+                
+                continuationToken = nextContinuationToken;
+                hasMore = more;
+            } catch (storageError) {
+                console.error("S3 Storage Error:", storageError);
+                break; // Stop pagination on error, return what we have
             }
         }
 

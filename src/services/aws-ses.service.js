@@ -1,22 +1,20 @@
 import nodemailer from "nodemailer";
 
-
-
 const transporter = nodemailer.createTransport({
-  host: process.env.BREVO_SMTP_HOST,
-  port: Number(process.env.BREVO_SMTP_PORT),
-  secure: false,
+  host: process.env.AWS_SES_SMTP_HOST,
+  port: Number(process.env.AWS_SES_SMTP_PORT),
+  secure: false, // true for 465, false for other ports
   auth: {
-    user: process.env.BREVO_SMTP_USER,
-    pass: process.env.BREVO_SMTP_PASS,
+    user: process.env.AWS_SES_SMTP_USER,
+    pass: process.env.AWS_SES_SMTP_PASS,
   },
 });
 
 transporter.verify((err) => {
   if (err) {
-    console.error("❌ Brevo SMTP error:", err.message);
+    console.error("❌ AWS SES SMTP error:", err.message);
   } else {
-    console.log("✅ Brevo SMTP ready");
+    console.log("✅ AWS SES SMTP ready");
   }
 });
 
@@ -29,7 +27,7 @@ export const sendEmail = async ({ to, subject, html, text }) => {
 
     console.log("=== CALLING transporter.sendMail ===");
     const info = await transporter.sendMail({
-      from: `"${process.env.BREVO_SENDER_NAME}" <${process.env.BREVO_SENDER_EMAIL}>`,
+      from: `"${process.env.AWS_SES_SENDER_NAME}" <${process.env.AWS_SES_SENDER_EMAIL}>`,
       to,
       subject,
       text, // Ensures deliverability by including plain text version

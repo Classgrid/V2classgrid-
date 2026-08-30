@@ -1,5 +1,6 @@
 import express from "express";
-import { classroomClient, studentNotesClient } from "../config/supabaseClient.js";
+import { classroomClient } from "../config/supabaseClient.js";
+import { s3Storage } from "../services/s3-storage.service.js";
 import { isAuthenticated, requireRole, requireOrganization } from "../middleware/auth.middleware.js";
 import { requireClassroomMember, requireClassroomOwner } from "../middleware/classroom.middleware.js";
 import Classroom from "../models/Classroom.js";
@@ -25,7 +26,7 @@ import { validateClassroom, validateJoinCode } from "../middleware/validation.mi
 
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 40 * 1024 * 1024 } // 40MB per file
+    limits: { fileSize: 100 * 1024 * 1024 } // 100MB per file
 });
 
 // ─────────────────────────────────────────────
@@ -36,9 +37,9 @@ router.get("/proxy/pdf", isAuthenticated, async (req, res) => {
         const fileUrl = req.query.url;
         if (!fileUrl) return res.status(400).json({ message: "Missing URL parameter" });
 
-        // Basic security check to ensure it's a supabase URL (prevent SSRF)
-        if (!fileUrl.includes('supabase.co/storage')) {
-            return res.status(403).json({ message: "Only Supabase storage URLs are allowed" });
+        // Basic security check to ensure it's a known storage URL (prevent SSRF)
+        if (!fileUrl.includes('supabase.co/storage') && !fileUrl.includes('cdn.classgrid.in')) {
+            return res.status(403).json({ message: "Only Supabase storage and Classgrid CDN URLs are allowed" });
         }
 
         const fetchRes = await fetch(fileUrl);
@@ -938,22 +939,14 @@ router.post("/:id/upload-urls", isAuthenticated, requireClassroomOwner, async (r
         const urls = [];
         for (const file of files) {
             const path = `${req.params.id}/${Date.now()}_${Math.floor(Math.random() * 1000)}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-            const { data, error } = await studentNotesClient.storage
-                .from('notes-files')
-                .createSignedUploadUrl(path);
-
-            if (error) throw error;
-
-            // Build public URL from the same project that created the signed URL
-            const { data: { publicUrl } } = studentNotesClient.storage
-                .from('notes-files')
-                .getPublicUrl(path);
+            const { signedUrl, fullPath } = await s3Storage.createSignedUploadUrl(path);
+            const publicUrl = s3Storage.getPublicUrl(path);
 
             urls.push({
                 originalname: file.name,
-                path: path,
-                token: data.token,
-                signedUrl: data.signedUrl,  // Full signed upload URL (correct project)
+                path: fullPath,
+                token: "s3-presigned",
+                signedUrl: signedUrl,  // Full signed upload URL (correct project)
                 publicUrl: publicUrl         // Public URL for after upload
             });
         }
@@ -1032,18 +1025,7 @@ router.post("/:id/content/:type", isAuthenticated, requireClassroomOwner, condit
                     const fileExt = file.originalname.split('.').pop();
                     const fileName = `${classroomId}/${Date.now()}_${i}_${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
 
-                    const { error: uploadError } = await studentNotesClient.storage
-                        .from('notes-files')
-                        .upload(fileName, file.buffer, {
-                            contentType: file.mimetype,
-                            upsert: false
-                        });
-
-                    if (uploadError) throw uploadError;
-
-                    const { data: { publicUrl } } = studentNotesClient.storage
-                        .from('notes-files')
-                        .getPublicUrl(fileName);
+                    const { publicUrl } = await s3Storage.uploadFile(fileName, file.buffer, file.mimetype);
 
                     const dbData = {
                         title: (oldFiles.length === 1 && title) ? title : (title ? `${title} - ${file.originalname}` : file.originalname),

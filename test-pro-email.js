@@ -12,7 +12,7 @@ async function runTest() {
     const userName = "Danny Perna (Test Admin)";
     const planDuration = 31;
 
-    const { sendEmail } = await import('./src/services/brevo.service.js');
+    const { sendEmail } = await import('./src/services/aws-ses.service.js');
     const { getPlanActivationHtml, getPlanActivationPlainText } = await import('./src/services/email-templates.service.js');
 
     const html = getPlanActivationHtml(planName, activationDate, expiryDate, studentLimit, userName, planDuration);

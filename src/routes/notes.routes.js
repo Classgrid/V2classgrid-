@@ -6,6 +6,7 @@ import Quiz from "../models/Quiz.js";
 import { verifyAndSummarize, generateQuizFromContent } from "../services/notes-ai.service.js";
 
 import { studentNotesClient } from "../config/supabaseClient.js"; // Needed for student notes
+import { s3Storage } from "../services/s3-storage.service.js";
 
 const router = express.Router();
 
@@ -17,9 +18,9 @@ router.post("/upload-url", isAuthenticated, async (req, res) => {
         const { fileName, fileSize } = req.body;
         if (!fileName) return res.status(400).json({ message: "fileName required" });
 
-        // 25MB limit
-        if (fileSize && fileSize > 25 * 1024 * 1024) {
-            return res.status(400).json({ message: "File size must be under 25MB" });
+        // 100MB limit
+        if (fileSize && fileSize > 100 * 1024 * 1024) {
+            return res.status(400).json({ message: "File size must be under 100MB" });
         }
 
         const orgId = req.user.organization_id;
@@ -28,13 +29,9 @@ router.post("/upload-url", isAuthenticated, async (req, res) => {
         const sanitized = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
         const path = `student-notes/${orgId}/${Date.now()}_${Math.floor(Math.random() * 1000)}_${sanitized}`;
 
-        const { data, error } = await studentNotesClient.storage
-            .from('notes-files')
-            .createSignedUploadUrl(path, 60);
+        const { signedUrl, fullPath } = await s3Storage.createSignedUploadUrl(path, 60);
 
-        if (error) throw error;
-
-        res.json({ path, token: data.token, signedUrl: data.signedUrl });
+        res.json({ path: fullPath, signedUrl, token: "s3-presigned" });
     } catch (err) {
         console.error("Student note upload-url error:", err);
         res.status(500).json({ message: "Server error generating upload URL" });
@@ -56,10 +53,7 @@ router.post("/", isAuthenticated, async (req, res) => {
         const VALID_NOTE_TYPES = ['self_made', 'teacher', 'buyed', 'university'];
         const noteType = VALID_NOTE_TYPES.includes(note_type) ? note_type : 'self_made';
 
-        // Get public URL
-        const { data: { publicUrl } } = studentNotesClient.storage
-            .from('notes-files')
-            .getPublicUrl(filePath);
+        const publicUrl = s3Storage.getPublicUrl(filePath);
 
         const noteData = {
             title: title.substring(0, 200),

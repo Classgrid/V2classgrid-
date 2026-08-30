@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
-import { sendEmail } from "../services/brevo.service.js";
+import { sendEmail } from "../services/aws-ses.service.js";
 import connectDB from "../../config/db.js";
 import { checkAndRegisterDevice, getDeviceFingerprint } from "../services/device-fingerprint.service.js";
 import {

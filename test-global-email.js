@@ -4,7 +4,7 @@ dotenv.config();
 import fs from 'fs';
 
 async function runTest() {
-    const { sendEmail } = await import('./src/services/brevo.service.js');
+    const { sendEmail } = await import('./src/services/aws-ses.service.js');
     const { getLoginNotificationHtml, getLoginNotificationPlainText } = await import('./src/services/email-templates.service.js');
 
     const fakeUser = {

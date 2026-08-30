@@ -8,7 +8,7 @@ import ActivityLog from "../models/ActivityLog.js";
 import AttendanceRecord from "../models/AttendanceRecord.js";
 import AttendanceSession from "../models/AttendanceSession.js";
 import crypto from "crypto";
-import { sendEmail } from "../services/brevo.service.js";
+import { sendEmail } from "../services/aws-ses.service.js";
 import connectDB from "../../config/db.js";
 import { generateUniqueDualCodes } from "../services/code-generator.service.js";
 import { studentNotesClient } from "../config/supabaseClient.js"; // For interacting with student_notes
@@ -452,7 +452,7 @@ export const suspendUser = async (req, res) => {
 
         // Send Email
         try {
-            const { sendEmail } = await import("../services/brevo.service.js");
+            const { sendEmail } = await import("../services/aws-ses.service.js");
             const { getAccountSuspensionEmailHtml, getAccountSuspensionEmailPlainText } = await import("../services/email-templates.service.js");
             if (getAccountSuspensionEmailHtml && getAccountSuspensionEmailPlainText) {
                 await sendEmail({
@@ -516,7 +516,7 @@ export const deleteUser = async (req, res) => {
 
         // Send email BEFORE deletion (so we still have the email address)
         try {
-            const { sendEmail } = await import("../services/brevo.service.js");
+            const { sendEmail } = await import("../services/aws-ses.service.js");
             const { getAccountDeletionEmailHtml, getAccountDeletionEmailPlainText } = await import("../services/email-templates.service.js");
             if (getAccountDeletionEmailHtml && getAccountDeletionEmailPlainText) {
                 await sendEmail({
@@ -676,7 +676,7 @@ export const createSuperAdmin = async (req, res) => {
 
         // Send login credentials and instructions via email
         try {
-            const { sendEmail } = await import("../services/brevo.service.js");
+            const { sendEmail } = await import("../services/aws-ses.service.js");
             const { getSuperAdminCredentialsHtml, getSuperAdminCredentialsPlainText } = await import("../services/email-templates.service.js");
             const frontendUrl = process.env.FRONTEND_URL?.trim() || (process.env.NODE_ENV === "production" ? "https://classgrid.in" : "http://localhost:3000");
 

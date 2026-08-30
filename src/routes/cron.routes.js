@@ -1,7 +1,7 @@
 import express from "express";
 import connectDB from "../../config/db.js";
 import Organization from "../models/Organization.js";
-import { sendEmail } from "../services/brevo.service.js";
+import { sendEmail } from "../services/aws-ses.service.js";
 import {
     getPlanExpiryReminderHtml,
     getPlanExpiryReminderPlainText,

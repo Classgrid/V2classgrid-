@@ -6,7 +6,7 @@
  * even if a cron run is missed.
  */
 
-import { sendEmail } from "./brevo.service.js";
+import { sendEmail } from "./aws-ses.service.js";
 import {
     getDailyDigestEmailHtml,
     getDailyDigestEmailPlainText,

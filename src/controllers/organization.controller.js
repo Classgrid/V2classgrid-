@@ -4,7 +4,8 @@ import Organization from "../models/Organization.js";
 import Classroom from "../models/Classroom.js";
 import ClassroomMembership from "../models/ClassroomMembership.js";
 import { studentNotesClient } from "../config/supabaseClient.js";
-import { sendEmail } from "../services/brevo.service.js";
+import { s3Storage } from "../services/s3-storage.service.js";
+import { sendEmail } from "../services/aws-ses.service.js";
 import connectDB from "../../config/db.js";
 import { getMaxFaculty, getMaxClassroomsPerFaculty, getMaxStudentsPerClassroom, getStudentLimit, getEffectivePlan } from "../config/plan.config.js";
 import OrganizationAnnouncement from "../models/OrganizationAnnouncement.js";
@@ -32,8 +33,9 @@ export const applyOrganization = async (req, res) => {
 
         // Server-Side File Validation & Handling — Logo
         if (logo_base64) {
-            if (logo_base64.length > 680000) {
-                return res.status(400).json({ message: "Logo file exceeds 500 KB limit." });
+            // 100 MB limit
+            if (logo_base64.length > 137000000) {
+                return res.status(400).json({ message: "Logo file exceeds 100 MB limit." });
             }
 
             const match = logo_base64.match(/^data:image\/(png|jpeg|webp);base64,/);
@@ -47,19 +49,7 @@ export const applyOrganization = async (req, res) => {
 
             try {
                 const filename = `org_${Date.now()}.${ext}`;
-                const { error: uploadError } = await studentNotesClient.storage
-                    .from('notes-files')
-                    .upload('logos/' + filename, buffer, {
-                        contentType: `image/${ext}`,
-                        upsert: false
-                    });
-
-                if (uploadError) throw uploadError;
-
-                const { data: { publicUrl } } = studentNotesClient.storage
-                    .from('notes-files')
-                    .getPublicUrl('logos/' + filename);
-
+                const { publicUrl } = await s3Storage.uploadFile(`logos/${filename}`, buffer, `image/${ext}`);
                 finalLogoUrl = publicUrl;
             } catch (storageErr) {
                 console.error("Supabase Storage Error:", storageErr);
@@ -735,9 +725,9 @@ export const updateOrgLogo = async (req, res) => {
             return res.status(400).json({ message: "logo_base64 is required" });
         }
 
-        // Validate size (max ~500 KB base64 ≈ 680 KB raw string)
-        if (logo_base64.length > 680000) {
-            return res.status(400).json({ message: "Logo file exceeds 500 KB limit." });
+        // Validate size (100 MB limit)
+        if (logo_base64.length > 137000000) {
+            return res.status(400).json({ message: "Logo file exceeds 100 MB limit." });
         }
 
         const match = logo_base64.match(/^data:image\/(png|jpeg|webp|jpg);base64,/);
@@ -750,21 +740,8 @@ export const updateOrgLogo = async (req, res) => {
         const buffer = Buffer.from(base64Data, "base64");
 
         const filename = `org_${organization_id}_${Date.now()}.${ext}`;
-        const { error: uploadError } = await studentNotesClient.storage
-            .from("notes-files")
-            .upload("logos/" + filename, buffer, {
-                contentType: `image/${ext}`,
-                upsert: true,
-            });
-
-        if (uploadError) {
-            console.error("Supabase logo upload error:", uploadError);
-            return res.status(500).json({ message: "Failed to upload logo to storage." });
-        }
-
-        const { data: { publicUrl } } = studentNotesClient.storage
-            .from("notes-files")
-            .getPublicUrl("logos/" + filename);
+        
+        const { publicUrl } = await s3Storage.uploadFile(`logos/${filename}`, buffer, `image/${ext}`);
 
         await Organization.findByIdAndUpdate(organization_id, { logo_url: publicUrl });
 
@@ -1402,9 +1379,9 @@ async function uploadAnnouncementAttachment(base64, originalName, orgId) {
     const rawData = dataUriMatch ? base64.replace(/^data:[^;]+;base64,/, '') : base64;
     const buffer = Buffer.from(rawData, 'base64');
 
-    // 5 MB limit
-    if (buffer.length > 5 * 1024 * 1024) {
-        throw new Error('Attachment exceeds 5 MB limit.');
+    // 100 MB limit
+    if (buffer.length > 100 * 1024 * 1024) {
+        throw new Error('Attachment exceeds 100 MB limit.');
     }
 
     // Determine extension from MIME
@@ -1417,18 +1394,7 @@ async function uploadAnnouncementAttachment(base64, originalName, orgId) {
     const ext = extMap[mimeType] || originalName?.split('.').pop() || 'bin';
     const filename = `ann_${orgId}_${Date.now()}.${ext}`;
 
-    const { error: uploadError } = await studentNotesClient.storage
-        .from('notes-files')
-        .upload('org-attachments/' + filename, buffer, {
-            contentType: mimeType,
-            upsert: false,
-        });
-
-    if (uploadError) throw uploadError;
-
-    const { data: { publicUrl } } = studentNotesClient.storage
-        .from('notes-files')
-        .getPublicUrl('org-attachments/' + filename);
+    const { publicUrl } = await s3Storage.uploadFile(`org-attachments/${filename}`, buffer, mimeType);
 
     // Determine simple file type category
     let fileType = 'file';
