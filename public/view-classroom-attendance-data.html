@@ -1271,7 +1271,19 @@
                 const loc = [meta.city, meta.region, meta.country].filter(Boolean).join(', ') || 'Unknown Location';
                 const dist = student.distanceMeters ? `${Math.round(student.distanceMeters)}m from teacher` : 'Unknown GPS distance';
                 
+                let timeStr = 'Unknown Time';
+                if (student.markedAt) {
+                    const d = new Date(student.markedAt);
+                    timeStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) + 
+                              ' at ' + 
+                              d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) + ' IST';
+                }
+                
                 html += `
+                    <div class="detail-row">
+                        <div class="detail-label">Time</div>
+                        <div class="detail-value"><i class="fas fa-clock"></i> ${esc(timeStr)}</div>
+                    </div>
                     <div class="detail-row">
                         <div class="detail-label">Device</div>
                         <div class="detail-value"><i class="fas fa-desktop"></i> ${esc(meta.userAgent || 'Unknown')}</div>
