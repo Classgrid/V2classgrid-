@@ -155,6 +155,17 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+app.get("/api/s3-test", async (req, res) => {
+  try {
+    const { s3Storage } = await import("../src/services/s3-storage.service.js");
+    const buffer = Buffer.from("test", "utf-8");
+    const result = await s3Storage.uploadFile("logos/test.txt", buffer, "text/plain");
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message, stack: err.stack });
+  }
+});
+
 app.get("/api/email-test", async (req, res) => {
   console.log("TEST ROUTE HIT");
 
