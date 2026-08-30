@@ -73,8 +73,8 @@ router.put("/update", isAuthenticated, async (req, res) => {
     // PRN: can only be set once (immutable), unique per organization
     if (prn !== undefined && prn !== null && prn.trim() !== "") {
       const trimmedPrn = prn.trim();
-      if (!/^[a-zA-Z0-9]{1,9}$/.test(trimmedPrn)) {
-        return res.status(400).json({ message: "PRN must be alphanumeric and up to 9 characters only." });
+      if (!/^[a-zA-Z0-9]{8,10}$/.test(trimmedPrn)) {
+        return res.status(400).json({ message: "PRN must be alphanumeric and exactly 8 to 10 characters long." });
       }
 
       const currentUser = await User.findById(req.user._id).select("prn organization_id").lean();
