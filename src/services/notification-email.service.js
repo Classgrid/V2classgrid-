@@ -197,6 +197,13 @@ export async function sendClassroomActivityEmails({
             `[EmailNotification] Classroom activity emails queued: jobsCreated=${jobs.length}`,
             { classroomId: classroom._id?.toString(), contentType }
         );
+        
+        // ── INSTANT TRIGGER (Fire & Forget) ────────
+        try {
+            fetch(`${FRONTEND_URL()}/api/cron/process-email-queue?secret=cg_cron_k8x2mP9qR4vL7nW3`)
+                .catch(() => {});
+        } catch (err) {}
+
         return { emailAttempted: true, jobsCreated: jobs.length };
     } catch (err) {
         console.error("[EmailNotification] classroom activity failed:", {
@@ -252,6 +259,9 @@ export async function sendJoinRequestEmail({ classroom, student }) {
             classroomId: classroom._id?.toString(),
             facultyEmail: faculty.email,
         });
+
+        try { fetch(`${FRONTEND_URL()}/api/cron/process-email-queue?secret=cg_cron_k8x2mP9qR4vL7nW3`).catch(() => {}); } catch (err) {}
+
     } catch (err) {
         console.error("[EmailNotification] join request email failed:", {
             classroomId: classroom?._id?.toString(),
@@ -303,6 +313,9 @@ export async function sendJoinApprovedEmail({ classroom, studentId }) {
             classroomId: classroom._id?.toString(),
             studentEmail: student.email,
         });
+
+        try { fetch(`${FRONTEND_URL()}/api/cron/process-email-queue?secret=cg_cron_k8x2mP9qR4vL7nW3`).catch(() => {}); } catch (err) {}
+
     } catch (err) {
         console.error("[EmailNotification] join approved email failed:", {
             classroomId: classroom?._id?.toString(),
@@ -358,6 +371,9 @@ export async function sendBulkJoinApprovedEmails({ classroom, studentIds }) {
             `[EmailNotification] Bulk join approved: jobsCreated=${jobs.length}`,
             { classroomId: classroom._id?.toString() }
         );
+
+        try { fetch(`${FRONTEND_URL()}/api/cron/process-email-queue?secret=cg_cron_k8x2mP9qR4vL7nW3`).catch(() => {}); } catch (err) {}
+
     } catch (err) {
         console.error("[EmailNotification] bulk join approved failed:", {
             classroomId: classroom?._id?.toString(),
@@ -506,6 +522,9 @@ export async function sendAbsenceNotificationEmails({ classroom, session }) {
             `[EmailNotification] Absence emails queued: jobsCreated=${jobs.length}`,
             { classroomId: classroom._id?.toString(), sessionId: session._id?.toString() }
         );
+
+        try { fetch(`${FRONTEND_URL()}/api/cron/process-email-queue?secret=cg_cron_k8x2mP9qR4vL7nW3`).catch(() => {}); } catch (err) {}
+
         return { emailAttempted: true, jobsCreated: jobs.length };
     } catch (err) {
         console.error("[EmailNotification] absence notification emails failed:", {
