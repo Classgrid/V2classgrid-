@@ -1,4 +1,4 @@
-﻿// === SAME-DOMAIN AUTH INTERCEPTOR ===
+// === SAME-DOMAIN AUTH INTERCEPTOR ===
 (function () {
     var _origFetch = window.fetch;
     window.fetch = function (url, opts) {
@@ -1181,6 +1181,15 @@ function removeAnnAttachment() {
     const preview = document.getElementById('annAttachmentPreview');
     if (input) input.value = '';
     if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
+}
+
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
 }
 
 async function submitAnnouncement(e) {
