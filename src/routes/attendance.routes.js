@@ -290,7 +290,7 @@ router.get(
 router.post(
     "/:classroomId/start",
     isAuthenticated,
-    requirePlan("PRO"),
+    // requirePlan("PRO"),
     requireClassroomOwner,
     async (req, res) => {
         try {
@@ -391,7 +391,7 @@ router.post(
 router.post(
     "/:classroomId/stop",
     isAuthenticated,
-    requirePlan("PRO"),
+    // requirePlan("PRO"),
     requireClassroomOwner,
     async (req, res) => {
         try {
@@ -426,7 +426,7 @@ router.post(
 router.post(
     "/:classroomId/mark",
     isAuthenticated,
-    requirePlan("PRO"),
+    // requirePlan("PRO"),
     requireClassroomMember,
     async (req, res) => {
         try {
@@ -646,7 +646,7 @@ router.post(
 router.get(
     "/:classroomId/active",
     isAuthenticated,
-    requirePlan("PRO"),
+    // requirePlan("PRO"),
     requireClassroomMember,
     async (req, res) => {
         try {
@@ -697,7 +697,7 @@ router.get(
 router.get(
     "/:classroomId/suspicious",
     isAuthenticated,
-    requirePlan("PRO"),
+    // requirePlan("PRO"),
     requireClassroomOwner,
     async (req, res) => {
         try {
@@ -749,7 +749,7 @@ router.get(
 router.post(
     "/:classroomId/manual-override",
     isAuthenticated,
-    requirePlan("PRO"),
+    // requirePlan("PRO"),
     requireClassroomOwner,
     async (req, res) => {
         try {
@@ -841,7 +841,7 @@ router.post(
 router.get(
     "/:classroomId/sessions",
     isAuthenticated,
-    requirePlan("PRO"),
+    // requirePlan("PRO"),
     requireClassroomOwner,
     async (req, res) => {
         try {
@@ -885,7 +885,7 @@ router.get(
 router.get(
     "/:classroomId/report",
     isAuthenticated,
-    requirePlan("PRO"),
+    // requirePlan("PRO"),
     requireClassroomOwner,
     async (req, res) => {
         try {
