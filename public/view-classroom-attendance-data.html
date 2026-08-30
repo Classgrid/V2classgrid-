@@ -1365,6 +1365,10 @@
                 let statusHtml = student.suspicious ? 
                     `<span style="color:var(--orange)"><i class="fas fa-exclamation-triangle"></i> Flagged (${student.suspicionReasons.length} issues)</span>` : 
                     `<span style="color:var(--green)"><i class="fas fa-shield-check"></i> Secure & Present</span>`;
+
+                if (student.suspicious && student.suspicionReasons.includes("vpn_suspected")) {
+                    statusHtml += ` <span style="background:rgba(255,71,87,0.1);color:var(--rd);padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800;margin-left:8px;border:1px solid rgba(255,71,87,0.3);"><i class="fas fa-user-secret"></i> VPN DETECTED</span>`;
+                }
                 
                 html += `
                     <div class="sa-card">

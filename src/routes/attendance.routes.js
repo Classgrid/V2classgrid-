@@ -584,6 +584,14 @@ router.post(
             if (gpsFlag) suspicionReasons.push(hasStudentGPS ? "gps_far" : "gps_not_provided");
             if (deviceFlag) suspicionReasons.push("device_mismatch");
 
+            // ── VPN / Proxy Detection ──────────────────────────────
+            const studentCountry = req.headers["x-vercel-ip-country"];
+            const teacherCountry = session.teacherMetadata?.country;
+            if (studentCountry && teacherCountry && studentCountry !== teacherCountry && teacherCountry !== "Unknown Country" && studentCountry !== "Unknown Country") {
+                suspicionReasons.push("vpn_suspected");
+                console.warn(`[Attendance] VPN/Proxy suspected for student ${req.user._id}. Teacher in ${teacherCountry}, Student in ${studentCountry}`);
+            }
+
             const isSuspicious = suspicionReasons.length > 0;
             const status = isSuspicious ? "present_suspicious" : "present";
 
