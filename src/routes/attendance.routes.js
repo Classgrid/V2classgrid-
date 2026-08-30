@@ -169,7 +169,7 @@ router.get(
             const students = await User.find({ _id: { $in: studentIds } }).select("name email prn").lean();
 
             const records = await AttendanceRecord.find({ session: session._id })
-                .select("student markedAt status pasteDetected distanceMeters suspicionReasons")
+                .select("student markedAt status pasteDetected distanceMeters suspicionReasons deviceMetadata")
                 .lean();
 
             const recordMap = Object.fromEntries(records.map(r => [r.student.toString(), r]));
@@ -186,6 +186,7 @@ router.get(
                     suspicious: record?.status === "present_suspicious",
                     suspicionReasons: record?.suspicionReasons || [],
                     distanceMeters: record?.distanceMeters || null,
+                    deviceMetadata: record?.deviceMetadata || null,
                 };
             }).sort((a, b) => {
                 if (a.status !== b.status) return a.status === "absent" ? -1 : 1;
@@ -577,6 +578,15 @@ router.post(
             const isSuspicious = suspicionReasons.length > 0;
             const status = isSuspicious ? "present_suspicious" : "present";
 
+            // ── Capture Vercel Network Metadata ──────────────────
+            const deviceMetadata = {
+                ip: req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.ip || "Unknown IP",
+                city: req.headers["x-vercel-ip-city"] || "Unknown City",
+                country: req.headers["x-vercel-ip-country"] || "Unknown Country",
+                region: req.headers["x-vercel-ip-country-region"] || "",
+                userAgent: req.headers["user-agent"] || "Unknown Device"
+            };
+
             // ── Create attendance record ───────────────────────────
             // Unique index {session, student} enforces one-attempt-per-session at DB level
             await AttendanceRecord.create({
@@ -591,6 +601,7 @@ router.post(
                 pasteDetected: !!pasteDetected,
                 deviceFingerprint,
                 suspicionReasons,
+                deviceMetadata,
             });
 
             // Atomic increment

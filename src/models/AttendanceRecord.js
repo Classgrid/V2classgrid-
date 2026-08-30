@@ -76,6 +76,13 @@ const attendanceRecordSchema = new mongoose.Schema(
             type: [String],
             default: [],
         },
+
+        // ── Advanced Device & Location Metadata ──────────────────
+        // Captured from Vercel headers (IP, City, Country, OS/Browser)
+        deviceMetadata: {
+            type: Object,
+            default: {},
+        },
     },
     { timestamps: true }
 );
