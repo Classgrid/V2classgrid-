@@ -603,10 +603,14 @@ router.post(
             const status = isSuspicious ? "present_suspicious" : "present";
 
             // ── Capture Vercel Network Metadata ──────────────────
+            const isVpn = suspicionReasons.includes("vpn_suspected");
+            const rawCity = req.headers["x-vercel-ip-city"];
+            const rawCountry = req.headers["x-vercel-ip-country"];
+
             const deviceMetadata = {
                 ip: req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.ip || "Unknown IP",
-                city: req.headers["x-vercel-ip-city"] || "Unknown City",
-                country: req.headers["x-vercel-ip-country"] || "Unknown Country",
+                city: isVpn ? "VPN Server / Datacenter" : (rawCity || "City Hidden"),
+                country: rawCountry || "Unknown Country",
                 region: req.headers["x-vercel-ip-country-region"] || "",
                 userAgent: req.headers["user-agent"] || "Unknown Device"
             };
