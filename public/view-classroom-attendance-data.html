@@ -827,12 +827,12 @@
             color: var(--text);
         }
 
-        /* ── MODAL ── */
+        /* ── MODAL REDESIGN (Superadmin Style) ── */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(6px);
             z-index: 100;
             display: none;
             align-items: center;
@@ -844,66 +844,141 @@
             animation: fadeIn 0.2s ease;
         }
         .modal-card {
-            background: var(--surface);
+            background: var(--bg); /* Use page background */
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 12px;
             width: 100%;
-            max-width: 500px;
+            max-width: 700px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             animation: slideUp 0.3s ease;
         }
         .modal-header {
-            padding: 20px;
+            padding: 24px 30px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: var(--surface);
+        }
+        .modal-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .modal-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--blue);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
         }
         .modal-header h3 {
             font-size: 16px;
             color: var(--text);
+            margin-bottom: 2px;
+        }
+        .modal-header p {
+            font-size: 12px;
+            color: var(--muted);
         }
         .modal-close {
             background: transparent;
             border: none;
             color: var(--muted);
             cursor: pointer;
-            font-size: 18px;
+            font-size: 20px;
             transition: color 0.2s;
+            padding: 8px;
         }
         .modal-close:hover { color: var(--text); }
+        
         .modal-body {
-            padding: 20px;
+            padding: 30px;
+            overflow-y: auto;
+            background: var(--bg);
         }
-        .detail-row {
-            margin-bottom: 16px;
+        
+        .sa-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
         }
-        .detail-row:last-child { margin-bottom: 0; }
-        .detail-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: var(--muted);
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
+        .sa-card:last-child { margin-bottom: 0; }
+        
+        .sa-card-header {
+            margin-bottom: 20px;
         }
-        .detail-value {
+        .sa-card-title {
+            font-family: 'Sora', sans-serif;
             font-size: 14px;
+            font-weight: 800;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .sa-card-subtitle {
+            font-size: 12px;
+            color: var(--muted);
+        }
+        
+        .sa-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .sa-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .sa-label {
+            font-size: 12px;
+            font-weight: 600;
             color: var(--text-body);
+        }
+        .sa-value {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--text);
             font-weight: 500;
-            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .detail-value i {
-            width: 20px;
+        .sa-value i {
             color: var(--dim);
+            font-size: 14px;
+            width: 16px;
             text-align: center;
-            margin-right: 6px;
         }
+        .sa-value.full-width {
+            grid-column: 1 / -1;
+        }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         @media(max-width:600px) {
+            .sa-grid { grid-template-columns: 1fr; }
+            .modal-body { padding: 16px; }
+            .sa-card { padding: 16px; }
             .info-flow {
                 flex-direction: column;
             }
@@ -1095,7 +1170,13 @@
     <div class="modal-overlay" id="detailModal" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <h3 id="modalStudentName">Student Details</h3>
+                <div class="modal-header-left">
+                    <div class="modal-avatar" id="modalAvatar">N</div>
+                    <div>
+                        <h3 id="modalStudentName">Student Name</h3>
+                        <p id="modalStudentEmail">student@email.com</p>
+                    </div>
+                </div>
                 <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" id="modalBody">
@@ -1263,6 +1344,8 @@
             if (!student) return;
             
             document.getElementById('modalStudentName').textContent = student.name;
+            document.getElementById('modalStudentEmail').textContent = student.email;
+            document.getElementById('modalAvatar').textContent = student.name.charAt(0).toUpperCase();
             
             let html = '';
             
@@ -1279,34 +1362,68 @@
                               d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) + ' IST';
                 }
                 
+                let statusHtml = student.suspicious ? 
+                    `<span style="color:var(--orange)"><i class="fas fa-exclamation-triangle"></i> Flagged (${student.suspicionReasons.length} issues)</span>` : 
+                    `<span style="color:var(--green)"><i class="fas fa-shield-check"></i> Secure & Present</span>`;
+                
                 html += `
-                    <div class="detail-row">
-                        <div class="detail-label">Time</div>
-                        <div class="detail-value"><i class="fas fa-clock"></i> ${esc(timeStr)}</div>
+                    <div class="sa-card">
+                        <div class="sa-card-header">
+                            <div class="sa-card-title">Attendance Status</div>
+                            <div class="sa-card-subtitle">Basic details of the attendance mark</div>
+                        </div>
+                        <div class="sa-grid">
+                            <div class="sa-field">
+                                <div class="sa-label">Security Flag</div>
+                                <div class="sa-value">${statusHtml}</div>
+                            </div>
+                            <div class="sa-field">
+                                <div class="sa-label">Time Marked</div>
+                                <div class="sa-value"><i class="fas fa-clock"></i> ${esc(timeStr)}</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Device</div>
-                        <div class="detail-value"><i class="fas fa-desktop"></i> ${esc(meta.userAgent || 'Unknown')}</div>
+                    
+                    <div class="sa-card">
+                        <div class="sa-card-header">
+                            <div class="sa-card-title">Location & Network</div>
+                            <div class="sa-card-subtitle">Geographic and IP address tracking data</div>
+                        </div>
+                        <div class="sa-grid">
+                            <div class="sa-field">
+                                <div class="sa-label">Physical Location (GPS)</div>
+                                <div class="sa-value"><i class="fas fa-map-marker-alt"></i> ${esc(dist)}</div>
+                            </div>
+                            <div class="sa-field">
+                                <div class="sa-label">IP Address</div>
+                                <div class="sa-value"><i class="fas fa-network-wired"></i> ${esc(meta.ip || 'Unknown')}</div>
+                            </div>
+                            <div class="sa-field" style="grid-column: 1 / -1;">
+                                <div class="sa-label">Network Location (Vercel IP)</div>
+                                <div class="sa-value"><i class="fas fa-globe"></i> ${esc(loc)}</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Network Location (Vercel IP)</div>
-                        <div class="detail-value"><i class="fas fa-globe"></i> ${esc(loc)}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Physical Location (GPS)</div>
-                        <div class="detail-value"><i class="fas fa-map-marker-alt"></i> ${esc(dist)}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">IP Address</div>
-                        <div class="detail-value"><i class="fas fa-network-wired"></i> ${esc(meta.ip || 'Unknown')}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Device Fingerprint</div>
-                        <div class="detail-value" style="font-family:monospace; font-size:11px;"><i class="fas fa-fingerprint"></i> ${esc(student.deviceFingerprint || 'None')}</div>
+                    
+                    <div class="sa-card">
+                        <div class="sa-card-header">
+                            <div class="sa-card-title">Device Identity</div>
+                            <div class="sa-card-subtitle">Browser, OS, and unique device fingerprint</div>
+                        </div>
+                        <div class="sa-grid">
+                            <div class="sa-field" style="grid-column: 1 / -1;">
+                                <div class="sa-label">Device (User Agent)</div>
+                                <div class="sa-value"><i class="fas fa-desktop"></i> ${esc(meta.userAgent || 'Unknown')}</div>
+                            </div>
+                            <div class="sa-field" style="grid-column: 1 / -1;">
+                                <div class="sa-label">Unique Device Fingerprint</div>
+                                <div class="sa-value" style="font-family:monospace; font-size:12px;"><i class="fas fa-fingerprint"></i> ${esc(student.deviceFingerprint || 'None')}</div>
+                            </div>
+                        </div>
                     </div>
                 `;
             } else {
-                html = '<div style="text-align:center; color:var(--muted); padding:20px;">Student is absent. No device data available.</div>';
+                html = '<div style="text-align:center; color:var(--muted); padding:40px;">Student is absent. No device data available.</div>';
             }
             
             document.getElementById('modalBody').innerHTML = html;
