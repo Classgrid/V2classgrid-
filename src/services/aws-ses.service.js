@@ -1,6 +1,9 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
+  pool: true,
+  maxConnections: 14,
+  maxMessages: 10000,
   host: process.env.AWS_SES_SMTP_HOST?.replace(/^=/, "")?.trim(),
   port: Number(process.env.AWS_SES_SMTP_PORT),
   secure: false, // true for 465, false for other ports
