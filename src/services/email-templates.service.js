@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Classgrid - Minimalist Transactional Email Templates
  */
 
@@ -1342,7 +1342,7 @@ export const getClassroomActivityEmailHtml = ({ orgName, classroomName, facultyN
       <div class="meta">Posted by</div>
       <p style="margin-bottom: 12px;">${facultyName}</p>
       <div class="meta">${label}</div>
-      <p style="margin-bottom: 0; font-weight: 600;">${title}</p>
+      ${(title && title !== (preview || '').substring(0, 80) && title !== 'New Announcement') ? `<p style="margin-bottom: 0; font-weight: 600;">${title}</p>` : ''}
       ${preview ? `<p style="margin-top: 8px; margin-bottom: 0; color: #525252; font-size: 14px;">${preview}</p>` : ''}
     </div>
 

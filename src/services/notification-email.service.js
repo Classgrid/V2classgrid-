@@ -166,7 +166,7 @@ export async function sendClassroomActivityEmails({
             facultyName: faculty.name,
             contentType,
             title: title || "Untitled",
-            preview: (preview || "").substring(0, 150),
+            preview: (preview || ""),
             classroomUrl,
         };
 
@@ -212,6 +212,86 @@ export async function sendClassroomActivityEmails({
             contentType,
             error: err.message,
         });
+        return { emailAttempted: false, jobsCreated: 0 };
+    }
+}
+
+// ─────────────────────────────────────────────────
+// 1.5 ORG ANNOUNCEMENT EMAILS
+//    Called when Org Admin posts an announcement
+// ─────────────────────────────────────────────────
+export async function sendOrgAnnouncementEmails({ organization_id, announcement, target_classrooms, target_type }) {
+    try {
+        const org = await Organization.findById(organization_id).select("name").lean();
+        if (!org) return { emailAttempted: false, jobsCreated: 0 };
+
+        let eligibleStudents = [];
+
+        if (target_type === 'specific' && target_classrooms && target_classrooms.length > 0) {
+            const memberships = await ClassroomMembership.find({
+                classroom: { $in: target_classrooms },
+                status: "approved",
+            })
+            .populate("student", "name email emailNotifications")
+            .lean();
+            eligibleStudents = memberships.map(m => m.student);
+        } else {
+            // target_type === 'all'
+            const users = await User.find({
+                organization_id,
+                role: 'student',
+                status: 'active'
+            }).select("name email emailNotifications").lean();
+            eligibleStudents = users;
+        }
+
+        // Deduplicate students & check preferences
+        const uniqueStudents = [];
+        const seenIds = new Set();
+        
+        for (const s of eligibleStudents) {
+            if (!s || !s.email) continue;
+            if (s.emailNotifications?.global === false) continue;
+            if (s.emailNotifications?.announcements === false) continue;
+            const mode = s.emailNotifications?.digestMode || 'instant';
+            if (mode !== 'instant') continue;
+
+            const idStr = s._id.toString();
+            if (!seenIds.has(idStr)) {
+                seenIds.add(idStr);
+                uniqueStudents.push(s);
+            }
+        }
+
+        if (uniqueStudents.length === 0) return { emailAttempted: false, jobsCreated: 0 };
+
+        const emailPayloads = uniqueStudents.map((student) => ({
+            to: student.email,
+            subject: `${announcement.title} — ${org.name} | Classgrid`,
+            html: getClassroomActivityEmailHtml({
+                orgName: org.name,
+                classroomName: "Organization Wide Announcement",
+                facultyName: announcement.creator_name || "Organization Admin",
+                contentType: "announcements",
+                title: announcement.title,
+                preview: announcement.content,
+                classroomUrl: `${FRONTEND_URL()}/student/dashboard.html`
+            }),
+            text: `New Announcement from ${org.name}: ${announcement.title}\n\n${announcement.content}`,
+            type: "announcement",
+            userId: student._id,
+        }));
+
+        console.log(`[EmailNotification] Enqueueing ${emailPayloads.length} email jobs for org announcement`);
+        const jobs = await enqueueBulkEmails(emailPayloads);
+
+        try {
+            fetch(`${FRONTEND_URL()}/api/cron/process-email-queue?secret=cg_cron_k8x2mP9qR4vL7nW3`).catch(() => {});
+        } catch (err) {}
+
+        return { emailAttempted: true, jobsCreated: jobs.length };
+    } catch (err) {
+        console.error("[EmailNotification] org announcement failed:", err);
         return { emailAttempted: false, jobsCreated: 0 };
     }
 }

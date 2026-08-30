@@ -1112,8 +1112,8 @@ router.post("/:id/content/:type", isAuthenticated, requireClassroomOwner, condit
                 classroom,
                 faculty: req.user,
                 contentType: type,
-                title: title || (message && message.substring(0, 80)) || 'Untitled',
-                preview: (message || description || '').substring(0, 150),
+                title: title || (type === 'announcements' ? 'New Announcement' : 'Untitled'),
+                preview: (message || description || ''),
             });
 
             // Track email status on notifications

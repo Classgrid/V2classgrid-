@@ -10,6 +10,7 @@ import connectDB from "../../config/db.js";
 import { getMaxFaculty, getMaxClassroomsPerFaculty, getMaxStudentsPerClassroom, getStudentLimit, getEffectivePlan } from "../config/plan.config.js";
 import OrganizationAnnouncement from "../models/OrganizationAnnouncement.js";
 import { logAdminAction } from "../services/auditLog.service.js";
+import { sendOrgAnnouncementEmails } from "../services/notification-email.service.js";
 import mongoose from "mongoose";
 
 // POST /api/organization/apply
