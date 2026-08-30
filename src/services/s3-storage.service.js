@@ -2,15 +2,15 @@ import { S3Client, PutObjectCommand, DeleteObjectCommand, DeleteObjectsCommand, 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const s3Client = new S3Client({
-    region: process.env.AWS_S3_ERP_REGION,
+    region: process.env.AWS_S3_ERP_REGION?.trim(),
     credentials: {
-        accessKeyId: process.env.AWS_S3_ERP_ACCESS_KEY,
-        secretAccessKey: process.env.AWS_S3_ERP_SECRET_KEY,
+        accessKeyId: process.env.AWS_S3_ERP_ACCESS_KEY?.trim(),
+        secretAccessKey: process.env.AWS_S3_ERP_SECRET_KEY?.trim(),
     },
 });
 
-const BUCKET_NAME = process.env.AWS_S3_ERP_BUCKET_NAME;
-const CLOUDFRONT_DOMAIN = process.env.AWS_CLOUDFRONT_ERP_DOMAIN;
+const BUCKET_NAME = process.env.AWS_S3_ERP_BUCKET_NAME?.trim();
+const CLOUDFRONT_DOMAIN = process.env.AWS_CLOUDFRONT_ERP_DOMAIN?.trim();
 
 export const s3Storage = {
     // Generate a presigned URL for direct client-side upload
