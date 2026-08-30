@@ -7,6 +7,7 @@
  */
 
 import express from "express";
+import connectDB from "../../config/db.js";
 import { sendDailyDigests, sendWeeklyDigests } from "../services/digest-email.service.js";
 
 const router = express.Router();
@@ -21,6 +22,8 @@ router.get("/daily", async (req, res) => {
     }
 
     try {
+        await connectDB();
+        
         // Always run daily digests
         const dailyResult = await sendDailyDigests();
 
