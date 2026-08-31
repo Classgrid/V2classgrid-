@@ -1352,7 +1352,15 @@
             if (student.status !== 'absent') {
                 const meta = student.deviceMetadata || {};
                 const loc = [meta.city, meta.region, meta.country].filter(Boolean).join(', ') || 'Unknown Location';
-                const dist = student.distanceMeters ? `${Math.round(student.distanceMeters)}m from teacher` : 'Unknown GPS distance';
+                let dist = 'Unknown GPS distance';
+                if (student.distanceMeters != null) {
+                    const d = Math.round(student.distanceMeters);
+                    if (d >= 1000) {
+                        dist = `${(d / 1000).toFixed(2)} km (${d}m) from teacher`;
+                    } else {
+                        dist = `${d}m from teacher`;
+                    }
+                }
                 
                 let timeStr = 'Unknown Time';
                 if (student.markedAt) {
