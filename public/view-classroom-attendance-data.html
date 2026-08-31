@@ -1358,6 +1358,14 @@
             } catch(e) { return code; }
         }
 
+        function getCountryName(code) {
+            if (!code) return 'Hidden';
+            try {
+                const regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
+                return regionNames.of(code) || code;
+            } catch(e) { return code; }
+        }
+
         function parseUserAgent(ua) {
             if (!ua) return 'Unknown Device';
             let os = 'Unknown OS';
@@ -1405,11 +1413,11 @@
                     }
                 }
                 
-                // Parse GPS Exact Location String to extract Local Area, City, State, Country
+                // Pure dynamic parsing based on AWS commas, zero hardcoding of states
+                let gpsCountry = getCountryName(meta.country); // Guaranteed Country Name via Intl API
                 let gpsLocalArea = 'Unavailable';
                 let gpsCity = 'Unavailable';
                 let gpsState = 'Unavailable';
-                let gpsCountry = 'Unavailable';
                 
                 if (student.locationName) {
                     let parts = student.locationName.split(',').map(p => p.trim());
@@ -1417,21 +1425,26 @@
                     parts = parts.filter(p => !/^\d+$/.test(p.replace(/\s/g, '')));
                     
                     if (parts.length > 0) {
-                        // Pure dynamic parsing based on AWS commas, zero hardcoding
-                        if (parts.length >= 4) {
-                            gpsCountry = parts[parts.length - 1]; 
-                            gpsState = parts[parts.length - 2];   
-                            gpsCity = parts[parts.length - 3];    
-                            gpsLocalArea = parts[parts.length - 4];
-                        } else if (parts.length === 3) {
-                            gpsCountry = parts[2];
+                        let lastPart = parts[parts.length - 1];
+                        
+                        // If AWS included the country at the end, drop it so we don't put it in the State box
+                        if (lastPart.toLowerCase() === gpsCountry.toLowerCase() || 
+                            lastPart.toUpperCase() === (meta.country || '').toUpperCase() || 
+                            lastPart.toUpperCase() === 'IND' || 
+                            lastPart.toUpperCase() === 'INDIA') {
+                            parts.pop();
+                        }
+                        
+                        // What remains is [..., LocalArea, City, State]
+                        if (parts.length >= 3) {
+                            gpsState = parts[parts.length - 1];   
+                            gpsCity = parts[parts.length - 2];    
+                            gpsLocalArea = parts[parts.length - 3];
+                        } else if (parts.length === 2) {
                             gpsState = parts[1];
                             gpsCity = parts[0];
-                        } else if (parts.length === 2) {
-                            gpsCountry = parts[1];
-                            gpsState = parts[0];
                         } else if (parts.length === 1) {
-                            gpsCountry = parts[0];
+                            gpsState = parts[0];
                         }
                     }
                 }
