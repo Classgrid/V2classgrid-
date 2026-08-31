@@ -1403,8 +1403,8 @@
                                 <div class="sa-value"><i class="fas fa-network-wired"></i> ${esc(meta.ip || 'Unknown')}</div>
                             </div>
                             <div class="sa-field" style="grid-column: 1 / -1;">
-                                <div class="sa-label">Network Location (Vercel IP)</div>
-                                <div class="sa-value"><i class="fas fa-globe"></i> ${esc(loc)}</div>
+                                <div class="sa-label">Exact Location Name</div>
+                                <div class="sa-value" style="font-weight:700;color:var(--tx);"><i class="fas fa-map-marker-alt" style="color:var(--rd);"></i> ${esc(student.locationName || 'Location Name Unavailable')}</div>
                             </div>
                         </div>
                     </div>
