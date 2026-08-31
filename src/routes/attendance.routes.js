@@ -182,7 +182,7 @@ router.get(
             const students = await User.find({ _id: { $in: studentIds } }).select("name email prn").lean();
 
             const records = await AttendanceRecord.find({ session: session._id })
-                .select("student markedAt status pasteDetected distanceMeters suspicionReasons deviceMetadata")
+                .select("student markedAt status pasteDetected distanceMeters suspicionReasons deviceMetadata locationName")
                 .lean();
 
             const recordMap = Object.fromEntries(records.map(r => [r.student.toString(), r]));
@@ -200,6 +200,7 @@ router.get(
                     suspicionReasons: record?.suspicionReasons || [],
                     distanceMeters: record?.distanceMeters || null,
                     deviceMetadata: record?.deviceMetadata || null,
+                    locationName: record?.locationName || null,
                 };
             }).sort((a, b) => {
                 if (a.status !== b.status) return a.status === "absent" ? -1 : 1;

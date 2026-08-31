@@ -3759,6 +3759,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                         <span><i class="fas fa-crosshairs" style="color:var(--ac);margin-right:6px"></i>Your Location</span>
                         <span style="font-size:10px;background:rgba(79,142,255,0.1);color:var(--ac);padding:2px 8px;border-radius:12px">±${Math.round(gpsAccuracy || 0)}m</span>
                     </div>
+                    ${exactLocationName ? `<div style="background:var(--surface);padding:10px 14px;font-size:11px;color:var(--tx);border-bottom:1px solid var(--bd2);display:flex;align-items:center;gap:8px;"><i class="fas fa-map-marker-alt" style="color:var(--rd)"></i> <span style="font-weight:600">${esc(exactLocationName)}</span></div>` : ''}
                     <div id="teacherVerifyMap" style="width:100%;height:220px;background:#1a1a2e"></div>
                     <div style="padding:12px 14px;background:var(--bg3);display:flex;gap:8px">
                         <button id="confirmLocBtn" class="btnd" style="flex:1;padding:12px;border-radius:10px;font-size:13px;font-weight:700;background:linear-gradient(135deg,var(--gr),#00a87a);color:#fff;border:none;cursor:pointer">
