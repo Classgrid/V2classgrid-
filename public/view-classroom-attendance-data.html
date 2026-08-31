@@ -1411,20 +1411,34 @@
                 let gpsCountry = 'Unavailable';
                 
                 if (student.locationName) {
-                    // Example format: "173/2-20 Ganga Nagar Road, Nigdi, Pune, Maharashtra, 411044, IND"
                     let parts = student.locationName.split(',').map(p => p.trim());
                     // Remove postal codes (pure numbers)
                     parts = parts.filter(p => !/^\d+$/.test(p.replace(/\s/g, '')));
                     
-                    if (parts.length >= 3) {
-                        gpsCountry = parts[parts.length - 1]; // IND
-                        gpsState = parts[parts.length - 2];   // Maharashtra
-                        gpsCity = parts[parts.length - 3];    // Pune
-                    } else if (parts.length === 2) {
-                        gpsCountry = parts[parts.length - 1];
-                        gpsState = parts[parts.length - 2];
-                    } else if (parts.length === 1) {
-                        gpsCountry = parts[0];
+                    if (parts.length > 0) {
+                        const lastPart = parts[parts.length - 1];
+                        const indianStates = ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Delhi','Chandigarh','Andaman','Puducherry','Jammu','Ladakh'];
+                        
+                        const isLastPartState = indianStates.some(s => lastPart.toLowerCase().includes(s.toLowerCase()));
+                        
+                        if (isLastPartState) {
+                            // AWS string ended with the State, meaning Country was omitted
+                            gpsCountry = 'India';
+                            gpsState = lastPart;
+                            gpsCity = parts.length >= 2 ? parts[parts.length - 2] : 'Unavailable';
+                        } else {
+                            // Standard format: [..., City, State, Country]
+                            if (parts.length >= 3) {
+                                gpsCountry = parts[parts.length - 1]; 
+                                gpsState = parts[parts.length - 2];   
+                                gpsCity = parts[parts.length - 3];    
+                            } else if (parts.length === 2) {
+                                gpsCountry = parts[1];
+                                gpsState = parts[0];
+                            } else if (parts.length === 1) {
+                                gpsCountry = parts[0];
+                            }
+                        }
                     }
                 }
                 
