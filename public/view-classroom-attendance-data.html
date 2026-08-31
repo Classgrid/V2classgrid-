@@ -1405,7 +1405,8 @@
                     }
                 }
                 
-                // Parse GPS Exact Location String to extract City, State, Country
+                // Parse GPS Exact Location String to extract Local Area, City, State, Country
+                let gpsLocalArea = 'Unavailable';
                 let gpsCity = 'Unavailable';
                 let gpsState = 'Unavailable';
                 let gpsCountry = 'Unavailable';
@@ -1422,16 +1423,22 @@
                         const isLastPartState = indianStates.some(s => lastPart.toLowerCase().includes(s.toLowerCase()));
                         
                         if (isLastPartState) {
-                            // AWS string ended with the State, meaning Country was omitted
+                            // AWS string ended with the State
                             gpsCountry = 'India';
                             gpsState = lastPart;
                             gpsCity = parts.length >= 2 ? parts[parts.length - 2] : 'Unavailable';
+                            gpsLocalArea = parts.length >= 3 ? parts[parts.length - 3] : 'Unavailable';
                         } else {
-                            // Standard format: [..., City, State, Country]
-                            if (parts.length >= 3) {
+                            // Standard format: [..., LocalArea, City, State, Country]
+                            if (parts.length >= 4) {
                                 gpsCountry = parts[parts.length - 1]; 
                                 gpsState = parts[parts.length - 2];   
                                 gpsCity = parts[parts.length - 3];    
+                                gpsLocalArea = parts[parts.length - 4];
+                            } else if (parts.length === 3) {
+                                gpsCountry = parts[2];
+                                gpsState = parts[1];
+                                gpsCity = parts[0];
                             } else if (parts.length === 2) {
                                 gpsCountry = parts[1];
                                 gpsState = parts[0];
@@ -1498,13 +1505,17 @@
                             <div class="sa-field" style="grid-column: 1 / -1; margin-top:12px; border-top: 1px solid var(--border); padding-top:12px;">
                                 <div style="font-size:11px; font-weight:700; color:var(--mt); margin-bottom:2px; text-transform:uppercase; letter-spacing:0.5px;">GPS Location Details</div>
                                 <div style="font-size:10px; font-weight:500; color:var(--mt); margin-bottom:12px; text-transform:none;">(Extracted from physical GPS coordinates, not network)</div>
-                                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                                    <div>
+                                        <div class="sa-label">Local Area / Region</div>
+                                        <div class="sa-value" style="font-size:13px"><i class="fas fa-map-signs" style="color:var(--ac);"></i> ${esc(gpsLocalArea)}</div>
+                                    </div>
                                     <div>
                                         <div class="sa-label">City</div>
                                         <div class="sa-value" style="font-size:13px"><i class="fas fa-city" style="color:var(--ac);"></i> ${esc(gpsCity)}</div>
                                     </div>
                                     <div>
-                                        <div class="sa-label">Region / State</div>
+                                        <div class="sa-label">State</div>
                                         <div class="sa-value" style="font-size:13px"><i class="fas fa-map" style="color:var(--ac);"></i> ${esc(gpsState)}</div>
                                     </div>
                                     <div>
