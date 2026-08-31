@@ -1339,6 +1339,25 @@
             </table></div>`;
         }
 
+        function getRegionName(code, country) {
+            if (!code) return 'Hidden';
+            if (country === 'IN' || country === 'India') {
+                const states = {
+                    'AN':'Andaman and Nicobar','AP':'Andhra Pradesh','AR':'Arunachal Pradesh','AS':'Assam','BR':'Bihar','CH':'Chandigarh','CT':'Chhattisgarh','DN':'Dadra and Nagar Haveli','DD':'Daman and Diu','DL':'Delhi','GA':'Goa','GJ':'Gujarat','HR':'Haryana','HP':'Himachal Pradesh','JK':'Jammu and Kashmir','JH':'Jharkhand','KA':'Karnataka','KL':'Kerala','LA':'Ladakh','LD':'Lakshadweep','MP':'Madhya Pradesh','MH':'Maharashtra','MN':'Manipur','ML':'Meghalaya','MZ':'Mizoram','NL':'Nagaland','OR':'Odisha','PY':'Puducherry','PB':'Punjab','RJ':'Rajasthan','SK':'Sikkim','TN':'Tamil Nadu','TG':'Telangana','TR':'Tripura','UP':'Uttar Pradesh','UT':'Uttarakhand','WB':'West Bengal'
+                };
+                if (states[code]) return states[code];
+            }
+            return code;
+        }
+
+        function getCountryName(code) {
+            if (!code) return 'Hidden';
+            try {
+                const regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
+                return regionNames.of(code) || code;
+            } catch(e) { return code; }
+        }
+
         function openDetailModal(studentId) {
             const student = ALL_STUDENTS.find(s => s.studentId === studentId);
             if (!student) return;
@@ -1351,7 +1370,11 @@
             
             if (student.status !== 'absent') {
                 const meta = student.deviceMetadata || {};
-                const loc = [meta.city, meta.region, meta.country].filter(Boolean).join(', ') || 'Unknown Location';
+                
+                const fullRegion = getRegionName(meta.region, meta.country);
+                const fullCountry = getCountryName(meta.country);
+                
+                const loc = [meta.city, fullRegion, fullCountry].filter(Boolean).join(', ') || 'Unknown Location';
                 let dist = 'Unknown GPS distance';
                 if (student.distanceMeters != null) {
                     const d = Math.round(student.distanceMeters);
@@ -1420,11 +1443,11 @@
                                     </div>
                                     <div>
                                         <div class="sa-label">Region / State</div>
-                                        <div class="sa-value" style="font-size:13px"><i class="fas fa-map" style="color:var(--ac);"></i> ${esc(meta.region || 'Hidden')}</div>
+                                        <div class="sa-value" style="font-size:13px"><i class="fas fa-map" style="color:var(--ac);"></i> ${esc(fullRegion)}</div>
                                     </div>
                                     <div>
                                         <div class="sa-label">Country</div>
-                                        <div class="sa-value" style="font-size:13px"><i class="fas fa-flag" style="color:var(--ac);"></i> ${esc(meta.country || 'Hidden')}</div>
+                                        <div class="sa-value" style="font-size:13px"><i class="fas fa-flag" style="color:var(--ac);"></i> ${esc(fullCountry)}</div>
                                     </div>
                                 </div>
                             </div>
