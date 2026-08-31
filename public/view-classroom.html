@@ -3502,19 +3502,54 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                             <div id="attTimer" style="font-size:36px;font-weight:900;color:var(--tx);font-family:monospace;margin-bottom:4px">--:--</div>
                             <div style="font-size:12px;color:var(--mt)">Enter the code to mark attendance</div>
                         </div>
+                        
+                        ${s.requiresGPS ? `
+                        ${s.requiresGPS ? `<div style="margin-bottom:16px;border-radius:12px;overflow:hidden;border:1px solid var(--bd2)"><div style="background:var(--bg3);padding:8px 12px;font-size:12px;font-weight:700;color:var(--tx);border-bottom:1px solid var(--bd2);display:flex;justify-content:space-between;align-items:center"><span><i class="fas fa-map-marker-alt" style="color:#FF4757;margin-right:6px"></i>Live Classroom Map</span><span style="font-size:10px;background:rgba(0,200,150,0.12);color:var(--gr);padding:2px 8px;border-radius:12px;font-weight:800">${s.radiusMeters || 25}m radius</span></div><div id="studentLiveMap" style="width:100%;height:200px;background:#1a1a2e"></div></div>` : ''}
                         <div class="mf" style="margin-bottom:14px">
                             <input id="attStudentCode" type="text" placeholder="Enter mysterious code" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;padding:14px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:16px;font-weight:700;text-align:center;letter-spacing:2px;font-family:var(--f)">
                         </div>
-                        <button class="btnd" id="markAttBtn" onclick="markAttendance('${s.sessionToken}', ${s.requiresGPS})" style="width:100%;padding:14px;border-radius:10px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--gr),#00a87a);color:#fff;border:none;cursor:pointer">
+                        <button class="btnd" id="markAttBtn" onclick="markAttendance('${s.sessionToken}', ${s.requiresGPS}, ${s.teacherLat || 0}, ${s.teacherLng || 0}, ${s.radiusMeters || 25})" style="width:100%;padding:14px;border-radius:10px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--gr),#00a87a);color:#fff;border:none;cursor:pointer">
                             <i class="fas fa-check"></i> Mark Attendance
                         </button>
-                        ${s.requiresGPS ? `<div style="display:flex;justify-content:center;margin-top:14px;"><div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,142,255,0.1);color:var(--ac);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;"><i class="fas fa-crosshairs"></i> Teacher GPS: ${s.teacherLat.toFixed(5)}, ${s.teacherLng.toFixed(5)}</div></div>` : ''}
-                        <div id="studentLocDisplay" style="display:none;justify-content:center;margin-top:8px;"></div>
+                        <div id="studentLocDisplay" style="display:none;justify-content:center;margin-top:10px"></div>
                         <div id="attError" style="display:none;margin-top:10px;padding:10px;border-radius:8px;background:rgba(255,71,87,.08);color:var(--rd);font-size:13px;font-weight:600"></div>
                     </div>`;
                     startCountdown(s.expiresAt);
 
-                    // Add tracking to the new element
+                    // Initialize Google Map for student if GPS session
+                    if (s.requiresGPS) {
+                        setTimeout(() => {
+                            const mapEl = document.getElementById('studentLiveMap');
+                            if (mapEl && window.google && window.google.maps) {
+                                const teacherPos = { lat: s.teacherLat, lng: s.teacherLng };
+                                const map = new google.maps.Map(mapEl, {
+                                    center: teacherPos,
+                                    zoom: 18,
+                                    mapTypeId: 'roadmap',
+                                    disableDefaultUI: true,
+                                    zoomControl: true,
+                                    gestureHandling: 'greedy',
+                                    styles: [{featureType:'poi',stylers:[{visibility:'off'}]}]
+                                });
+                                new google.maps.Marker({
+                                    position: teacherPos, map,
+                                    title: 'Teacher Location',
+                                    icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#FF4757', fillOpacity: 1, strokeWeight: 3, strokeColor: '#fff' }
+                                });
+                                new google.maps.Circle({
+                                    strokeColor: '#00C896', strokeOpacity: 0.8, strokeWeight: 2,
+                                    fillColor: '#00C896', fillOpacity: 0.12,
+                                    map, center: teacherPos, radius: s.radiusMeters || 25
+                                });
+                                window._attStudentMap = map;
+                                window._attTeacherPos = teacherPos;
+                            } else if (mapEl) {
+                                mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:12px;text-align:center;padding:15px">Google Maps loading...<br>Teacher: ' + s.teacherLat.toFixed(5) + ', ' + s.teacherLng.toFixed(5) + '</div>';
+                            }
+                        }, 300);
+                    }
+
+                    // Add paste tracking
                     setTimeout(() => {
                         const iel = g('attStudentCode');
                         if (iel) {
@@ -3524,7 +3559,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                     }, 50);
                 }
             } else {
-                // No active session â— show stats
+                // No active session — show stats
                 el.innerHTML = `
                 <div style="padding:20px">
                     <div style="text-align:center;padding:30px 20px;margin-bottom:20px">
@@ -3575,56 +3610,112 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
 
             const btn = g('startAttBtn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting GPS Location...';
             errEl.style.display = 'none';
 
-            // Get teacher's location before starting
+            // Get teacher's REAL GPS location (strict high accuracy, 25s timeout)
             let teacherLat = null;
             let teacherLng = null;
+            let gpsAccuracy = null;
 
             try {
                 const pos = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 15000, maximumAge: 0, enableHighAccuracy: true });
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 25000, maximumAge: 0, enableHighAccuracy: true });
                 });
                 teacherLat = pos.coords.latitude;
                 teacherLng = pos.coords.longitude;
+                gpsAccuracy = pos.coords.accuracy; // in meters
             } catch (e) {
                 console.warn("GPS missing for teacher, blocking session start.", e);
-                let msg = "Could not get your GPS location. You MUST allow location access to start an attendance session.";
-                if (window.isSecureContext === false) msg += " (Needs HTTPS or Localhost)";
-                else if (e.code === 1) msg += " (Permission Denied by Browser)";
+                let msg = "⚠️ Could not get your GPS location.";
+                if (window.isSecureContext === false) msg = "❌ GPS requires HTTPS. Open v2.classgrid.in instead of localhost.";
+                else if (e.code === 1) msg = "❌ GPS Permission Denied. Tap the lock icon in your browser address bar → Allow Location.";
+                else if (e.code === 2) msg = "❌ GPS Unavailable. Make sure Location/GPS is turned ON in your phone settings.";
+                else if (e.code === 3) msg = "❌ GPS Timeout. Move near a window or outside for better GPS signal, then try again.";
 
                 errEl.textContent = msg;
                 errEl.style.display = 'block';
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-play"></i> Start Attendance Session';
-                return; // Hard Block
+                return; // Hard Block — NO FALLBACK
             }
 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+            // Show map verification UI
+            btn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Verify Location Below';
+            const mapContainer = document.createElement('div');
+            mapContainer.id = 'teacherMapVerify';
+            mapContainer.innerHTML = `
+                <div style="margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid var(--bd2)">
+                    <div style="background:var(--bg3);padding:10px 14px;font-size:12px;font-weight:700;color:var(--tx);border-bottom:1px solid var(--bd2);display:flex;justify-content:space-between;align-items:center">
+                        <span><i class="fas fa-crosshairs" style="color:var(--ac);margin-right:6px"></i>Your GPS Location</span>
+                        <span style="font-size:10px;background:rgba(79,142,255,0.1);color:var(--ac);padding:2px 8px;border-radius:12px">±${Math.round(gpsAccuracy || 0)}m accuracy</span>
+                    </div>
+                    <div id="teacherVerifyMap" style="width:100%;height:220px;background:#1a1a2e"></div>
+                    <div style="padding:12px 14px;background:var(--bg3);display:flex;gap:8px">
+                        <button id="confirmLocBtn" class="btnd" style="flex:1;padding:12px;border-radius:10px;font-size:13px;font-weight:700;background:linear-gradient(135deg,var(--gr),#00a87a);color:#fff;border:none;cursor:pointer">
+                            <i class="fas fa-check-circle"></i> Confirm & Start Session
+                        </button>
+                        <button id="retryLocBtn" class="btnd" style="padding:12px 16px;border-radius:10px;font-size:13px;font-weight:700;background:var(--bg2);color:var(--tx);border:1px solid var(--bd2);cursor:pointer" onclick="document.getElementById('teacherMapVerify').remove();g('startAttBtn').disabled=false;g('startAttBtn').innerHTML='<i class=\'fas fa-play\'></i> Start Attendance Session';">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                </div>`;
+            btn.parentNode.insertBefore(mapContainer, errEl);
 
-            try {
-                const durationVal = g('attDuration')?.value || "240";
-                const payload = { code, durationSeconds: parseInt(durationVal) };
-                if (teacherLat) payload.teacherLat = teacherLat;
-                if (teacherLng) payload.teacherLng = teacherLng;
+            // Render Google Map
+            setTimeout(() => {
+                const mapEl = document.getElementById('teacherVerifyMap');
+                if (mapEl && window.google && window.google.maps) {
+                    const pos = { lat: teacherLat, lng: teacherLng };
+                    const map = new google.maps.Map(mapEl, {
+                        center: pos, zoom: 18, mapTypeId: 'roadmap',
+                        disableDefaultUI: true, zoomControl: true,
+                        styles: [{featureType:'poi',stylers:[{visibility:'off'}]}]
+                    });
+                    new google.maps.Marker({
+                        position: pos, map, title: 'Your Location',
+                        animation: google.maps.Animation.DROP,
+                        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 12, fillColor: '#4F8EFF', fillOpacity: 1, strokeWeight: 3, strokeColor: '#fff' }
+                    });
+                    // Show accuracy circle
+                    new google.maps.Circle({
+                        strokeColor: '#4F8EFF', strokeOpacity: 0.4, strokeWeight: 1,
+                        fillColor: '#4F8EFF', fillOpacity: 0.08,
+                        map, center: pos, radius: gpsAccuracy || 10
+                    });
+                } else if (mapEl) {
+                    mapEl.innerHTML = `<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:13px;text-align:center;padding:20px"><div><i class="fas fa-map-marker-alt" style="font-size:24px;color:var(--ac);margin-bottom:8px;display:block"></i>GPS Location Captured<br><b>${teacherLat.toFixed(6)}, ${teacherLng.toFixed(6)}</b><br><span style="font-size:11px;color:var(--mt)">Google Maps SDK still loading...</span></div></div>`;
+                }
+            }, 200);
 
-                const r = await api(`/api/attendance/${CID}/start`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const d = await r.json();
-                if (!r.ok) throw new Error(d.message || 'Failed');
+            // Confirm button → actually start the session
+            document.getElementById('confirmLocBtn').onclick = async function() {
+                const confirmBtn = document.getElementById('confirmLocBtn');
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+                errEl.style.display = 'none';
 
-                toast('Attendance session started!', 'ok');
-                loadAttendanceTab();
-            } catch (e) {
-                errEl.textContent = e.message;
-                errEl.style.display = 'block';
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-play"></i> Start Attendance Session';
-            }
+                try {
+                    const durationVal = g('attDuration')?.value || "240";
+                    const payload = { code, durationSeconds: parseInt(durationVal), teacherLat, teacherLng };
+
+                    const r = await api(`/api/attendance/${CID}/start`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const d = await r.json();
+                    if (!r.ok) throw new Error(d.message || 'Failed');
+
+                    toast('Attendance session started!', 'ok');
+                    loadAttendanceTab();
+                } catch (e) {
+                    errEl.textContent = e.message;
+                    errEl.style.display = 'block';
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm & Start Session';
+                }
+            };
         };
 
         window.stopAttendance = async () => {
@@ -3658,7 +3749,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             }
         };
 
-        window.markAttendance = async function (sessionToken, requiresGPS) {
+        window.markAttendance = async function (sessionToken, requiresGPS, teacherLat, teacherLng, radiusMeters) {
             const codeEl = g('attStudentCode');
             const code = (codeEl?.value || '').trim();
             const errEl = g('attError');
@@ -3678,57 +3769,93 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             const btn = g('markAttBtn');
             btn.disabled = true;
 
-            // ── Fraud Signals ──
+            // — Fraud Signals —
             const pasteDetected = codeEl.dataset.pasted === 'true';
 
-            // ── GPS ──
+            // — GPS (STRICT — no IP/network fallback!) —
             let studentLat = null;
             let studentLng = null;
 
             if (requiresGPS) {
-                btn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Verifying Location...';
+                btn.innerHTML = '<i class="fas fa-satellite"></i> Getting Exact GPS...';
                 try {
                     const pos = await new Promise((resolve, reject) => {
-                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 15000, maximumAge: 0, enableHighAccuracy: true });
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 25000, maximumAge: 0, enableHighAccuracy: true });
                     });
                     studentLat = pos.coords.latitude;
                     studentLng = pos.coords.longitude;
-                } catch (e) {
-                    if (e.code === 3) { // TIMEOUT ON HIGH ACCURACY
-                        try {
-                            btn.innerHTML = '<i class="fas fa-satellite"></i> Retrying without GPS...';
-                            const fallbackPos = await new Promise((resolve, reject) => {
-                                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false });
-                            });
-                            studentLat = fallbackPos.coords.latitude;
-                            studentLng = fallbackPos.coords.longitude;
-                        } catch (eFallback) {
-                            errEl.textContent = "GPS keeps timing out. Please restart your browser or turn on Location Services.";
-                            errEl.style.display = 'block';
-                            btn.disabled = false;
-                            btn.innerHTML = '<i class="fas fa-check"></i> Mark Attendance';
-                            return;
+                    const accuracy = pos.coords.accuracy;
+
+                    // Show student on the live map
+                    if (window._attStudentMap && window.google && window.google.maps) {
+                        const studentPos = { lat: studentLat, lng: studentLng };
+                        const tPos = window._attTeacherPos;
+
+                        // Student marker
+                        new google.maps.Marker({
+                            position: studentPos, map: window._attStudentMap,
+                            title: 'You', animation: google.maps.Animation.DROP,
+                            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#4F8EFF', fillOpacity: 1, strokeWeight: 3, strokeColor: '#fff' }
+                        });
+
+                        // Line between teacher and student
+                        new google.maps.Polyline({
+                            path: [tPos, studentPos], geodesic: true,
+                            strokeColor: '#FF6B6B', strokeOpacity: 0.7, strokeWeight: 2,
+                            strokeDashArray: [8, 4], map: window._attStudentMap
+                        });
+
+                        // Fit both markers
+                        const bounds = new google.maps.LatLngBounds();
+                        bounds.extend(tPos);
+                        bounds.extend(studentPos);
+                        window._attStudentMap.fitBounds(bounds, 40);
+
+                        // Calculate distance using Google Maps geometry
+                        let dist = null;
+                        if (google.maps.geometry) {
+                            dist = google.maps.geometry.spherical.computeDistanceBetween(
+                                new google.maps.LatLng(tPos.lat, tPos.lng),
+                                new google.maps.LatLng(studentLat, studentLng)
+                            );
+                        }
+
+                        const sloc = g('studentLocDisplay');
+                        if (sloc && dist !== null) {
+                            const isInside = dist <= (radiusMeters || 25);
+                            sloc.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                                <div style="display:inline-flex;align-items:center;gap:6px;background:${isInside ? 'rgba(0,200,150,0.1)' : 'rgba(255,71,87,0.1)'};color:${isInside ? 'var(--gr)' : 'var(--rd)'};padding:6px 14px;border-radius:20px;font-size:12px;font-weight:800;border:1px solid ${isInside ? 'rgba(0,200,150,0.3)' : 'rgba(255,71,87,0.3)'}">
+                                    <i class="fas fa-${isInside ? 'check-circle' : 'exclamation-triangle'}"></i>
+                                    ${Math.round(dist)}m away ${isInside ? '— Inside Zone ✓' : '— Outside Zone!'}
+                                </div>
+                                <div style="font-size:10px;color:var(--mt)">GPS accuracy: ±${Math.round(accuracy)}m</div>
+                            </div>`;
+                            sloc.style.display = 'flex';
                         }
                     } else {
-                        let errMsg = "Location access needed. Please allow GPS to mark attendance.";
-                        if (window.isSecureContext === false) {
-                            errMsg = "Browser requires a secure connection (HTTPS or localhost) for GPS access.";
-                        } else if (e.code === 1) { // PERMISSION_DENIED
-                            errMsg = "GPS permission denied. Please allow it in device/browser settings.";
-                        } else if (e.code === 2) { // POSITION_UNAVAILABLE
-                            errMsg = "GPS position unavailable. Make sure device Location is ON.";
+                        const sloc = g('studentLocDisplay');
+                        if (sloc) {
+                            sloc.innerHTML = `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,150,0.1);color:var(--gr);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700"><i class="fas fa-user-circle"></i> Your GPS: ${studentLat.toFixed(5)}, ${studentLng.toFixed(5)}</div>`;
+                            sloc.style.display = 'flex';
                         }
-                        errEl.textContent = errMsg;
-                        errEl.style.display = 'block';
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-check"></i> Mark Attendance';
-                        return;
                     }
-                }
-                const sloc = g('studentLocDisplay');
-                if (sloc) {
-                    sloc.innerHTML = `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,150,0.1);color:var(--gr);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;"><i class="fas fa-user-circle"></i> Your GPS: ${studentLat.toFixed(5)}, ${studentLng.toFixed(5)}</div>`;
-                    sloc.style.display = 'flex';
+                } catch (e) {
+                    // STRICT: No fallback to low accuracy — that's what caused the Pinjam bug!
+                    let errMsg = "❌ GPS is required to mark attendance.";
+                    if (window.isSecureContext === false) {
+                        errMsg = "❌ GPS needs HTTPS. Open v2.classgrid.in in your browser.";
+                    } else if (e.code === 1) {
+                        errMsg = "❌ GPS Permission Denied. Tap the lock icon in your browser → Allow Location.";
+                    } else if (e.code === 2) {
+                        errMsg = "❌ GPS Unavailable. Turn ON Location in your phone settings.";
+                    } else if (e.code === 3) {
+                        errMsg = "❌ GPS timed out. Move closer to a window or step outside briefly for GPS signal.";
+                    }
+                    errEl.textContent = errMsg;
+                    errEl.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Mark Attendance';
+                    return;
                 }
             }
 
@@ -3906,6 +4033,8 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
 
     <!-- SPA Router: instant navigation between classroom/view-classroom/settings -->
     <script src="/js/spa-router.js"></script>
+    <!-- Google Maps SDK for live attendance location -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_Z3r-QnKRPQWpldDcEydeX6aHJOlAN6A&libraries=geometry" async defer></script>
 </body>
 
 </html>

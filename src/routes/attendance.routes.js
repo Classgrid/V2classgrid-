@@ -735,6 +735,7 @@ router.get(
                     requiresGPS: !!(session.teacherLat && session.teacherLng),
                     teacherLat: session.teacherLat,
                     teacherLng: session.teacherLng,
+                    radiusMeters: session.radiusMeters || 25,
                     teacherMetadata: session.teacherMetadata || {},
                 },
             });
