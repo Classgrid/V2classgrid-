@@ -731,9 +731,19 @@ router.get(
             if (!session) return res.json({ active: false });
 
             let alreadyMarked = false;
+            let studentData = {};
+            
             if (req.user.role === "student") {
                 const record = await AttendanceRecord.findOne({ session: session._id, student: req.user._id }).lean();
-                alreadyMarked = !!record;
+                if (record) {
+                    alreadyMarked = true;
+                    studentData = {
+                        lat: record.studentLat,
+                        lng: record.studentLng,
+                        distanceMeters: record.distanceMeters,
+                        locationName: record.locationName
+                    };
+                }
             }
 
             res.json({
@@ -745,6 +755,7 @@ router.get(
                     durationSeconds: session.durationSeconds,
                     presentCount: session.presentCount,
                     alreadyMarked,
+                    studentData,
                     // Send token to frontend so mark request can include it
                     sessionToken: session.sessionToken,
                     // Tell frontend whether to request GPS permission

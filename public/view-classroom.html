@@ -3601,14 +3601,110 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             if (data.active) {
                 const s = data.session;
                 if (s.alreadyMarked) {
-                    el.innerHTML = `
-                    <div style="padding:40px 20px;text-align:center">
-                        <div style="width:64px;height:64px;border-radius:50%;background:rgba(0,200,150,.12);display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px">
-                            <i class="fas fa-check-circle" style="font-size:30px;color:var(--gr)"></i>
-                        </div>
-                        <h3 style="font-size:18px;font-weight:700;color:var(--gr);margin-bottom:6px">Attendance Marked!</h3>
-                        <p style="font-size:13px;color:var(--mt)">Your attendance for this session has been recorded.</p>
-                    </div>`;
+                    if (s.requiresGPS && s.studentData && s.studentData.lat) {
+                        const d = s.studentData;
+                        el.innerHTML = `
+                        <div style="padding:20px">
+                            <div style="background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.25);border-radius:14px;padding:20px;text-align:center;margin-bottom:20px">
+                                <div style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:rgba(0,200,150,.12);margin-bottom:10px">
+                                    <i class="fas fa-check" style="font-size:20px;color:var(--gr)"></i>
+                                </div>
+                                <h3 style="font-size:18px;font-weight:700;color:var(--gr);margin-bottom:4px">Attendance Marked!</h3>
+                                <p style="font-size:12px;color:var(--tx);margin-bottom:0">Your attendance has been recorded successfully.</p>
+                            </div>
+                            
+                            <div style="border:1px solid var(--bd2);border-radius:14px;overflow:hidden;background:var(--bg3);margin-bottom:16px">
+                                <div style="padding:12px 14px;border-bottom:1px solid var(--bd2);background:var(--bg2)">
+                                    <div style="font-size:11px;font-weight:700;color:var(--mt);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px"><i class="fas fa-map-marked-alt" style="margin-right:6px"></i>Your Location Data</div>
+                                    <div style="font-size:13px;font-weight:700;color:var(--tx)"><i class="fas fa-map-marker-alt" style="color:var(--ac);margin-right:4px"></i> ${d.locationName ? x(d.locationName) : 'Location Unavailable'}</div>
+                                    <div style="font-size:12px;color:var(--tx);margin-top:6px;display:flex;align-items:center;gap:6px">
+                                        <div style="background:rgba(79,142,255,0.1);color:var(--ac);padding:4px 10px;border-radius:12px;font-weight:700"><i class="fas fa-ruler"></i> Total Distance: ${d.distanceMeters != null ? Math.round(d.distanceMeters) + 'm' : 'Unknown'}</div>
+                                    </div>
+                                </div>
+                                <div id="studentSuccessMap" style="width:100%;height:220px;background:#1a1a2e"></div>
+                            </div>
+                            
+                            <div style="background:rgba(255,165,2,0.1);border:1px solid rgba(255,165,2,0.3);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
+                                <i class="fas fa-exclamation-triangle" style="color:#ffa502;margin-top:2px"></i>
+                                <div style="font-size:11px;color:var(--tx);line-height:1.4"><b>Note:</b> Sometimes our GPS system can face issues. Please ensure your device location is enabled and highly accurate if you experience anomalies.</div>
+                            </div>
+                        </div>`;
+
+                        setTimeout(() => {
+                            const mapEl = document.getElementById('studentSuccessMap');
+                            if (mapEl && typeof maplibregl !== 'undefined' && AWS_MAP_STYLE_URL) {
+                                const teacherPos = [s.teacherLng, s.teacherLat];
+                                const studentPos = [d.lng, d.lat];
+                                
+                                const map = new maplibregl.Map({
+                                    container: 'studentSuccessMap',
+                                    style: AWS_MAP_STYLE_URL,
+                                    center: studentPos,
+                                    zoom: 17,
+                                    attributionControl: false,
+                                    interactive: true
+                                });
+                                
+                                // Teacher marker
+                                new maplibregl.Marker({ color: "#FF4757" })
+                                    .setLngLat(teacherPos)
+                                    .addTo(map);
+                                    
+                                // Student marker
+                                new maplibregl.Marker({ color: "#4F8EFF" })
+                                    .setLngLat(studentPos)
+                                    .addTo(map);
+
+                                map.on('load', () => {
+                                    // Route line
+                                    map.addSource('route', {
+                                        'type': 'geojson',
+                                        'data': {
+                                            'type': 'Feature',
+                                            'properties': {},
+                                            'geometry': {
+                                                'type': 'LineString',
+                                                'coordinates': [teacherPos, studentPos]
+                                            }
+                                        }
+                                    });
+                                    map.addLayer({
+                                        'id': 'route',
+                                        'type': 'line',
+                                        'source': 'route',
+                                        'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                                        'paint': { 'line-color': '#FF6B6B', 'line-width': 2, 'line-dasharray': [2, 2] }
+                                    });
+
+                                    // Teacher Radius
+                                    map.addSource('radius-circle', {
+                                        type: 'geojson',
+                                        data: createCircleGeoJSON(teacherPos, s.radiusMeters || 25)
+                                    });
+                                    map.addLayer({
+                                        id: 'radius-circle-fill',
+                                        type: 'fill',
+                                        source: 'radius-circle',
+                                        paint: { 'fill-color': '#00C896', 'fill-opacity': 0.15 }
+                                    });
+
+                                    // Fit bounds
+                                    const bounds = new maplibregl.LngLatBounds(teacherPos, teacherPos);
+                                    bounds.extend(studentPos);
+                                    map.fitBounds(bounds, { padding: 40 });
+                                });
+                            }
+                        }, 300);
+                    } else {
+                        el.innerHTML = `
+                        <div style="padding:40px 20px;text-align:center">
+                            <div style="width:64px;height:64px;border-radius:50%;background:rgba(0,200,150,.12);display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px">
+                                <i class="fas fa-check-circle" style="font-size:30px;color:var(--gr)"></i>
+                            </div>
+                            <h3 style="font-size:18px;font-weight:700;color:var(--gr);margin-bottom:6px">Attendance Marked!</h3>
+                            <p style="font-size:13px;color:var(--mt)">Your attendance for this session has been recorded.</p>
+                        </div>`;
+                    }
                 } else {
                     el.innerHTML = `
                     <div style="padding:20px">
