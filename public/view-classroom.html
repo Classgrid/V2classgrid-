@@ -3609,11 +3609,14 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                     </div>`;
                     startCountdown(s.expiresAt);
 
-                    // Initialize AWS Map (MapLibre) for student if GPS session
                     if (s.requiresGPS) {
                         setTimeout(() => {
                             const mapEl = document.getElementById('studentLiveMap');
                             if (mapEl && typeof maplibregl !== 'undefined') {
+                                if (!AWS_MAP_STYLE_URL) {
+                                    mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:12px;text-align:center;padding:15px">AWS Map API Key missing in environment variables.<br>Teacher: ' + s.teacherLat.toFixed(5) + ', ' + s.teacherLng.toFixed(5) + '</div>';
+                                    return;
+                                }
                                 const teacherPos = [s.teacherLng, s.teacherLat];
                                 const map = new maplibregl.Map({
                                     container: 'studentLiveMap',
@@ -3771,6 +3774,10 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             setTimeout(() => {
                 const mapEl = document.getElementById('teacherVerifyMap');
                 if (mapEl && typeof maplibregl !== 'undefined') {
+                    if (!AWS_MAP_STYLE_URL) {
+                        mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:13px;text-align:center;padding:20px"><div><i class="fas fa-map-marker-alt" style="font-size:24px;color:var(--ac);margin-bottom:8px;display:block"></i>GPS Location Captured<br><b>' + teacherLat.toFixed(5) + ', ' + teacherLng.toFixed(5) + '</b><br><span style="font-size:11px;color:var(--rd)">AWS Map API Key missing in environment variables.</span></div></div>';
+                        return;
+                    }
                     const pos = [teacherLng, teacherLat];
                     const map = new maplibregl.Map({
                         container: 'teacherVerifyMap',
