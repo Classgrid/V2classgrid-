@@ -3748,7 +3748,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                 return;
             }
 
-            const exactLocationName = await getExactLocationName(teacherLat, teacherLng);
+            let exactLocationName = await getExactLocationName(teacherLat, teacherLng);
 
             btn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Verify Location Below';
             const mapContainer = document.createElement('div');
@@ -3759,8 +3759,10 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                         <span><i class="fas fa-crosshairs" style="color:var(--ac);margin-right:6px"></i>Your Location</span>
                         <span style="font-size:10px;background:rgba(79,142,255,0.1);color:var(--ac);padding:2px 8px;border-radius:12px">±${Math.round(gpsAccuracy || 0)}m</span>
                     </div>
-                    ${exactLocationName ? `<div style="background:var(--surface);padding:10px 14px;font-size:11px;color:var(--tx);border-bottom:1px solid var(--bd2);display:flex;align-items:center;gap:8px;"><i class="fas fa-map-marker-alt" style="color:var(--rd)"></i> <span style="font-weight:600">${esc(exactLocationName)}</span></div>` : ''}
-                    <div id="teacherVerifyMap" style="width:100%;height:220px;background:#1a1a2e"></div>
+                    <div style="background:var(--surface);padding:10px 14px;font-size:11px;color:var(--tx);border-bottom:1px solid var(--bd2);display:flex;align-items:center;gap:8px;" id="teacherExactLocText">
+                        ${exactLocationName ? `<i class="fas fa-map-marker-alt" style="color:var(--rd)"></i> <span style="font-weight:600">${esc(exactLocationName)}</span>` : '<span style="color:var(--mt)">Location Name Unavailable</span>'}
+                    </div>
+                    <div id="teacherVerifyMap" style="width:100%;height:220px;background:#1a1a2e;position:relative;"></div>
                     <div style="padding:12px 14px;background:var(--bg3);display:flex;gap:8px">
                         <button id="confirmLocBtn" class="btnd" style="flex:1;padding:12px;border-radius:10px;font-size:13px;font-weight:700;background:linear-gradient(135deg,var(--gr),#00a87a);color:#fff;border:none;cursor:pointer">
                             <i class="fas fa-check-circle"></i> Confirm & Start Session
@@ -3787,7 +3789,29 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                         zoom: 17,
                         attributionControl: false
                     });
-                    new maplibregl.Marker({ color: "#4F8EFF" }).setLngLat(pos).addTo(map);
+                    
+                    const marker = new maplibregl.Marker({ color: "#4F8EFF", draggable: true })
+                        .setLngLat(pos)
+                        .addTo(map);
+                        
+                    const hint = document.createElement('div');
+                    hint.innerHTML = '<div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;pointer-events:none;z-index:10;backdrop-filter:blur(4px);box-shadow:0 4px 12px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);"><i class="fas fa-hand-pointer" style="margin-right:6px"></i>Drag pin to exact location</div>';
+                    document.getElementById('teacherVerifyMap').appendChild(hint);
+
+                    marker.on('dragend', async () => {
+                        const lngLat = marker.getLngLat();
+                        teacherLng = lngLat.lng;
+                        teacherLat = lngLat.lat;
+                        
+                        const locTextEl = document.getElementById('teacherExactLocText');
+                        if (locTextEl) locTextEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--ac)"></i> <span style="color:var(--mt)">Finding exact address...</span>';
+                        
+                        exactLocationName = await getExactLocationName(teacherLat, teacherLng);
+                        
+                        if (locTextEl) {
+                            locTextEl.innerHTML = exactLocationName ? `<i class="fas fa-map-marker-alt" style="color:var(--rd)"></i> <span style="font-weight:600">${esc(exactLocationName)}</span>` : '<span style="color:var(--mt)">Location Name Unavailable</span>';
+                        }
+                    });
                 }
             }, 200);
 
