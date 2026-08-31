@@ -45,6 +45,10 @@ const attendanceRecordSchema = new mongoose.Schema(
             type: Number,
             default: null,
         },
+        locationName: {
+            type: String,
+            default: null, // Reverse geocoded text (e.g. "PCCOE College")
+        },
         // Calculated Haversine distance from teacher's GPS (meters)
         distanceMeters: {
             type: Number,

@@ -55,6 +55,10 @@ const attendanceSessionSchema = new mongoose.Schema(
             type: Number,
             default: null,
         },
+        locationName: {
+            type: String,
+            default: null, // Reverse geocoded text (e.g. "PCCOE College")
+        },
         // Captured from Vercel headers for the teacher
         teacherMetadata: {
             type: Object,
