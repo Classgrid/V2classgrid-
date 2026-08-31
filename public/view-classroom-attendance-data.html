@@ -1395,10 +1395,6 @@
             if (student.status !== 'absent') {
                 const meta = student.deviceMetadata || {};
                 
-                const fullRegion = getRegionName(meta.region, meta.country);
-                const fullCountry = getCountryName(meta.country);
-                
-                const loc = [meta.city, fullRegion, fullCountry].filter(Boolean).join(', ') || 'Unknown Location';
                 let dist = 'Unknown GPS distance';
                 if (student.distanceMeters != null) {
                     const d = Math.round(student.distanceMeters);
