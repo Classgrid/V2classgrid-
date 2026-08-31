@@ -3366,18 +3366,41 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             return { type: "Feature", geometry: { type: "Polygon", coordinates: [ret] } };
         }
 
-        // Helper: Convert coordinates to Exact Location Name (Reverse Geocoding via OpenStreetMap)
+        // Helper: Convert coordinates to Exact Location Name (Reverse Geocoding via AWS Location Service)
         async function getExactLocationName(lat, lng) {
             try {
-                const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
-                const d = await r.json();
-                if (d && d.display_name) {
-                    // Make it shorter: e.g. "PCCOE, Sector 26, Pune"
-                    const parts = d.display_name.split(',').slice(0, 4);
+                // Fetch AWS API Config securely
+                const rConf = await api('/api/attendance/maps-config');
+                const conf = await rConf.json();
+                if (!conf.success || !conf.apiKey) return null;
+
+                const awsRegion = conf.region || "eu-north-1";
+                const indexName = "classgrid"; // Assumes a place index named "classgrid" exists
+                
+                const response = await fetch(`https://places.geo.${awsRegion}.amazonaws.com/places/v0/indexes/${indexName}/search/position?key=${conf.apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        Position: [lng, lat],
+                        MaxResults: 1,
+                        Language: "en"
+                    })
+                });
+
+                if (!response.ok) {
+                    console.warn("AWS Reverse Geocode failed. Did you create the Place Index 'classgrid'?", await response.text());
+                    return null;
+                }
+
+                const data = await response.json();
+                if (data.Results && data.Results.length > 0) {
+                    // Make it shorter by taking first 4 components of the Label
+                    const label = data.Results[0].Place.Label || "";
+                    const parts = label.split(',').slice(0, 4);
                     return parts.join(',').trim();
                 }
             } catch(e) {
-                console.warn("Reverse geocode failed:", e);
+                console.error("AWS Reverse Geocode exception:", e);
             }
             return null;
         }
