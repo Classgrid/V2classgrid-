@@ -35,7 +35,7 @@ router.get("/maps-config", isAuthenticated, (req, res) => {
         success: true,
         region: process.env.AWS_LOCATION_REGION || "eu-north-1",
         mapName: process.env.AWS_LOCATION_MAP_NAME || "classgrid",
-        apiKey: process.env.AWS_LOCATION_API_KEY || ""
+        apiKey: process.env.AWS_LOCATION_API_KEY || "v1.public.eyJqdGkiOiJjNDMzMWM1Mi1kZjhlLTQyZDYtODNjNi1lMWVhZWU4MDc3M2MifU3kZFVA9jUPV9ZKYppomYXKfRoToc-9QRCLGz35Wa27DEYu_ReZkIEgGAxLst6S_VWlozLEWt17rabSRc_39Jz42nJurJnjZoGypP5dquXqfcaAHN9yJlFyPD6pTDM5FhS4438WawkKjanUyjTavSLRG0EUrcB0n4GYQxbJUjjDA-cxZNnNM2Koua51ctj5iZlkqM4S7uC0NQOdvtqes76kpB3W9b1mylzpKltOKEzjCWuJmJg4PuW2aRQz0kEqvAaSbjAqEv60KYxppHmfau5LzjAhJfNHo8WQekl_bMfpFZ3gsjdeQCXyDrKmjUcAejCXEllTnk-d8cQUl-kYMrg.N2IyNTQ2ODQtOWE1YS00MmI2LTkyOTItMGJlNGMxODU1Mzc2"
     });
 });
 
