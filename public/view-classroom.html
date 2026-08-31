@@ -3418,6 +3418,36 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             });
         });
 
+        // Smart GPS Warm-up (like Uber/Zomato)
+        // Uses watchPosition to collect multiple readings and picks the most accurate one
+        function getBestGPS(timeoutMs, maxAccuracyM) {
+            timeoutMs = timeoutMs || 6000;
+            maxAccuracyM = maxAccuracyM || 50;
+            return new Promise(function(resolve, reject) {
+                var bestReading = null;
+                var watchId = null;
+                function done() {
+                    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                    if (bestReading) { resolve(bestReading); }
+                    else { navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 15000, maximumAge: 0, enableHighAccuracy: true }); }
+                }
+                var timer = setTimeout(done, timeoutMs);
+                try {
+                    watchId = navigator.geolocation.watchPosition(
+                        function(pos) {
+                            var acc = pos.coords.accuracy;
+                            if (!bestReading || acc < bestReading.coords.accuracy) { bestReading = pos; }
+                            if (acc <= maxAccuracyM) { clearTimeout(timer); done(); }
+                        },
+                        function(err) {
+                            if (!bestReading) { clearTimeout(timer); if (watchId !== null) navigator.geolocation.clearWatch(watchId); reject(err); }
+                        },
+                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                    );
+                } catch(e) { clearTimeout(timer); reject(e); }
+            });
+        }
         // â”€â”€ ATTENDANCE TAB LOGIC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         let ATT_TIMER = null;
         let ATT_REFRESH = null;
@@ -3734,9 +3764,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             let gpsAccuracy = null;
 
             try {
-                const pos = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 25000, maximumAge: 0, enableHighAccuracy: true });
-                });
+                const pos = await getBestGPS(8000, 30);
                 teacherLat = pos.coords.latitude;
                 teacherLng = pos.coords.longitude;
                 gpsAccuracy = pos.coords.accuracy;
@@ -3907,9 +3935,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             if (requiresGPS) {
                 btn.innerHTML = '<i class="fas fa-satellite"></i> Getting Exact GPS...';
                 try {
-                    const pos = await new Promise((resolve, reject) => {
-                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 25000, maximumAge: 0, enableHighAccuracy: true });
-                    });
+                    const pos = await getBestGPS(6000, 50);
                     studentLat = pos.coords.latitude;
                     studentLng = pos.coords.longitude;
                     const accuracy = pos.coords.accuracy;
