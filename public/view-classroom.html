@@ -3334,7 +3334,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                     AWS_MAP_STYLE_URL = `https://maps.geo.${d.region}.amazonaws.com/maps/v0/maps/${d.mapName}/style-descriptor?key=${d.apiKey}`;
                 }
             } catch(e) {
-                console.error("Failed to load AWS Maps config", e);
+                console.error("Failed to load Maps config", e);
             }
             return AWS_MAP_STYLE_URL;
         }
@@ -3388,7 +3388,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                 });
 
                 if (!response.ok) {
-                    console.warn("AWS Reverse Geocode failed. Did you create the Place Index 'classgrid'?", await response.text());
+                    console.warn("Reverse Geocode failed", await response.text());
                     return null;
                 }
 
@@ -3400,7 +3400,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                     return parts.join(',').trim();
                 }
             } catch(e) {
-                console.error("AWS Reverse Geocode exception:", e);
+                console.error("Reverse Geocode exception:", e);
             }
             return null;
         }
@@ -3487,7 +3487,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                     <div id="stopAttError" style="display:none;margin-top:10px;padding:10px;border-radius:8px;background:rgba(255,71,87,.08);color:var(--rd);font-size:13px;font-weight:600"></div>
                     
                     <div style="margin-top:20px;border-top:1px solid var(--bd);padding-top:20px;">
-                        <div style="font-size:11px;font-weight:700;color:var(--mt);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;text-align:center;">Your Session Identity (Vercel Tracking)</div>
+                        <div style="font-size:11px;font-weight:700;color:var(--mt);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;text-align:center;">Your Session Identity</div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                             ${s.teacherLocationName ? `<div style="background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:10px;font-size:12px;grid-column: 1 / -1;"><div style="color:var(--mt);font-size:10px;margin-bottom:2px;">Exact Location Name</div><div style="color:var(--tx);font-weight:700;"><i class="fas fa-map-marker-alt" style="color:var(--rd);margin-right:4px;"></i> ${x(s.teacherLocationName)}</div></div>` : ''}
                             ${s.requiresGPS ? `<div style="background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:10px;font-size:12px;"><div style="color:var(--mt);font-size:10px;margin-bottom:2px;">GPS Coordinates</div><div style="color:var(--tx);font-weight:600;"><i class="fas fa-location-arrow" style="color:var(--ac);margin-right:4px;"></i> ${s.teacherLat.toFixed(5)}, ${s.teacherLng.toFixed(5)}</div></div>` : ''}
@@ -3614,7 +3614,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                             const mapEl = document.getElementById('studentLiveMap');
                             if (mapEl && typeof maplibregl !== 'undefined') {
                                 if (!AWS_MAP_STYLE_URL) {
-                                    mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:12px;text-align:center;padding:15px">AWS Map API Key missing in environment variables.<br>Teacher: ' + s.teacherLat.toFixed(5) + ', ' + s.teacherLng.toFixed(5) + '</div>';
+                                    mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:12px;text-align:center;padding:15px">Map configuration missing in environment.<br>Teacher: ' + s.teacherLat.toFixed(5) + ', ' + s.teacherLng.toFixed(5) + '</div>';
                                     return;
                                 }
                                 const teacherPos = [s.teacherLng, s.teacherLat];
@@ -3659,7 +3659,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                                 window._attStudentMap = map;
                                 window._attTeacherPos = teacherPos; // [lng, lat]
                             } else if (mapEl) {
-                                mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:12px;text-align:center;padding:15px">AWS Maps loading...<br>Teacher: ' + s.teacherLat.toFixed(5) + ', ' + s.teacherLng.toFixed(5) + '</div>';
+                                mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:12px;text-align:center;padding:15px">Map loading...<br>Teacher: ' + s.teacherLat.toFixed(5) + ', ' + s.teacherLng.toFixed(5) + '</div>';
                             }
                         }, 300);
                     }
@@ -3775,7 +3775,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                 const mapEl = document.getElementById('teacherVerifyMap');
                 if (mapEl && typeof maplibregl !== 'undefined') {
                     if (!AWS_MAP_STYLE_URL) {
-                        mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:13px;text-align:center;padding:20px"><div><i class="fas fa-map-marker-alt" style="font-size:24px;color:var(--ac);margin-bottom:8px;display:block"></i>GPS Location Captured<br><b>' + teacherLat.toFixed(5) + ', ' + teacherLng.toFixed(5) + '</b><br><span style="font-size:11px;color:var(--rd)">AWS Map API Key missing in environment variables.</span></div></div>';
+                        mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:13px;text-align:center;padding:20px"><div><i class="fas fa-map-marker-alt" style="font-size:24px;color:var(--ac);margin-bottom:8px;display:block"></i>GPS Location Captured<br><b>' + teacherLat.toFixed(5) + ', ' + teacherLng.toFixed(5) + '</b><br><span style="font-size:11px;color:var(--rd)">Map configuration missing in environment.</span></div></div>';
                         return;
                     }
                     const pos = [teacherLng, teacherLat];
