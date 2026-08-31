@@ -1417,34 +1417,21 @@
                     parts = parts.filter(p => !/^\d+$/.test(p.replace(/\s/g, '')));
                     
                     if (parts.length > 0) {
-                        const lastPart = parts[parts.length - 1];
-                        const indianStates = ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Delhi','Chandigarh','Andaman','Puducherry','Jammu','Ladakh'];
-                        
-                        const isLastPartState = indianStates.some(s => lastPart.toLowerCase().includes(s.toLowerCase()));
-                        
-                        if (isLastPartState) {
-                            // AWS string ended with the State
-                            gpsCountry = 'India';
-                            gpsState = lastPart;
-                            gpsCity = parts.length >= 2 ? parts[parts.length - 2] : 'Unavailable';
-                            gpsLocalArea = parts.length >= 3 ? parts[parts.length - 3] : 'Unavailable';
-                        } else {
-                            // Standard format: [..., LocalArea, City, State, Country]
-                            if (parts.length >= 4) {
-                                gpsCountry = parts[parts.length - 1]; 
-                                gpsState = parts[parts.length - 2];   
-                                gpsCity = parts[parts.length - 3];    
-                                gpsLocalArea = parts[parts.length - 4];
-                            } else if (parts.length === 3) {
-                                gpsCountry = parts[2];
-                                gpsState = parts[1];
-                                gpsCity = parts[0];
-                            } else if (parts.length === 2) {
-                                gpsCountry = parts[1];
-                                gpsState = parts[0];
-                            } else if (parts.length === 1) {
-                                gpsCountry = parts[0];
-                            }
+                        // Pure dynamic parsing based on AWS commas, zero hardcoding
+                        if (parts.length >= 4) {
+                            gpsCountry = parts[parts.length - 1]; 
+                            gpsState = parts[parts.length - 2];   
+                            gpsCity = parts[parts.length - 3];    
+                            gpsLocalArea = parts[parts.length - 4];
+                        } else if (parts.length === 3) {
+                            gpsCountry = parts[2];
+                            gpsState = parts[1];
+                            gpsCity = parts[0];
+                        } else if (parts.length === 2) {
+                            gpsCountry = parts[1];
+                            gpsState = parts[0];
+                        } else if (parts.length === 1) {
+                            gpsCountry = parts[0];
                         }
                     }
                 }
