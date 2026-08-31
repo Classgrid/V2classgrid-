@@ -27,6 +27,19 @@ const ATTENDANCE_MODE = process.env.ATTENDANCE_MODE || "testing";
 const IS_STRICT = ATTENDANCE_MODE === "strict";
 
 /**
+ * Get AWS Location Service Configuration
+ * Used by the frontend to render the MapLibre map without hardcoding the API key.
+ */
+router.get("/maps-config", isAuthenticated, (req, res) => {
+    res.json({
+        success: true,
+        region: process.env.AWS_LOCATION_REGION || "eu-north-1",
+        mapName: process.env.AWS_LOCATION_MAP_NAME || "classgrid",
+        apiKey: process.env.AWS_LOCATION_API_KEY || ""
+    });
+});
+
+/**
  * Auto-expire sessions that have passed their expiresAt time.
  * Fires absence notification emails for each newly expired session.
  */

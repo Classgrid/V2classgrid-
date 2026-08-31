@@ -3322,6 +3322,50 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                 body: JSON.stringify({ classroomId: CID, action: `view_${type}`, targetType: type, targetId: id, targetTitle: title })
             }).catch(() => { });
         }
+
+        // AWS Location Service Configuration (Fetched securely from backend)
+        let AWS_MAP_STYLE_URL = null;
+        async function loadAwsMapConfig() {
+            if (AWS_MAP_STYLE_URL) return AWS_MAP_STYLE_URL;
+            try {
+                const r = await api('/api/attendance/maps-config');
+                const d = await r.json();
+                if (d.success && d.apiKey) {
+                    AWS_MAP_STYLE_URL = `https://maps.geo.${d.region}.amazonaws.com/maps/v0/maps/${d.mapName}/style-descriptor?key=${d.apiKey}`;
+                }
+            } catch(e) {
+                console.error("Failed to load AWS Maps config", e);
+            }
+            return AWS_MAP_STYLE_URL;
+        }
+
+        // Helper: Calculate distance between two coordinates in meters
+        function haversineDist(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // Earth radius in meters
+            const p1 = lat1 * Math.PI / 180;
+            const p2 = lat2 * Math.PI / 180;
+            const dp = (lat2 - lat1) * Math.PI / 180;
+            const dl = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        // Helper: Generate GeoJSON polygon for radius circle
+        function createCircleGeoJSON(center, radiusInMeters) {
+            const points = 64;
+            const coords = { latitude: center[1], longitude: center[0] };
+            const km = radiusInMeters / 1000;
+            const ret = [];
+            const distanceX = km / (111.320 * Math.cos(coords.latitude * Math.PI / 180));
+            const distanceY = km / 110.574;
+            for(let i=0; i<points; i++) {
+                const theta = (i / points) * (2 * Math.PI);
+                ret.push([coords.longitude + distanceX * Math.cos(theta), coords.latitude + distanceY * Math.sin(theta)]);
+            }
+            ret.push(ret[0]); // close polygon
+            return { type: "Feature", geometry: { type: "Polygon", coordinates: [ret] } };
+        }
+
         function g(id) { return document.getElementById(id) }
         function x(s) { if (!s) return ''; return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') }
 
@@ -3341,6 +3385,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
 
         async function loadAttendanceTab() {
             try {
+                await loadAwsMapConfig();
                 const r = await api(`/api/attendance/${CID}/active`);
                 if (r.status === 403) {
                     // Not PRO â— hide tab
@@ -3516,35 +3561,54 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                     </div>`;
                     startCountdown(s.expiresAt);
 
-                    // Initialize Google Map for student if GPS session
+                    // Initialize AWS Map (MapLibre) for student if GPS session
                     if (s.requiresGPS) {
                         setTimeout(() => {
                             const mapEl = document.getElementById('studentLiveMap');
-                            if (mapEl && window.google && window.google.maps) {
-                                const teacherPos = { lat: s.teacherLat, lng: s.teacherLng };
-                                const map = new google.maps.Map(mapEl, {
+                            if (mapEl && typeof maplibregl !== 'undefined') {
+                                const teacherPos = [s.teacherLng, s.teacherLat];
+                                const map = new maplibregl.Map({
+                                    container: 'studentLiveMap',
+                                    style: AWS_MAP_STYLE_URL,
                                     center: teacherPos,
-                                    zoom: 18,
-                                    mapTypeId: 'roadmap',
-                                    disableDefaultUI: true,
-                                    zoomControl: true,
-                                    gestureHandling: 'greedy',
-                                    styles: [{featureType:'poi',stylers:[{visibility:'off'}]}]
+                                    zoom: 17,
+                                    attributionControl: false
                                 });
-                                new google.maps.Marker({
-                                    position: teacherPos, map,
-                                    title: 'Teacher Location',
-                                    icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#FF4757', fillOpacity: 1, strokeWeight: 3, strokeColor: '#fff' }
+                                
+                                new maplibregl.Marker({ color: "#FF4757" })
+                                    .setLngLat(teacherPos)
+                                    .addTo(map);
+
+                                map.on('load', () => {
+                                    map.addSource('radius-circle', {
+                                        type: 'geojson',
+                                        data: createCircleGeoJSON(teacherPos, s.radiusMeters || 25)
+                                    });
+                                    map.addLayer({
+                                        id: 'radius-circle-fill',
+                                        type: 'fill',
+                                        source: 'radius-circle',
+                                        paint: {
+                                            'fill-color': '#00C896',
+                                            'fill-opacity': 0.15
+                                        }
+                                    });
+                                    map.addLayer({
+                                        id: 'radius-circle-outline',
+                                        type: 'line',
+                                        source: 'radius-circle',
+                                        paint: {
+                                            'line-color': '#00C896',
+                                            'line-width': 2,
+                                            'line-opacity': 0.8
+                                        }
+                                    });
                                 });
-                                new google.maps.Circle({
-                                    strokeColor: '#00C896', strokeOpacity: 0.8, strokeWeight: 2,
-                                    fillColor: '#00C896', fillOpacity: 0.12,
-                                    map, center: teacherPos, radius: s.radiusMeters || 25
-                                });
+
                                 window._attStudentMap = map;
-                                window._attTeacherPos = teacherPos;
+                                window._attTeacherPos = teacherPos; // [lng, lat]
                             } else if (mapEl) {
-                                mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:12px;text-align:center;padding:15px">Google Maps loading...<br>Teacher: ' + s.teacherLat.toFixed(5) + ', ' + s.teacherLng.toFixed(5) + '</div>';
+                                mapEl.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:12px;text-align:center;padding:15px">AWS Maps loading...<br>Teacher: ' + s.teacherLat.toFixed(5) + ', ' + s.teacherLng.toFixed(5) + '</div>';
                             }
                         }, 300);
                     }
@@ -3662,29 +3726,53 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                 </div>`;
             btn.parentNode.insertBefore(mapContainer, errEl);
 
-            // Render Google Map
+            // Render AWS Map (MapLibre)
             setTimeout(() => {
                 const mapEl = document.getElementById('teacherVerifyMap');
-                if (mapEl && window.google && window.google.maps) {
-                    const pos = { lat: teacherLat, lng: teacherLng };
-                    const map = new google.maps.Map(mapEl, {
-                        center: pos, zoom: 18, mapTypeId: 'roadmap',
-                        disableDefaultUI: true, zoomControl: true,
-                        styles: [{featureType:'poi',stylers:[{visibility:'off'}]}]
+                if (mapEl && typeof maplibregl !== 'undefined') {
+                    const pos = [teacherLng, teacherLat];
+                    const map = new maplibregl.Map({
+                        container: 'teacherVerifyMap',
+                        style: AWS_MAP_STYLE_URL,
+                        center: pos,
+                        zoom: 17,
+                        attributionControl: false
                     });
-                    new google.maps.Marker({
-                        position: pos, map, title: 'Your Location',
-                        animation: google.maps.Animation.DROP,
-                        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 12, fillColor: '#4F8EFF', fillOpacity: 1, strokeWeight: 3, strokeColor: '#fff' }
-                    });
+                    
+                    // Teacher Marker
+                    new maplibregl.Marker({ color: "#4F8EFF" })
+                        .setLngLat(pos)
+                        .addTo(map);
+
                     // Show accuracy circle
-                    new google.maps.Circle({
-                        strokeColor: '#4F8EFF', strokeOpacity: 0.4, strokeWeight: 1,
-                        fillColor: '#4F8EFF', fillOpacity: 0.08,
-                        map, center: pos, radius: gpsAccuracy || 10
+                    map.on('load', () => {
+                        const radiusKm = (gpsAccuracy || 10) / 1000;
+                        map.addSource('accuracy-circle', {
+                            type: 'geojson',
+                            data: createCircleGeoJSON(pos, gpsAccuracy || 10)
+                        });
+                        map.addLayer({
+                            id: 'accuracy-circle-fill',
+                            type: 'fill',
+                            source: 'accuracy-circle',
+                            paint: {
+                                'fill-color': '#4F8EFF',
+                                'fill-opacity': 0.15
+                            }
+                        });
+                        map.addLayer({
+                            id: 'accuracy-circle-outline',
+                            type: 'line',
+                            source: 'accuracy-circle',
+                            paint: {
+                                'line-color': '#4F8EFF',
+                                'line-width': 1,
+                                'line-opacity': 0.5
+                            }
+                        });
                     });
                 } else if (mapEl) {
-                    mapEl.innerHTML = `<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:13px;text-align:center;padding:20px"><div><i class="fas fa-map-marker-alt" style="font-size:24px;color:var(--ac);margin-bottom:8px;display:block"></i>GPS Location Captured<br><b>${teacherLat.toFixed(6)}, ${teacherLng.toFixed(6)}</b><br><span style="font-size:11px;color:var(--mt)">Google Maps SDK still loading...</span></div></div>`;
+                    mapEl.innerHTML = `<div style="display:flex;height:100%;align-items:center;justify-content:center;color:#888;font-size:13px;text-align:center;padding:20px"><div><i class="fas fa-map-marker-alt" style="font-size:24px;color:var(--ac);margin-bottom:8px;display:block"></i>GPS Location Captured<br><b>${teacherLat.toFixed(6)}, ${teacherLng.toFixed(6)}</b><br><span style="font-size:11px;color:var(--mt)">AWS Map SDK still loading...</span></div></div>`;
                 }
             }, 200);
 
@@ -3786,39 +3874,51 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                     studentLng = pos.coords.longitude;
                     const accuracy = pos.coords.accuracy;
 
-                    // Show student on the live map
-                    if (window._attStudentMap && window.google && window.google.maps) {
-                        const studentPos = { lat: studentLat, lng: studentLng };
-                        const tPos = window._attTeacherPos;
+                    // Show student on the AWS live map
+                    if (window._attStudentMap && typeof maplibregl !== 'undefined') {
+                        const studentPos = [studentLng, studentLat];
+                        const tPos = window._attTeacherPos; // [lng, lat]
+                        const map = window._attStudentMap;
 
                         // Student marker
-                        new google.maps.Marker({
-                            position: studentPos, map: window._attStudentMap,
-                            title: 'You', animation: google.maps.Animation.DROP,
-                            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#4F8EFF', fillOpacity: 1, strokeWeight: 3, strokeColor: '#fff' }
-                        });
+                        new maplibregl.Marker({ color: "#4F8EFF" })
+                            .setLngLat(studentPos)
+                            .addTo(map);
 
                         // Line between teacher and student
-                        new google.maps.Polyline({
-                            path: [tPos, studentPos], geodesic: true,
-                            strokeColor: '#FF6B6B', strokeOpacity: 0.7, strokeWeight: 2,
-                            strokeDashArray: [8, 4], map: window._attStudentMap
+                        map.addSource('route', {
+                            'type': 'geojson',
+                            'data': {
+                                'type': 'Feature',
+                                'properties': {},
+                                'geometry': {
+                                    'type': 'LineString',
+                                    'coordinates': [tPos, studentPos]
+                                }
+                            }
+                        });
+                        map.addLayer({
+                            'id': 'route',
+                            'type': 'line',
+                            'source': 'route',
+                            'layout': {
+                                'line-join': 'round',
+                                'line-cap': 'round'
+                            },
+                            'paint': {
+                                'line-color': '#FF6B6B',
+                                'line-width': 2,
+                                'line-dasharray': [2, 2]
+                            }
                         });
 
                         // Fit both markers
-                        const bounds = new google.maps.LatLngBounds();
-                        bounds.extend(tPos);
+                        const bounds = new maplibregl.LngLatBounds(tPos, tPos);
                         bounds.extend(studentPos);
-                        window._attStudentMap.fitBounds(bounds, 40);
+                        map.fitBounds(bounds, { padding: 40 });
 
-                        // Calculate distance using Google Maps geometry
-                        let dist = null;
-                        if (google.maps.geometry) {
-                            dist = google.maps.geometry.spherical.computeDistanceBetween(
-                                new google.maps.LatLng(tPos.lat, tPos.lng),
-                                new google.maps.LatLng(studentLat, studentLng)
-                            );
-                        }
+                        // Calculate distance using Haversine
+                        const dist = haversineDist(tPos[1], tPos[0], studentLat, studentLng);
 
                         const sloc = g('studentLocDisplay');
                         if (sloc && dist !== null) {
@@ -4033,8 +4133,9 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
 
     <!-- SPA Router: instant navigation between classroom/view-classroom/settings -->
     <script src="/js/spa-router.js"></script>
-    <!-- Google Maps SDK for live attendance location -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_Z3r-QnKRPQWpldDcEydeX6aHJOlAN6A&libraries=geometry" async defer></script>
+    <!-- MapLibre GL JS for AWS Location Service -->
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 </body>
 
 </html>
