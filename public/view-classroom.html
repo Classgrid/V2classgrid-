@@ -3421,23 +3421,49 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
         // Smart GPS Warm-up (like Uber/Zomato)
         // Uses watchPosition to collect multiple readings and picks the most accurate one
         function getBestGPS(timeoutMs, maxAccuracyM) {
-            timeoutMs = timeoutMs || 6000;
-            maxAccuracyM = maxAccuracyM || 50;
+            timeoutMs = timeoutMs || 12000;
+            maxAccuracyM = maxAccuracyM || 20;
             return new Promise(function(resolve, reject) {
                 var bestReading = null;
+                var readingCount = 0;
                 var watchId = null;
+                var settled = false;
                 function done() {
-                    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-                    watchId = null;
-                    if (bestReading) { resolve(bestReading); }
-                    else { navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 15000, maximumAge: 0, enableHighAccuracy: true }); }
+                    if (settled) return;
+                    settled = true;
+                    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+                    if (bestReading) {
+                        // Hard reject: if best reading is still worse than 150m, it's garbage
+                        if (bestReading.coords.accuracy > 150) {
+                            reject(new Error('GPS accuracy too low (' + Math.round(bestReading.coords.accuracy) + 'm). Please move near a window or go outdoors, then retry.'));
+                        } else {
+                            console.log('[GPS] Best reading: ' + bestReading.coords.accuracy.toFixed(1) + 'm accuracy after ' + readingCount + ' readings');
+                            resolve(bestReading);
+                        }
+                    } else {
+                        // No watchPosition reading at all — fallback to single shot
+                        navigator.geolocation.getCurrentPosition(
+                            function(pos) {
+                                if (pos.coords.accuracy > 150) {
+                                    reject(new Error('GPS accuracy too low (' + Math.round(pos.coords.accuracy) + 'm). Please enable high-accuracy location mode and retry.'));
+                                } else { resolve(pos); }
+                            },
+                            reject,
+                            { timeout: 15000, maximumAge: 0, enableHighAccuracy: true }
+                        );
+                    }
                 }
                 var timer = setTimeout(done, timeoutMs);
                 try {
                     watchId = navigator.geolocation.watchPosition(
                         function(pos) {
+                            readingCount++;
                             var acc = pos.coords.accuracy;
+                            // Only accept readings that are fresh (not cached)
+                            var age = Date.now() - pos.timestamp;
+                            if (age > 10000) return; // Skip readings older than 10 seconds
                             if (!bestReading || acc < bestReading.coords.accuracy) { bestReading = pos; }
+                            // If we hit target accuracy, stop immediately
                             if (acc <= maxAccuracyM) { clearTimeout(timer); done(); }
                         },
                         function(err) {
@@ -3860,7 +3886,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             let gpsAccuracy = null;
 
             try {
-                const pos = await getBestGPS(8000, 30);
+                const pos = await getBestGPS(12000, 20);
                 teacherLat = pos.coords.latitude;
                 teacherLng = pos.coords.longitude;
                 gpsAccuracy = pos.coords.accuracy;
@@ -4031,7 +4057,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             if (requiresGPS) {
                 btn.innerHTML = '<i class="fas fa-satellite"></i> Getting Exact GPS...';
                 try {
-                    const pos = await getBestGPS(6000, 50);
+                    const pos = await getBestGPS(12000, 20);
                     studentLat = pos.coords.latitude;
                     studentLng = pos.coords.longitude;
                     const accuracy = pos.coords.accuracy;
