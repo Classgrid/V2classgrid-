@@ -2031,7 +2031,7 @@ export const getNewDeviceOtpHtml = (userName, otp) => {
     <div class="box" style="text-align:center; margin: 24px 0;">
       <div class="meta">Your Verification Code</div>
       <span class="code" style="font-size:32px; letter-spacing:8px; color:#ffffff;">${otp}</span>
-      <p style="margin-top:12px; font-size:13px; color:#9ca3af;">This code expires in <strong style="color:#ffffff;">30 seconds</strong>.</p>
+      <p style="margin-top:12px; font-size:13px; color:#9ca3af;">This code expires in <strong style="color:#ffffff;">10 minutes</strong>.</p>
     </div>
 
     <p>Enter this code on the login page to verify your device. If you did not attempt to log in, please secure your account immediately.</p>
@@ -2052,7 +2052,7 @@ We noticed a login attempt from a new device or browser.
 
 Your Verification Code: ${otp}
 
-This code expires in 30 seconds. Enter it on the login page to verify your device.
+This code expires in 10 minutes. Enter it on the login page to verify your device.
 
 If you did not attempt to log in, please reset your password immediately.
 
