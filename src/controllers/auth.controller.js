@@ -527,16 +527,18 @@ export const login = async (req, res) => {
 
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-                await DeviceVerification.deleteMany({ email: user.email });
-                await DeviceVerification.create({
-                    email: user.email,
-                    deviceFingerprint,
-                    otp,
-                    isUsed: false,
-                    failedAttempts: 0,
-                    lastResentAt: new Date(),
-                    expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
-                });
+                await DeviceVerification.findOneAndUpdate(
+                    { email: user.email },
+                    {
+                        deviceFingerprint,
+                        otp,
+                        isUsed: false,
+                        failedAttempts: 0,
+                        lastResentAt: new Date(),
+                        expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+                    },
+                    { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
+                );
 
                 const { getNewDeviceOtpHtml, getNewDeviceOtpPlainText } = await import("../services/email-templates.service.js");
 
@@ -800,17 +802,18 @@ export const oauthCallback = async (req, res) => {
                 }
 
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-                await DeviceVerification.deleteMany({ email: userEmail });
-                await DeviceVerification.create({
-                    email: userEmail,
-                    deviceFingerprint: serverFingerprint,
-                    otp,
-                    isUsed: false,
-                    failedAttempts: 0,
-                    lastResentAt: new Date(),
-                    expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
-                });
+                await DeviceVerification.findOneAndUpdate(
+                    { email: userEmail },
+                    {
+                        deviceFingerprint: serverFingerprint,
+                        otp,
+                        isUsed: false,
+                        failedAttempts: 0,
+                        lastResentAt: new Date(),
+                        expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+                    },
+                    { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
+                );
 
                 const { getNewDeviceOtpHtml, getNewDeviceOtpPlainText } = await import("../services/email-templates.service.js");
                 try {
