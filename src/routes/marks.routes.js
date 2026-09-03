@@ -901,6 +901,72 @@ router.get(
 );
 
 // ─────────────────────────────────────────────────────────
+// GET /exams/:examId/template — Download dynamic template
+// ─────────────────────────────────────────────────────────
+router.get(
+    "/exams/:examId/template",
+    isAuthenticated,
+    async (req, res) => {
+        try {
+            await connectDB();
+            const exam = await ExamRecord.findById(req.params.examId).populate("classroomId").lean();
+            if (!exam) return res.status(404).json({ message: "Exam not found" });
+
+            // Verify teacher in classroom or org admin
+            const isMember = await ClassroomMembership.findOne({
+                classroom: exam.classroomId._id,
+                user: req.user._id,
+                role: 'teacher'
+            });
+            if (exam.classroomId.teacher.toString() !== req.user._id.toString() && !isMember && req.user.role !== 'org_admin' && req.user.role !== 'super_admin') {
+                return res.status(403).json({ message: "Not authorized for this classroom" });
+            }
+
+            // Get students in this classroom
+            const students = await ClassroomMembership.find({
+                classroom: exam.classroomId._id,
+                role: 'student'
+            }).populate('user', 'name prn email');
+
+            const { default: XLSX } = await import("xlsx");
+
+            // Build dynamic data
+            const templateData = students.map(s => {
+                const row = {
+                    "PRN": s.user.prn || s.user.email,
+                    "Student Name": s.user.name
+                };
+                // Add empty column for each subject
+                (exam.subjects || []).forEach(subj => {
+                    row[subj.subjectName] = "";
+                });
+                return row;
+            });
+
+            // If no students, add an empty row just to show columns
+            if (templateData.length === 0) {
+                const row = { "PRN": "", "Student Name": "" };
+                (exam.subjects || []).forEach(subj => { row[subj.subjectName] = ""; });
+                templateData.push(row);
+            }
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(templateData);
+            XLSX.utils.book_append_sheet(wb, ws, "Marks");
+
+            const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+
+            res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            res.setHeader("Content-Disposition", `attachment; filename="Exam_${exam.title.replace(/\s+/g, '_')}_Template.xlsx"`);
+            res.send(buf);
+        } catch (err) {
+            console.error("[Marks] Dynamic Template error:", err);
+            res.status(500).json({ message: "Server error generating template" });
+        }
+    }
+);
+
+// ─────────────────────────────────────────────────────────
 // POST /upload-multi/:examId — Upload multi-subject Excel
 // ─────────────────────────────────────────────────────────
 router.post(
@@ -921,7 +987,7 @@ router.post(
                 role: 'teacher'
             });
             const classroom = await Classroom.findById(exam.classroomId).lean();
-            if (!classroom || (classroom.teacher.toString() !== req.user._id.toString() && !isMember)) {
+            if (!classroom || (classroom.teacher.toString() !== req.user._id.toString() && !isMember && req.user.role !== 'org_admin' && req.user.role !== 'super_admin')) {
                 return res.status(403).json({ message: "Not authorized for this classroom" });
             }
 
