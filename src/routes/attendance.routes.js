@@ -1012,6 +1012,105 @@ router.get(
 );
 
 // ─────────────────────────────────────────────
+// GET /:classroomId/monthly-grid — Day-by-day attendance report (faculty)
+// ─────────────────────────────────────────────
+router.get(
+    "/:classroomId/monthly-grid",
+    isAuthenticated,
+    requireClassroomOwner,
+    async (req, res) => {
+        try {
+            await connectDB();
+            const classroomId = req.params.classroomId;
+            const month = parseInt(req.query.month) || new Date().getMonth() + 1;
+            const year = parseInt(req.query.year) || new Date().getFullYear();
+            
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            // Find all sessions in this month
+            const sessions = await AttendanceSession.find({ 
+                classroom: classroomId, 
+                createdAt: { $gte: startDate, $lte: endDate } 
+            }).select("_id createdAt").lean();
+            
+            const sessionIds = sessions.map(s => s._id);
+            
+            // Map each day (1-31) to an array of session IDs that occurred on that day
+            const dayToSessions = {};
+            for (let i = 1; i <= daysInMonth; i++) {
+                dayToSessions[i] = [];
+            }
+            sessions.forEach(s => {
+                const day = new Date(s.createdAt).getDate();
+                dayToSessions[day].push(s._id.toString());
+            });
+
+            // Get all approved students
+            const members = await ClassroomMembership.find({ 
+                classroom: classroomId, 
+                status: "approved" 
+            }).populate("student", "name prn").lean();
+
+            // Get all records for these sessions
+            const records = await AttendanceRecord.find({ 
+                session: { $in: sessionIds },
+                status: { $in: ["present", "present_suspicious"] }
+            }).select("student session").lean();
+
+            // Map which student attended which session
+            // studentId -> Set(sessionId)
+            const studentAttendance = {};
+            records.forEach(r => {
+                const sId = r.student.toString();
+                if (!studentAttendance[sId]) studentAttendance[sId] = new Set();
+                studentAttendance[sId].add(r.session.toString());
+            });
+
+            // Build the grid
+            const grid = members.map(m => {
+                const sId = m.student._id.toString();
+                const studentAttended = studentAttendance[sId] || new Set();
+                
+                const days = {};
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const sessionsOnDay = dayToSessions[i];
+                    if (sessionsOnDay.length === 0) {
+                        days[i] = "-"; // No session held on this day
+                    } else {
+                        // If student was present in at least one session on this day, mark 'P', else 'A'
+                        const wasPresent = sessionsOnDay.some(sessionId => studentAttended.has(sessionId));
+                        days[i] = wasPresent ? "P" : "A";
+                    }
+                }
+
+                return {
+                    studentId: sId,
+                    name: m.student.name,
+                    prn: m.student.prn || "",
+                    days
+                };
+            });
+
+            // Sort alphabetically by name
+            grid.sort((a, b) => a.name.localeCompare(b.name));
+
+            res.json({
+                month,
+                year,
+                daysInMonth,
+                grid
+            });
+
+        } catch (err) {
+            console.error("[Attendance] Monthly Grid error:", err);
+            res.status(500).json({ message: "Server error" });
+        }
+    }
+);
+
+// ─────────────────────────────────────────────
 // GET /:classroomId/my-attendance — Student's own stats
 // ─────────────────────────────────────────────
 router.get(

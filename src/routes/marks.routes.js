@@ -654,7 +654,7 @@ router.put(
     "/policy",
     isAuthenticated,
     requirePlan("PRO"),
-    requireRole(["super_admin", "org_admin"]),
+    requireRole("super_admin", "org_admin"),
     async (req, res) => {
         try {
             const { calculationMethod, passPercentage, gradeRules } = req.body;
@@ -703,7 +703,7 @@ router.get(
     "/subjects",
     isAuthenticated,
     requirePlan("PRO"),
-    requireRole(["super_admin", "org_admin"]),
+    requireRole("super_admin", "org_admin"),
     async (req, res) => {
         try {
             await connectDB();
@@ -726,7 +726,7 @@ router.post(
     "/subjects",
     isAuthenticated,
     requirePlan("PRO"),
-    requireRole(["super_admin", "org_admin"]),
+    requireRole("super_admin", "org_admin"),
     async (req, res) => {
         try {
             await connectDB();
@@ -757,7 +757,7 @@ router.put(
     "/subjects/:id",
     isAuthenticated,
     requirePlan("PRO"),
-    requireRole(["super_admin", "org_admin"]),
+    requireRole("super_admin", "org_admin"),
     async (req, res) => {
         try {
             await connectDB();
@@ -786,7 +786,7 @@ router.delete(
     "/subjects/:id",
     isAuthenticated,
     requirePlan("PRO"),
-    requireRole(["super_admin", "org_admin"]),
+    requireRole("super_admin", "org_admin"),
     async (req, res) => {
         try {
             await connectDB();
@@ -810,7 +810,7 @@ router.post(
     "/create-exam",
     isAuthenticated,
     requirePlan("PRO"),
-    requireRole(["super_admin", "org_admin"]),
+    requireRole("super_admin", "org_admin"),
     async (req, res) => {
         try {
             await connectDB();
@@ -1184,7 +1184,7 @@ router.put(
     "/exams/:id/status",
     isAuthenticated,
     requirePlan("PRO"),
-    requireRole(["super_admin", "org_admin"]),
+    requireRole("super_admin", "org_admin"),
     async (req, res) => {
         try {
             await connectDB();
@@ -1252,7 +1252,7 @@ router.get(
     "/exams/:examId/export",
     isAuthenticated,
     requirePlan("PRO"),
-    requireRole(["super_admin", "org_admin"]),
+    requireRole("super_admin", "org_admin"),
     async (req, res) => {
         try {
             await connectDB();
