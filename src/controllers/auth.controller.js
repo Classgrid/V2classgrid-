@@ -525,7 +525,19 @@ export const login = async (req, res) => {
                     });
                 }
 
-                const otp = Math.floor(100000 + Math.random() * 900000).toString();
+                let otp;
+                let newExpiresAt;
+                let newFailedAttempts = 0;
+
+                // Reuse existing OTP if it is still valid to prevent race conditions when users receive multiple emails
+                if (existingVerification && existingVerification.expiresAt > new Date() && existingVerification.failedAttempts < 5 && !existingVerification.isUsed) {
+                    otp = existingVerification.otp;
+                    newExpiresAt = existingVerification.expiresAt;
+                    newFailedAttempts = existingVerification.failedAttempts;
+                } else {
+                    otp = Math.floor(100000 + Math.random() * 900000).toString();
+                    newExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+                }
 
                 await DeviceVerification.findOneAndUpdate(
                     { email: user.email },
@@ -533,9 +545,9 @@ export const login = async (req, res) => {
                         deviceFingerprint,
                         otp,
                         isUsed: false,
-                        failedAttempts: 0,
+                        failedAttempts: newFailedAttempts,
                         lastResentAt: new Date(),
-                        expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+                        expiresAt: newExpiresAt
                     },
                     { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
                 );
@@ -801,16 +813,28 @@ export const oauthCallback = async (req, res) => {
                     return res.redirect(`${FRONTEND_URL}/login.html?device_verify=true&email=${encodeURIComponent(userEmail)}&provider=${provider}`);
                 }
 
-                const otp = Math.floor(100000 + Math.random() * 900000).toString();
+                let otp;
+                let newExpiresAt;
+                let newFailedAttempts = 0;
+
+                if (existingVerification && existingVerification.expiresAt > new Date() && existingVerification.failedAttempts < 5 && !existingVerification.isUsed) {
+                    otp = existingVerification.otp;
+                    newExpiresAt = existingVerification.expiresAt;
+                    newFailedAttempts = existingVerification.failedAttempts;
+                } else {
+                    otp = Math.floor(100000 + Math.random() * 900000).toString();
+                    newExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+                }
+
                 await DeviceVerification.findOneAndUpdate(
                     { email: userEmail },
                     {
                         deviceFingerprint: serverFingerprint,
                         otp,
                         isUsed: false,
-                        failedAttempts: 0,
+                        failedAttempts: newFailedAttempts,
                         lastResentAt: new Date(),
-                        expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+                        expiresAt: newExpiresAt
                     },
                     { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
                 );
