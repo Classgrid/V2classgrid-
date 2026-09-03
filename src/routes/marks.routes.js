@@ -660,11 +660,13 @@ router.put(
             const { calculationMethod, passPercentage, gradeRules } = req.body;
 
             // Check if policy exists
-            const { data: existing } = await studentNotesClient
+            const { data: existing, error: existErr } = await studentNotesClient
                 .from("OrgResultPolicy")
                 .select("id")
                 .eq("org_id", req.user.organization_id)
-                .single();
+                .maybeSingle();
+
+            if (existErr) throw existErr;
 
             let result;
             if (existing) {

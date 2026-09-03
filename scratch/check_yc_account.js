@@ -1,9 +1,10 @@
-import mongoose from 'mongoose';
+import 'dotenv/config';
+import connectDB from '../config/db.js';
 import User from '../src/models/User.js';
 import Organization from '../src/models/Organization.js';
 
 async function run() {
-    await mongoose.connect('mongodb+srv://classgrid-admin:aiLfOjcURw9UUALw@cluster0.ktur3iv.mongodb.net/classgrid?retryWrites=true&w=majority&appName=Cluster0');
+    await connectDB();
     
     const user = await User.findOne({ email: 'yc@classgrid.in' }).lean();
     if (user) {

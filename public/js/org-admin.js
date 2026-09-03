@@ -2359,9 +2359,14 @@ async function loadSubjects() {
         const res = await apiRequest('/marks/subjects');
         if (res.ok) {
             _rsSubjects = res.data.subjects || [];
-            renderSubjects();
+        } else {
+            console.error("Failed to load subjects", res);
         }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+        console.error(e);
+    } finally {
+        renderSubjects();
+    }
 }
 
 function renderSubjects() {
