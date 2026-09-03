@@ -535,7 +535,7 @@ export const login = async (req, res) => {
                         isUsed: false,
                         failedAttempts: 0,
                         lastResentAt: new Date(),
-                        expiresAt: new Date(Date.now() + 30 * 1000) // 30 secs
+                        expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
                     },
                     { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
                 );
@@ -810,7 +810,7 @@ export const oauthCallback = async (req, res) => {
                         isUsed: false,
                         failedAttempts: 0,
                         lastResentAt: new Date(),
-                        expiresAt: new Date(Date.now() + 30 * 1000) // 30 secs
+                        expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
                     },
                     { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
                 );

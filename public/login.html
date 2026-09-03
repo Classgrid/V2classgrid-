@@ -1455,7 +1455,7 @@
             <!-- OTP Countdown Timer -->
             <div id="otpTimerContainer" style="text-align:center;margin:0.8rem 0;">
               <span style="font-size:0.85rem;color:var(--medium-gray);">Code expires in </span>
-              <span id="otpTimerDisplay" style="font-size:0.95rem;font-weight:700;color:#111;">00:30</span>
+              <span id="otpTimerDisplay" style="font-size:0.95rem;font-weight:700;color:#111;">10:00</span>
             </div>
 
             <button type="button" class="submit-btn" id="verifyDeviceBtn">
@@ -1724,7 +1724,7 @@
             showMessage('A verification code has been sent to your email.', 'info');
           }
 
-          startOtpTimer(30);
+          startOtpTimer(600);
           showStep(3);
           return;
         }
@@ -1909,8 +1909,13 @@
         const r = await fetch(EP.login, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ email: vemail, password, expectedLoginType: 'standard', deviceFingerprint: vfp }) });
         const d = await r.json();
         if (d.needsDeviceOtp) {
-          document.getElementById('deviceOtpValue').value = '';
-          showMessage('A new verification code has been sent to your email.', 'success');
+          if (!r.ok && d.message.includes('wait 60 seconds')) {
+            showMessage(d.message, 'warning');
+          } else {
+            document.getElementById('deviceOtpValue').value = '';
+            showMessage('A new verification code has been sent to your email.', 'success');
+            startOtpTimer(600);
+          }
         } else {
           showMessage('Could not resend OTP. Please close this and log in again.', 'error');
         }
