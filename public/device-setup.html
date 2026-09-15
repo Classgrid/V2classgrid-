@@ -214,6 +214,9 @@
         <span class="btn-text">Send Verification Code</span>
         <div class="loader" id="loader1"></div>
       </button>
+      <div style="text-align: center; margin-top: 15px;">
+        <a href="#" onclick="logoutUser(event)" style="color: var(--medium-gray); text-decoration: none; font-weight: 500; font-size: 0.9rem;">Wrong account? Log out</a>
+      </div>
     </div>
 
     <!-- Step 2: Verify OTP -->
@@ -253,6 +256,15 @@
   <script>
     // These will be securely returned by the backend
     let setupToken = "";
+
+    async function logoutUser(e) {
+      if (e) e.preventDefault();
+      try { await fetch('/api/auth/logout', { method: 'POST' }); } catch(err) {}
+      localStorage.removeItem('token');
+      localStorage.removeItem('jwt_token');
+      document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      window.location.replace('/login.html');
+    }
 
     function showStep(step) {
       document.querySelectorAll('.step-section').forEach(el => el.classList.remove('active'));
