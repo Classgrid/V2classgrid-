@@ -2062,10 +2062,10 @@ If you did not attempt to log in, please reset your password immediately.
 // -------------------------------------------------------------
 // APP REQUIRED EMAIL (Sent when blocking mobile browser login)
 // -------------------------------------------------------------
-export const getMobileAppRequiredEmailHtml = (email) => {
+export const getMobileAppRequiredEmailHtml = (userName) => {
+  const firstName = userName && userName.trim() && !userName.includes('@') ? userName.split(' ')[0] : 'there';
   const content = `
-    <h1 style="color: #ef4444;">Action Required</h1>
-    <p>Hi there,</p>
+    <p>Hello ${firstName},</p>
     <p>We noticed you tried to log into Classgrid from a mobile web browser. For security, GPS location tracking, and attendance verification, <strong>mobile web access is strictly disabled for students</strong>.</p>
     
     <div class="box" style="text-align:center; margin: 24px 0;">
@@ -2077,15 +2077,16 @@ export const getMobileAppRequiredEmailHtml = (email) => {
   `;
   return baseTemplate({
     content,
-    title: 'Action Required: Download Classgrid App',
+    title: '',
     ignoreText: 'If you are not a student, or if you received this in error, you may safely ignore this email.'
   });
 };
 
-export const getMobileAppRequiredEmailPlainText = (email) => {
+export const getMobileAppRequiredEmailPlainText = (userName) => {
+  const firstName = userName && userName.trim() && !userName.includes('@') ? userName.split(' ')[0] : 'there';
   return `Action Required: Download Classgrid App
 
-Hi there,
+Hello ${firstName},
 
 We noticed you tried to log into Classgrid from a mobile web browser. For security, GPS location tracking, and attendance verification, mobile web access is strictly disabled.
 
