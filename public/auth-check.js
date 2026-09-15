@@ -79,7 +79,7 @@
                     try { localStorage.setItem(USER_KEY, JSON.stringify(user)); } catch (_) { }
 
                     // --- STRICT ANDROID DEVICE BINDING INTERCEPTOR (COOKIE PATH) ---
-                    if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId) {
+                    if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId && user.role === 'student') {
                         const hwId = window.AndroidApp.getHardwareDeviceId();
                         const currentPath = window.location.pathname;
                         const isBound = user.registeredDevice && user.registeredDevice.deviceId === hwId && (typeof window.AndroidApp.hasBiometricKey !== 'function' || window.AndroidApp.hasBiometricKey());
@@ -111,7 +111,7 @@
                 window.Auth.isAuthenticated = true;
 
                 // --- STRICT ANDROID DEVICE BINDING INTERCEPTOR (CACHE PATH) ---
-                if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId) {
+                if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId && user.role === 'student') {
                     const hwId = window.AndroidApp.getHardwareDeviceId();
                     const currentPath = window.location.pathname;
                     const isBound = user.registeredDevice && user.registeredDevice.deviceId === hwId && (typeof window.AndroidApp.hasBiometricKey !== 'function' || window.AndroidApp.hasBiometricKey());
@@ -166,7 +166,7 @@
                 }
 
                 // --- STRICT ANDROID DEVICE BINDING INTERCEPTOR ---
-                if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId) {
+                if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId && user.role === 'student') {
                     const hwId = window.AndroidApp.getHardwareDeviceId();
                     const currentPath = window.location.pathname;
                     

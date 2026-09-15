@@ -25,7 +25,7 @@
                     if (r.ok) return r.json().then(function (u) { 
                         window._cookieAuthUser = u; 
                         if (u.token && !_tok) localStorage.setItem('jwt_token', u.token); 
-                        if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId) {
+                        if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId && u.role === 'student') {
                             var hwId = window.AndroidApp.getHardwareDeviceId();
                             var isBound = u.registeredDevice && u.registeredDevice.deviceId === hwId;
                             if (!isBound) { window.location.replace('/device-setup.html'); return; }
