@@ -2077,8 +2077,7 @@ export const getMobileAppRequiredEmailHtml = (userName) => {
   `;
   return baseTemplate({
     content,
-    title: '',
-    ignoreText: 'If you are not a student, or if you received this in error, you may safely ignore this email.'
+    title: ''
   });
 };
 
