@@ -227,6 +227,13 @@
         <span class="btn-text">Verify Code</span>
         <div class="loader" id="loader2"></div>
       </button>
+      
+      <div style="text-align: center; margin-top: 15px;">
+        <p class="subtitle" style="font-size: 0.9rem;">Didn't receive the code? <br>
+          <a href="#" id="resendLink" onclick="resendOtp(event)" style="color: var(--primary); text-decoration: none; font-weight: 600; display: none;">Resend Code</a>
+          <span id="resendTimer" style="color: var(--text-muted); font-weight: 500;">Resend in <span id="timeRemaining">60</span>s</span>
+        </p>
+      </div>
     </div>
 
     <!-- Step 3: Biometric Scan -->
@@ -271,6 +278,7 @@
 
         if (res.ok) {
           showStep(2);
+          startResendTimer();
         } else {
           alert("Failed to send OTP. Please try again.");
         }
@@ -279,6 +287,55 @@
       } finally {
         btn.disabled = false;
         loader.style.display = 'none';
+      }
+    }
+
+    let timerInterval;
+    function startResendTimer() {
+      const resendLink = document.getElementById('resendLink');
+      const resendTimer = document.getElementById('resendTimer');
+      const timeRemaining = document.getElementById('timeRemaining');
+      
+      resendLink.style.display = 'none';
+      resendTimer.style.display = 'inline';
+      
+      let timeLeft = 60;
+      timeRemaining.innerText = timeLeft;
+      
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timeRemaining.innerText = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          resendTimer.style.display = 'none';
+          resendLink.style.display = 'inline';
+        }
+      }, 1000);
+    }
+
+    async function resendOtp(e) {
+      e.preventDefault();
+      const resendLink = document.getElementById('resendLink');
+      resendLink.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      resendLink.style.pointerEvents = 'none';
+      
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('jwt_token');
+        const res = await fetch('/api/auth/send-setup-otp', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+           startResendTimer();
+        } else {
+           alert('Failed to resend code.');
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        resendLink.innerHTML = 'Resend Code';
+        resendLink.style.pointerEvents = 'auto';
       }
     }
 
