@@ -1452,15 +1452,19 @@ export const sendSetupOtp = async (req, res) => {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         
         await DeviceVerification.findOneAndUpdate(
-            { email: user.email },
+            { email: new RegExp(`^${user.email}$`, "i") },
             {
-                otp,
-                isUsed: false,
-                failedAttempts: 0,
-                lastResentAt: new Date(),
-                expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 mins
+                $set: {
+                    email: user.email.toLowerCase(),
+                    deviceFingerprint: "pending",
+                    otp,
+                    isUsed: false,
+                    failedAttempts: 0,
+                    lastResentAt: new Date(),
+                    expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 mins
+                }
             },
-            { upsert: true }
+            { upsert: true, sort: { createdAt: -1 } }
         );
 
         const { getNewDeviceOtpHtml, getNewDeviceOtpPlainText } = await import("../services/email-templates.service.js");
@@ -1483,10 +1487,10 @@ export const sendSetupOtp = async (req, res) => {
 export const verifySetupOtp = async (req, res) => {
     try {
         await connectDB();
-        const { otp } = req.body;
+        const otp = (req.body.otp || "").toString().trim();
         const user = await User.findById(req.user.id);
 
-        const record = await DeviceVerification.findOne({ email: user.email });
+        const record = await DeviceVerification.findOne({ email: new RegExp(`^${user.email}$`, "i") }).sort({ lastResentAt: -1 });
         if (!record || record.otp !== otp || record.isUsed || record.expiresAt < new Date()) {
             return res.status(400).json({ message: "Invalid or expired OTP" });
         }
