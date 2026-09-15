@@ -60,7 +60,7 @@ async function main() {
     ]);
 
     const apkPath = 'c:\\V2classgrid-\\android-wrapper\\app\\build\\outputs\\apk\\debug\\app-debug.apk';
-    await uploadFile(apkPath, 'v2classgrid.apk', 'application/vnd.android.package-archive');
+    await uploadFile(apkPath, 'v2_classgrid_app_3.apk', 'application/vnd.android.package-archive');
 }
 
 main();

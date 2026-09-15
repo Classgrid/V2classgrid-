@@ -43,7 +43,14 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
-
+    deviceFingerprint: {
+        type: String, // To track and restrict multiple device logins
+        default: null
+    },
+    fcmToken: {
+        type: String, // Firebase Cloud Messaging token for push notifications
+        default: null
+    },
 
     // 📚 Subject assignment (for teachers only)
     subject: {

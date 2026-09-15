@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -38,4 +39,8 @@ dependencies {
     implementation("androidx.webkit:webkit:1.8.0")
     implementation("androidx.biometric:biometric:1.2.0-alpha05") // Fingerprint package
     implementation("androidx.browser:browser:1.8.0") // Custom Tabs for Google Auth
+    
+    // Firebase Cloud Messaging
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
+    implementation("com.google.firebase:firebase-messaging")
 }

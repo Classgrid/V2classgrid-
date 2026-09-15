@@ -21,6 +21,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
+import android.Manifest
+import android.content.pm.PackageManager
+import android.provider.Settings
+import android.os.Build
+import android.webkit.GeolocationPermissions
+import android.webkit.WebChromeClient
+import androidx.core.app.ActivityCompat
+import com.google.firebase.messaging.FirebaseMessaging
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.Signature
@@ -28,9 +36,16 @@ import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    private val NOTIFICATION_PERMISSION_REQUEST_CODE = 1002
+
     private lateinit var webView: WebView
     private val KEY_NAME = "ClassgridBiometricKey"
     private lateinit var prefs: SharedPreferences
+
+    // File Upload properties
+    private var fileUploadCallback: android.webkit.ValueCallback<Array<Uri>>? = null
+    private val FILE_CHOOSER_RESULT_CODE = 1003
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +60,46 @@ class MainActivity : AppCompatActivity() {
         webSettings.domStorageEnabled = true
         webSettings.useWideViewPort = true
         webSettings.loadWithOverviewMode = true
+        webSettings.setGeolocationEnabled(true)
+        
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+                // Check if we have Android location permissions
+                if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // We don't have it, request it. We'll grant the webview permission after the user grants the android permission.
+                    ActivityCompat.requestPermissions(
+                        this@MainActivity,
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                        LOCATION_PERMISSION_REQUEST_CODE
+                    )
+                    // We retain the callback to invoke it in onRequestPermissionsResult
+                    geolocationOrigin = origin
+                    geolocationCallback = callback
+                } else {
+                    // We already have Android permission, grant WebView permission
+                    callback.invoke(origin, true, false)
+                }
+            }
+
+            // Enable file uploads (e.g., for profile pictures or assignments)
+            override fun onShowFileChooser(
+                webView: WebView?,
+                filePathCallback: android.webkit.ValueCallback<Array<Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                fileUploadCallback?.onReceiveValue(null)
+                fileUploadCallback = filePathCallback
+
+                val intent = fileChooserParams?.createIntent()
+                try {
+                    startActivityForResult(intent!!, FILE_CHOOSER_RESULT_CODE)
+                } catch (e: Exception) {
+                    fileUploadCallback = null
+                    return false
+                }
+                return true
+            }
+        }
         
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
@@ -73,7 +128,14 @@ class MainActivity : AppCompatActivity() {
         // Add JavaScript Bridge to connect the Web App with Native Kotlin
         webView.addJavascriptInterface(WebAppInterface(this), "AndroidApp")
 
-        webView.loadUrl("https://v2.classgrid.in/login") 
+        // Prevent 1-second login flash: check if we already have the auth cookie
+        val cookieManager = CookieManager.getInstance()
+        val cookies = cookieManager.getCookie("https://v2.classgrid.in")
+        if (cookies != null && cookies.contains("jwt=")) {
+            webView.loadUrl("https://v2.classgrid.in/classroom.html")
+        } else {
+            webView.loadUrl("https://v2.classgrid.in/login") 
+        }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -88,6 +150,45 @@ class MainActivity : AppCompatActivity() {
         
         // Handle initial intent if app was launched via deep link
         handleIntent(intent)
+        
+        // Request Notification Permissions (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), NOTIFICATION_PERMISSION_REQUEST_CODE)
+            }
+        }
+    }
+    
+    private var geolocationOrigin: String? = null
+    private var geolocationCallback: GeolocationPermissions.Callback? = null
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Android permission granted, now grant WebView permission
+                geolocationCallback?.invoke(geolocationOrigin, true, false)
+            } else {
+                // Android permission denied
+                geolocationCallback?.invoke(geolocationOrigin, false, false)
+            }
+            geolocationCallback = null
+            geolocationOrigin = null
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        if (requestCode == FILE_CHOOSER_RESULT_CODE) {
+            if (fileUploadCallback == null) return
+            val result = if (intent == null || resultCode != RESULT_OK) null else intent.data
+            if (result != null) {
+                fileUploadCallback?.onReceiveValue(arrayOf(result))
+            } else {
+                fileUploadCallback?.onReceiveValue(null)
+            }
+            fileUploadCallback = null
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -114,14 +215,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // 1. Get or Create Unique Hardware Device ID
+    // 1. Get True Hardware Device ID (Survives App Uninstalls & Data Clears)
     private fun getHardwareDeviceId(): String {
-        var id = prefs.getString("DEVICE_ID", null)
-        if (id == null) {
-            id = UUID.randomUUID().toString()
-            prefs.edit().putString("DEVICE_ID", id).apply()
-        }
-        return id
+        return Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
     }
 
     // 2. Generate Biometric Cryptographic KeyPair
@@ -262,6 +358,19 @@ class MainActivity : AppCompatActivity() {
                 val safeErr = errorMsg.replace("'", "\\'").replace("\n", " ")
                 runOnUiThread {
                     webView.evaluateJavascript("javascript:$callbackName(false, 'Biometric Error: $safeErr', null, null);", null)
+                }
+            }
+        }
+        
+        // Expose to JS: window.AndroidApp.getFcmToken()
+        @JavascriptInterface
+        fun getFcmToken() {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val token = task.result
+                    runOnUiThread {
+                        webView.evaluateJavascript("javascript:if(window.onFcmTokenReady) window.onFcmTokenReady('$token');", null)
+                    }
                 }
             }
         }

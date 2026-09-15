@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1092696949197",
+    "project_id": "classgrid-7da3e",
+    "storage_bucket": "classgrid-7da3e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092696949197:android:b82015fa7560b643b30484",
+        "android_client_info": {
+          "package_name": "com.classgrid.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFUGt9LE2kDL2waa3wd8AwQYZR_80jwKI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

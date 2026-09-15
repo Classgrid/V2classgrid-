@@ -1456,6 +1456,20 @@ export const checkStudentEmail = async (req, res) => {
     }
 };
 
+export const updateFcmToken = async (req, res) => {
+    try {
+        await connectDB();
+        const { fcmToken } = req.body;
+        if (!req.user || !req.user.id) return res.status(401).json({ message: "Unauthorized" });
+
+        await User.findByIdAndUpdate(req.user.id, { fcmToken });
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        console.error("updateFcmToken error:", err);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
 /* ==================== DEVICE BINDING (NATIVE APP) ==================== */
 
 // POST /api/auth/send-setup-otp

@@ -4,6 +4,18 @@
 
     <!-- Required permission to load the web app -->
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Required permissions for GPS (Attendance) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
+    <!-- Required permission for Firebase Cloud Messaging (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    
+    <!-- Required permissions for File Uploads (Assignments, Profile Pics) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -30,6 +42,25 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="classgridapp" android:host="auth" />
             </intent-filter>
+            
+            <!-- Deep Link (Android App Links) for v2.classgrid.in -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="v2.classgrid.in" />
+                <data android:scheme="http" android:host="v2.classgrid.in" />
+            </intent-filter>
         </activity>
+
+        <!-- Firebase Cloud Messaging Service -->
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
     </application>
 </manifest>

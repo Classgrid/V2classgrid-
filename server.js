@@ -2,6 +2,7 @@
 import "./env.js";
 
 import app from "./api/index.js";
+import { initFirebase } from "./src/services/firebase.service.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -26,6 +27,7 @@ process.on("unhandledRejection", (reason, promise) => {
 // ─────────────────────────────────────────────────────────
 // 🚀  Start Server
 // ─────────────────────────────────────────────────────────
+initFirebase();
 app.listen(PORT, () => {
   console.log(`🔥 Local server running at http://localhost:${PORT}`);
 });

@@ -13,6 +13,7 @@ import User from "../models/User.js";
 import AdminAuditLog from "../models/AdminAuditLog.js";
 import { sendAttendanceStartedEmails, sendAbsenceNotificationEmails } from "../services/notification-email.service.js";
 import { checkRadius, isValidCoords } from "../services/gps.service.js";
+import { sendPushNotification } from "../services/firebase.service.js";
 import connectDB from "../../config/db.js";
 
 const router = express.Router();
@@ -370,9 +371,10 @@ router.post(
 
             // Notify students
             try {
-                const members = await ClassroomMembership.find({ classroom: classroomId, status: "approved" }).select("student");
+                const members = await ClassroomMembership.find({ classroom: classroomId, status: "approved" }).populate("student", "fcmToken");
+                
                 const notifications = members.map(m => ({
-                    recipient: m.student,
+                    recipient: m.student._id,
                     type: "system",
                     title: "Attendance Active!",
                     message: `Attendance is open for ${req.classroom.name}. Mark now (${duration}s window)!`,
@@ -380,6 +382,18 @@ router.post(
                     createdAt: new Date(),
                 }));
                 if (notifications.length > 0) await Notification.insertMany(notifications);
+
+                // Send Push Notifications
+                for (const m of members) {
+                    if (m.student && m.student.fcmToken) {
+                        sendPushNotification({
+                            fcmToken: m.student.fcmToken,
+                            title: "Attendance Active!",
+                            body: `Attendance is open for ${req.classroom.name}. You have ${duration} seconds to mark it!`,
+                            data: { url: `https://v2.classgrid.in/view-classroom.html?id=${classroomId}#attendance` }
+                        });
+                    }
+                }
             } catch (notifErr) {
                 console.error("[Attendance] Notification error:", notifErr.message);
             }

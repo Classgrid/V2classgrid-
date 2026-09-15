@@ -29,6 +29,7 @@ router.post("/resend-activation", authController.resendActivation);
 
 router.post("/login", loginLimiter, authController.login);
 router.post("/verify-device", authController.verifyDeviceOtp);
+router.post("/fcm-token", isAuthenticated, authController.updateFcmToken);
 
 // 📱 Native Device Binding & Biometric Setup
 router.post("/send-setup-otp", isAuthenticated, authController.sendSetupOtp);
