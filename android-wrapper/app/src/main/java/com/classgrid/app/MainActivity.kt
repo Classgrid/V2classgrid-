@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         // Add JavaScript Bridge to connect the Web App with Native Kotlin
         webView.addJavascriptInterface(WebAppInterface(this), "AndroidApp")
 
-        webView.loadUrl("http://10.0.2.2:3000/login") 
+        webView.loadUrl("https://v2.classgrid.in/login") 
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -102,19 +102,20 @@ class MainActivity : AppCompatActivity() {
         if (Intent.ACTION_VIEW == action && data != null && data.scheme == "classgridapp") {
             // We just returned from the Google Custom Tab
             val token = data.getQueryParameter("token")
+            val target = data.getQueryParameter("target") ?: "/classroom.html"
             if (token != null) {
                 // Set the token securely in the WebView's localStorage and cookies
                 val cookieManager = CookieManager.getInstance()
-                cookieManager.setCookie("10.0.2.2:3000", "jwt=$token; Path=/; HttpOnly")
+                cookieManager.setCookie("https://v2.classgrid.in", "jwt=$token; Path=/; HttpOnly")
                 
                 // Inject token into localStorage and redirect to dashboard
-                webView.evaluateJavascript("localStorage.setItem('token', '$token'); window.location.href = '/student.html';", null)
+                webView.evaluateJavascript("localStorage.setItem('token', '$token'); window.location.href = '$target';", null)
             }
         }
     }
 
     // 1. Get or Create Unique Hardware Device ID
-    private fun getDeviceId(): String {
+    private fun getHardwareDeviceId(): String {
         var id = prefs.getString("DEVICE_ID", null)
         if (id == null) {
             id = UUID.randomUUID().toString()
@@ -163,7 +164,7 @@ class MainActivity : AppCompatActivity() {
                 object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                         super.onAuthenticationSucceeded(result)
-                        val deviceId = getDeviceId()
+                        val deviceId = getHardwareDeviceId()
                         val publicKey = getPublicKeyString()
                         
                         // Send data back to Web JS
@@ -216,7 +217,7 @@ class MainActivity : AppCompatActivity() {
                                 sig.update(challenge.toByteArray())
                                 val signatureBytes = sig.sign()
                                 val signatureBase64 = Base64.encodeToString(signatureBytes, Base64.NO_WRAP)
-                                val deviceId = getDeviceId()
+                                val deviceId = getHardwareDeviceId()
                                 
                                 runOnUiThread {
                                     webView.evaluateJavascript("javascript:$callbackName(true, null, '$deviceId', '$signatureBase64');", null)

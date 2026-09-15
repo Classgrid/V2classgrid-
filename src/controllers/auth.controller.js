@@ -847,18 +847,6 @@ export const oauthCallback = async (req, res) => {
 
     const token = generateToken(req.user);
     
-    // If logging in via Android Custom Tab, redirect to deep link instead of setting cookie
-    if (isAndroid) {
-        return res.redirect(`classgridapp://auth?token=${token}`);
-    }
-    
-    setTokenCookie(res, token);
-
-    // Send welcome email on first login only
-    if (isFirstLogin) {
-        await sendWelcomeEmail(req.user, provider);
-    }
-
     // Role-based redirect
     let target;
     if (req.user.role === 'super_admin') {
@@ -873,7 +861,19 @@ export const oauthCallback = async (req, res) => {
         // Faculty with no org must enter org code first
         target = '/enter-org-code.html';
     } else {
-        target = '/classroom';
+        target = '/classroom.html';
+    }
+
+    // If logging in via Android Custom Tab, redirect to deep link instead of setting cookie
+    if (isAndroid) {
+        return res.redirect(`classgridapp://auth?token=${token}&target=${encodeURIComponent(target)}`);
+    }
+    
+    setTokenCookie(res, token);
+
+    // Send welcome email on first login only
+    if (isFirstLogin) {
+        await sendWelcomeEmail(req.user, provider);
     }
 
     const qs = isFirstLogin ? `?welcome=true&token=${token}` : `?token=${token}`;
