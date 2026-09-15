@@ -787,8 +787,8 @@ export const oauthCallback = async (req, res) => {
     const isFirstLogin = !req.user.lastLoginAt;
 
     // --- DEVICE OTP CHECK FOR OAUTH (ALL PROVIDERS) ---
-    // Skip device check for first-ever login (new users shouldn't be blocked) and sandbox accounts
-    if (!isFirstLogin && !req.user.isSandbox) {
+    // Skip device check for first-ever login (new users shouldn't be blocked), sandbox accounts, and Android Native (Android has its own biometric check)
+    if (!isFirstLogin && !req.user.isSandbox && !isAndroid) {
         const { fingerprint: serverFingerprint } = getDeviceFingerprint(req);
         const isKnownDevice = req.user.trustedDevices && req.user.trustedDevices.some(d => d.fingerprint === serverFingerprint);
 

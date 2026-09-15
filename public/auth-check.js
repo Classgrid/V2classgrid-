@@ -77,6 +77,19 @@
                     window.Auth.isAuthenticated = true;
                     window.Auth.token = null; // cookie-mode, no Bearer token
                     try { localStorage.setItem(USER_KEY, JSON.stringify(user)); } catch (_) { }
+
+                    // --- STRICT ANDROID DEVICE BINDING INTERCEPTOR (COOKIE PATH) ---
+                    if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId) {
+                        const hwId = window.AndroidApp.getHardwareDeviceId();
+                        const currentPath = window.location.pathname;
+                        const isBound = user.registeredDevice && user.registeredDevice.deviceId === hwId;
+                        if (!isBound && currentPath !== '/device-setup.html') {
+                            window.location.href = '/device-setup.html';
+                            return; // Stop execution
+                        }
+                    }
+                    // --- END INTERCEPTOR ---
+
                     updateUI(user);
                     updatePageSpecificUI(true);
                     return;
