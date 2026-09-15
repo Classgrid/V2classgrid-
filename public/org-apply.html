@@ -1142,143 +1142,6 @@
             color: var(--muted);
             line-height: 1.5;
         }
-
-        /* --- POLICIES MODAL --- */
-        .policies-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            display: none; /* hidden by default */
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            z-index: 9999;
-        }
-
-        .policies-modal-overlay.open {
-            display: flex;
-        }
-
-        .policies-modal-content {
-            background-color: #161616;
-            border: 1px solid #2a2a2a;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 750px;
-            padding: 32px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            max-height: 90vh; 
-            overflow-y: auto;
-        }
-
-        .policies-modal-header {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .policies-modal-title {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: #ffffff;
-            line-height: 1.3;
-        }
-
-        .policies-modal-subtitle {
-            margin: 0;
-            font-size: 14px;
-            color: #a1a1aa;
-            line-height: 1.4;
-        }
-
-        .policies-modal-body {
-            background-color: #1a1a1a;
-            border-radius: 8px;
-            padding: 24px;
-            min-height: 150px;
-            border: 1px solid #242424;
-            color: #d4d4d8;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
-        .policies-modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 16px;
-            margin-top: 8px;
-        }
-
-        .policies-btn {
-            border: none;
-            border-radius: 8px;
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: inherit;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        .policies-btn-cancel {
-            background: transparent;
-            color: #ffffff;
-        }
-
-        .policies-btn-cancel:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .policies-btn-primary {
-            background-color: #f59e0b;
-            color: #000000;
-        }
-
-        .policies-btn-primary:hover {
-            background-color: #d97706;
-            transform: translateY(-1px);
-        }
-        
-        .policies-btn-primary:active {
-            transform: translateY(0);
-        }
-
-        @media (max-width: 600px) {
-            .policies-modal-overlay {
-                padding: 12px;
-            }
-            .policies-modal-content {
-                padding: 20px;
-                gap: 20px;
-            }
-            .policies-modal-title {
-                font-size: 18px;
-            }
-            .policies-modal-body {
-                padding: 16px;
-                font-size: 14px;
-            }
-            .policies-modal-footer {
-                flex-direction: column-reverse;
-                gap: 12px;
-                width: 100%;
-            }
-            .policies-btn {
-                width: 100%;
-                padding: 14px 20px;
-            }
-        }
     </style>
 </head>
 
@@ -1315,32 +1178,6 @@
             <h1>Bring Your Institution<br>to <span>Classgrid</span></h1>
             <p id="heroSubtitle">Apply below. For the Free plan, our team will review your application and set up your
                 organisation within 24–48 hours — free of charge.</p>
-        </div>
-
-        <!-- POLICIES MODAL -->
-        <div class="policies-modal-overlay" id="policiesModal">
-            <div class="policies-modal-content">
-                <div class="policies-modal-header">
-                    <h2 class="policies-modal-title">Classgrid: Platform Purpose & Operational Flow</h2>
-                    <p class="policies-modal-subtitle">Please review our flow before proceeding to checkout.</p>
-                </div>
-
-                <div class="policies-modal-body">
-                    <p style="margin-top: 0;">Classgrid operates on a strict, high-security model to prevent account sharing and unauthorized access. Before upgrading to a Pro plan, please ensure you understand and agree to the following flow:</p>
-                    
-                    <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 0; margin-top: 15px;">
-                        <li><strong>Strict 1-Device Policy:</strong> Every student account is permanently locked to a single physical phone motherboard via hardware ID (Android ID) and Biometric authentication.</li>
-                        <li><strong>Mandatory App Usage:</strong> Students <strong>cannot</strong> log in via a web browser. They must download the Classgrid Android app to securely bind their device and access the classroom.</li>
-                        <li><strong>No Account Sharing:</strong> Once a device is bound to a student's email, no other account can ever log in on that physical phone, and the student cannot log in on any other phone.</li>
-                        <li><strong>Pro Plan Activation:</strong> Upon successful checkout, your organization will be instantly upgraded to the Pro Tier for 31 days. You will receive an admin dashboard to invite teachers and students.</li>
-                    </ul>
-                </div>
-
-                <div class="policies-modal-footer">
-                    <button class="policies-btn policies-btn-cancel" onclick="closePoliciesModal()">Cancel</button>
-                    <button class="policies-btn policies-btn-primary" onclick="acceptPoliciesAndProceed()">I Understand &mdash; Proceed</button>
-                </div>
-            </div>
         </div>
 
         <!-- Chips -->
@@ -1833,15 +1670,8 @@
             }
 
             if (isPro) {
-                // Check if form is valid before showing policies
-                const missingFields = validateForm();
-                if (missingFields.length > 0) {
-                    showMsg(`Please fill in required fields: <strong>${missingFields.join(', ')}</strong>`, 'error');
-                    return;
-                }
-                // PRO: Show Policies Modal first
-                document.getElementById('policiesModal').classList.add('open');
-                document.body.style.overflow = 'hidden';
+                // PRO: Submit application (payment happens later from dashboard via Razorpay Checkout)
+                openPaymentModal();
                 return;
             }
 
@@ -1896,16 +1726,6 @@
                 document.body.style.overflow = '';
             }
         });
-
-        function closePoliciesModal() {
-            document.getElementById('policiesModal').classList.remove('open');
-            document.body.style.overflow = '';
-        }
-
-        function acceptPoliciesAndProceed() {
-            closePoliciesModal();
-            openPaymentModal();
-        }
 
         async function openPaymentModal() {
             paymentModal.classList.add('open');
