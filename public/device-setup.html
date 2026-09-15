@@ -251,6 +251,17 @@
       </button>
     </div>
 
+    <!-- Step 4: Success Screen -->
+    <div class="step-section" id="step4" style="text-align: center;">
+      <div class="icon-container" style="background: rgba(46, 125, 50, 0.1); color: var(--success);"><i class="fa-solid fa-circle-check"></i></div>
+      <h2>Device Bound!</h2>
+      <p class="subtitle">Your physical device has been permanently locked to your account. You can now securely access your classrooms and mark attendance.</p>
+      <div style="margin-top: 20px;">
+        <div class="loader" style="display: inline-block; border-color: rgba(46, 125, 50, 0.3); border-top-color: var(--success);"></div>
+        <p style="color: var(--success); font-weight: 600; margin-top: 10px;">Redirecting...</p>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -408,16 +419,23 @@
           });
           
           if (res.ok) {
-            // Redirect to dashboard
-            window.location.href = "/classroom"; 
+            // Show Success Screen
+            showStep(4);
+            setTimeout(() => {
+              window.location.href = "/classroom.html"; 
+            }, 2500);
           } else {
             const data = await res.json();
             document.getElementById('bioError').innerText = data.message || "Device binding failed";
             document.getElementById('bioError').style.display = 'block';
+            document.getElementById('btnBio').disabled = false;
+            document.getElementById('loader3').style.display = 'none';
           }
         } catch (e) {
           document.getElementById('bioError').innerText = "Network error while binding device";
           document.getElementById('bioError').style.display = 'block';
+          document.getElementById('btnBio').disabled = false;
+          document.getElementById('loader3').style.display = 'none';
         }
       } else {
         let displayMessage = message;
