@@ -3,6 +3,9 @@ import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { isAuthenticated } from '../middleware/auth.middleware.js';
 import { requireClassroomMember } from '../middleware/classroom.middleware.js';
+import ClassroomMembership from '../models/ClassroomMembership.js';
+import Classroom from '../models/Classroom.js';
+import { sendPushNotification } from '../services/firebase.service.js';
 
 const router = express.Router();
 
@@ -156,6 +159,31 @@ router.post('/:id', isAuthenticated, requireClassroomMember, async (req, res) =>
         if (error) throw error;
 
         res.status(201).json({ message: data });
+
+        // --- FCM PUSH NOTIFICATIONS ---
+        try {
+            const classroom = await Classroom.findById(id).select('name').lean();
+            if (classroom) {
+                const members = await ClassroomMembership.find({ classroom: id, status: 'active' })
+                    .populate('student', 'fcmToken')
+                    .populate('teacher', 'fcmToken')
+                    .lean();
+
+                for (const m of members) {
+                    const memberUser = m.student || m.teacher;
+                    if (memberUser && memberUser._id.toString() !== user._id.toString() && memberUser.fcmToken) {
+                        sendPushNotification({
+                            fcmToken: memberUser.fcmToken,
+                            title: `New Message in ${classroom.name}`,
+                            body: `${user.name}: ${message.length > 50 ? message.substring(0, 47) + '...' : message}`,
+                            data: { actionUrl: `https://v2.classgrid.in/view-classroom.html?id=${id}#chat` }
+                        }).catch(e => console.error("FCM Send Error:", e.message));
+                    }
+                }
+            }
+        } catch (fcmErr) {
+            console.error("FCM Chat Error:", fcmErr);
+        }
 
     } catch (err) {
         console.error('Chat send error:', err);

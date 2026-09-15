@@ -10,6 +10,7 @@ import ActivityLog from "../models/ActivityLog.js";
 import Organization from "../models/Organization.js";
 import connectDB from "../../config/db.js";
 import { getStudentLimit, getMaxStudentsPerClassroom, getMaxClassroomsPerFaculty, getEffectivePlan, normalizePlan } from "../config/plan.config.js";
+import { sendPushNotification } from "../services/firebase.service.js";
 import {
     sendClassroomActivityEmails,
     sendJoinRequestEmail,
@@ -1086,7 +1087,9 @@ router.post("/:id/content/:type", isAuthenticated, requireClassroomOwner, condit
 
         // Notify students (wrapped in try-catch so failures do not crash the file upload)
         try {
-            const members = await ClassroomMembership.find({ classroom: classroomId, status: "approved" }).select("student");
+            const members = await ClassroomMembership.find({ classroom: classroomId, status: "approved" })
+                .populate("student", "fcmToken");
+                
             if (members.length > 0) {
                 const notifTitle = type === 'materials'
                     ? `New Material${insertedItems.length > 1 ? 's' : ''}`
@@ -1096,7 +1099,7 @@ router.post("/:id/content/:type", isAuthenticated, requireClassroomOwner, condit
                     : `New content added to ${classroom.name}: ${title || (message && message.substring(0, 30) + '...') || 'Untitled'}`;
 
                 const notifications = members.map(m => ({
-                    recipient: m.student,
+                    recipient: m.student._id || m.student,
                     type: "content_update", // Added "content_update" to the enum in Notification.js
                     title: notifTitle,
                     message: notifMsg,
@@ -1105,6 +1108,18 @@ router.post("/:id/content/:type", isAuthenticated, requireClassroomOwner, condit
                     createdAt: new Date()
                 }));
                 await Notification.insertMany(notifications);
+                
+                // --- FCM PUSH NOTIFICATIONS ---
+                for (const m of members) {
+                    if (m.student && m.student.fcmToken) {
+                        sendPushNotification({
+                            fcmToken: m.student.fcmToken,
+                            title: notifTitle,
+                            body: notifMsg,
+                            data: { actionUrl: `https://v2.classgrid.in/view-classroom.html?id=${classroomId}` }
+                        }).catch(e => console.error("FCM Send Error:", e.message));
+                    }
+                }
             }
 
             // 📧 Queue email notifications (reliable, with retry)
