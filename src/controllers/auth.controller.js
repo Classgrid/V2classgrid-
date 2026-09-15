@@ -861,7 +861,7 @@ export const oauthCallback = async (req, res) => {
         // Faculty with no org must enter org code first
         target = '/enter-org-code.html';
     } else {
-        target = '/classroom.html';
+        target = '/classroom';
     }
 
     // If logging in via Android Custom Tab, redirect to deep link instead of setting cookie
