@@ -32,7 +32,7 @@ const attendanceRecordSchema = new mongoose.Schema(
         // present_suspicious → flagged (paste, fast typing, GPS mismatch)
         status: {
             type: String,
-            enum: ["present", "present_suspicious"],
+            enum: ["present", "present_suspicious", "absent"],
             default: "present",
         },
 

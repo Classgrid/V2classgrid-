@@ -131,7 +131,7 @@ router.get(
             const sessionMap = Object.fromEntries(sessionAgg.map(s => [s._id.toString(), s.totalSessions]));
 
             const presentAgg = await AttendanceRecord.aggregate([
-                { $match: { student: userId, classroom: { $in: classroomIds }, createdAt: { $gte: startDate, $lte: endDate } } },
+                { $match: { student: userId, classroom: { $in: classroomIds }, createdAt: { $gte: startDate, $lte: endDate }, status: { $ne: "absent" } } },
                 { $group: { _id: "$classroom", present: { $sum: 1 } } },
             ]);
             const presentMap = Object.fromEntries(presentAgg.map(p => [p._id.toString(), p.present]));
@@ -276,7 +276,7 @@ router.get(
 
             const sessions = await AttendanceSession.find({ classroom: { $in: classroomIds }, createdAt: { $gte: startDate, $lte: endDate } }).sort({ createdAt: -1 }).lean();
             const sessionIds = sessions.map(s => s._id);
-            const records = await AttendanceRecord.find({ student: userId, session: { $in: sessionIds } }).select("session status").lean();
+            const records = await AttendanceRecord.find({ student: userId, session: { $in: sessionIds }, status: { $ne: "absent" } }).select("session status").lean();
             const presentSessionSet = new Set(records.map(r => r.session.toString()));
 
             const grouped = {};
@@ -497,6 +497,11 @@ router.post(
             const attempts = failedAttemptsMap.get(attemptKey) || 0;
 
             if (attempts >= 3) {
+                await AttendanceRecord.findOneAndUpdate(
+                    { session: session._id, student: req.user._id },
+                    { $setOnInsert: { session: session._id, classroom: classroomId, student: req.user._id, status: "absent", suspicionReasons: ["max_failed_attempts"] } },
+                    { upsert: true }
+                );
                 return res.status(403).json({ message: "You entered wrong more than 2 times. You have been marked absent by the system." });
             }
 
@@ -505,6 +510,11 @@ router.post(
                 const newAttempts = attempts + 1;
                 failedAttemptsMap.set(attemptKey, newAttempts);
                 if (newAttempts >= 3) {
+                    await AttendanceRecord.findOneAndUpdate(
+                        { session: session._id, student: req.user._id },
+                        { $setOnInsert: { session: session._id, classroom: classroomId, student: req.user._id, status: "absent", suspicionReasons: ["max_failed_attempts"] } },
+                        { upsert: true }
+                    );
                     return res.status(403).json({ message: "You entered wrong more than 2 times. You have been marked absent by the system." });
                 }
                 return res.status(401).json({ message: "Incorrect attendance code" });
@@ -575,6 +585,11 @@ router.post(
             const attemptKey = `${session._id}_${req.user._id}`;
             const attempts = failedAttemptsMap.get(attemptKey) || 0;
             if (attempts >= 3) {
+                await AttendanceRecord.findOneAndUpdate(
+                    { session: session._id, student: req.user._id },
+                    { $setOnInsert: { session: session._id, classroom: classroomId, student: req.user._id, status: "absent", suspicionReasons: ["max_failed_attempts"] } },
+                    { upsert: true }
+                );
                 return res.status(403).json({ message: "You entered wrong more than 2 times. You have been marked absent by the system." });
             }
 
@@ -583,6 +598,11 @@ router.post(
                 const newAttempts = attempts + 1;
                 failedAttemptsMap.set(attemptKey, newAttempts);
                 if (newAttempts >= 3) {
+                    await AttendanceRecord.findOneAndUpdate(
+                        { session: session._id, student: req.user._id },
+                        { $setOnInsert: { session: session._id, classroom: classroomId, student: req.user._id, status: "absent", suspicionReasons: ["max_failed_attempts"] } },
+                        { upsert: true }
+                    );
                     return res.status(403).json({ message: "You entered wrong more than 2 times. You have been marked absent by the system." });
                 }
                 return res.status(401).json({ message: "Incorrect attendance code" });
@@ -844,7 +864,8 @@ router.get(
                         lat: record.studentLat,
                         lng: record.studentLng,
                         distanceMeters: record.distanceMeters,
-                        locationName: record.locationName
+                        locationName: record.locationName,
+                        status: record.status
                     };
                 }
             }
@@ -1094,7 +1115,7 @@ router.get(
             const members = await ClassroomMembership.find({ classroom: classroomId, status: "approved" }).populate("student", "name email").lean();
 
             const records = await AttendanceRecord.aggregate([
-                { $match: { session: { $in: sessionIds } } },
+                { $match: { session: { $in: sessionIds }, status: { $ne: "absent" } } },
                 { $group: { _id: "$student", present: { $sum: 1 }, suspicious: { $sum: { $cond: [{ $eq: ["$status", "present_suspicious"] }, 1, 0] } } } },
             ]);
 
@@ -1235,7 +1256,7 @@ router.get(
             const endDate = new Date(year, month, 0, 23, 59, 59, 999);
 
             const totalSessions = await AttendanceSession.countDocuments({ classroom: classroomId, createdAt: { $gte: startDate, $lte: endDate } });
-            const presentCount = await AttendanceRecord.countDocuments({ classroom: classroomId, student: req.user._id, createdAt: { $gte: startDate, $lte: endDate } });
+            const presentCount = await AttendanceRecord.countDocuments({ classroom: classroomId, student: req.user._id, createdAt: { $gte: startDate, $lte: endDate }, status: { $ne: "absent" } });
 
             const absent = totalSessions - presentCount;
             const percentage = totalSessions > 0 ? Math.round((presentCount / totalSessions) * 100) : 0;

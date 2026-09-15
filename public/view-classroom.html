@@ -3630,7 +3630,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
         function renderStudentAttendance(el, data) {
             if (data.active) {
                 const s = data.session;
-                if (s.alreadyMarked) {
+                if (s.alreadyMarked && s.studentData?.status !== 'absent') {
                     if (s.requiresGPS && s.studentData && s.studentData.lat) {
                         const d = s.studentData;
                         el.innerHTML = `
@@ -3735,7 +3735,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                             <p style="font-size:13px;color:var(--mt)">Your attendance for this session has been recorded.</p>
                         </div>`;
                     }
-                } else if (s.isBlocked) {
+                } else if (s.isBlocked || (s.alreadyMarked && s.studentData?.status === 'absent')) {
                     el.innerHTML = `
                     <div style="padding:40px 20px;text-align:center">
                         <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,71,87,.12);display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px">
