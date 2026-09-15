@@ -751,7 +751,6 @@ export const oauthCallback = async (req, res) => {
     if (isMobileDevice && !isAndroid && req.user.role === 'student') {
         try {
             const { getMobileAppRequiredEmailHtml, getMobileAppRequiredEmailPlainText } = await import("../services/email-templates.service.js");
-            const { sendEmail } = await import("../services/email.service.js");
             
             await sendEmail({
                 to: req.user.email,
