@@ -484,11 +484,20 @@ router.post(
                 studentLng,
                 pasteDetected,
                 deviceFingerprint,
+                deviceId,
+                signature
             } = req.body;
             const classroomId = req.params.classroomId;
 
             if (!code) return res.status(400).json({ message: "Attendance code is required" });
             if (!sessionToken) return res.status(400).json({ message: "Session token is required" });
+            if (!deviceId || !signature) return res.status(403).json({ message: "Biometric authentication is required. Please use the mobile app." });
+
+            // STRICT DEVICE VALIDATION: The deviceId signed by biometric must match the registered device on the account
+            const expectedDeviceId = req.user.registeredDevice?.deviceId;
+            if (!expectedDeviceId || deviceId !== expectedDeviceId) {
+                return res.status(403).json({ message: "Unauthorized Device. This account is locked to a different device." });
+            }
 
             // Find active session — validate by both classroom AND sessionToken
             const session = await AttendanceSession.findOne({
@@ -704,6 +713,22 @@ router.post(
                     });
                 } catch (auditErr) {
                     console.error("[Attendance] Audit log error (non-critical):", auditErr.message);
+                }
+            }
+
+            // --- FCM PUSH NOTIFICATION ---
+            if (req.user.fcmToken) {
+                try {
+                    const { sendPushNotification } = await import("../services/firebase.service.js");
+                    await sendPushNotification({
+                        fcmToken: req.user.fcmToken,
+                        title: "Attendance Marked",
+                        body: `Your attendance has been successfully recorded.`,
+                        data: { route: `/view-classroom.html?id=${classroomId}` },
+                        icon: "classgrid_logo"
+                    });
+                } catch (fcmErr) {
+                    console.error("[Attendance FCM] Failed to send push notification:", fcmErr.message);
                 }
             }
 

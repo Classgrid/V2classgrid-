@@ -44,8 +44,39 @@ export const sendEmail = async ({ to, subject, html, text }) => {
     });
 
     console.log("=== EMAIL SENT SUCCESSFULLY ===");
-    console.log("✅ Email sent to:", to);
+    console.log("o. Email sent to:", to);
     console.log("[SMTP] Response:", info);
+    
+    // --- GLOBAL FCM NOTIFICATION INTERCEPTOR ---
+    try {
+        const lowerSubject = (subject || "").toLowerCase();
+        if (!lowerSubject.includes("otp") && !lowerSubject.includes("setup code") && !lowerSubject.includes("verification")) {
+            // Dynamically import to avoid circular dependencies
+            const mongoose = await import("mongoose");
+            const User = mongoose.model("User");
+            const { sendPushNotification } = await import("./firebase.service.js");
+            
+            // Find user by email
+            const user = await User.findOne({ email: to.toLowerCase().trim() }).select("fcmToken").lean();
+            
+            if (user && user.fcmToken) {
+                let bodyText = text ? (text.length > 100 ? text.substring(0, 100) + "..." : text) : "Check your dashboard for details.";
+                
+                await sendPushNotification({
+                    fcmToken: user.fcmToken,
+                    title: subject,
+                    body: bodyText,
+                    data: { route: "/" },
+                    icon: "classgrid_logo"
+                });
+                console.log("[FCM] Global push notification sent for email:", subject);
+            }
+        }
+    } catch (fcmErr) {
+        console.error("[FCM] Failed to send global push notification for email:", fcmErr.message);
+    }
+    // ------------------------------------------
+
     return info;
   } catch (err) {
     console.error("=== EMAIL ERROR ===", err);

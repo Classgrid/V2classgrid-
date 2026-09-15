@@ -3751,7 +3751,7 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                         </div>
 
                         <div class="mf" style="margin-bottom:14px">
-                            <input id="attStudentCode" type="text" placeholder="Enter mysterious code" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;padding:14px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:16px;font-weight:700;text-align:center;letter-spacing:2px;font-family:var(--f)">
+                            <input id="attStudentCode" type="text" placeholder="Tap to scan fingerprint first" readonly="true" onclick="onAttendanceInputFocus('${s.sessionToken}')" onfocus="onAttendanceInputFocus('${s.sessionToken}')" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;padding:14px;border-radius:10px;border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);font-size:16px;font-weight:700;text-align:center;letter-spacing:2px;font-family:var(--f);cursor:pointer">
                         </div>
                         <button class="btnd" id="markAttBtn" onclick="markAttendance('${s.sessionToken}', ${s.requiresGPS}, ${s.teacherLat || 0}, ${s.teacherLng || 0}, ${s.radiusMeters || 25})" style="width:100%;padding:14px;border-radius:10px;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--gr),#00a87a);color:#fff;border:none;cursor:pointer">
                             <i class="fas fa-check"></i> Mark Attendance
@@ -4026,10 +4026,48 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
             }
         };
 
+        window.onAttendanceBiometricResult = function(success, errorMsg, deviceId, signature) {
+            const errEl = g('attError');
+            if (!success) {
+                errEl.textContent = errorMsg || "Biometric authentication failed";
+                errEl.style.display = 'block';
+                return;
+            }
+            errEl.style.display = 'none';
+            window._attBiometricData = { deviceId, signature };
+            const codeEl = g('attStudentCode');
+            codeEl.placeholder = "Enter mysterious code";
+            codeEl.readOnly = false;
+            codeEl.style.cursor = 'text';
+            codeEl.focus();
+        };
+
+        window.onAttendanceInputFocus = function(sessionToken) {
+            const codeEl = g('attStudentCode');
+            if (!codeEl.readOnly) return; // Already verified
+            
+            const errEl = g('attError');
+            if (window.AndroidApp && window.AndroidApp.signChallenge) {
+                // Blur to prevent keyboard from popping up before fingerprint
+                codeEl.blur();
+                errEl.style.display = 'none';
+                window.AndroidApp.signChallenge(sessionToken, 'onAttendanceBiometricResult');
+            } else {
+                errEl.textContent = "Attendance marking is only available inside the secure Classgrid App.";
+                errEl.style.display = 'block';
+            }
+        };
+
         window.markAttendance = async function (sessionToken, requiresGPS, teacherLat, teacherLng, radiusMeters) {
             const codeEl = g('attStudentCode');
             const code = (codeEl?.value || '').trim();
             const errEl = g('attError');
+
+            if (codeEl.readOnly) {
+                errEl.textContent = 'Please complete fingerprint verification first';
+                errEl.style.display = 'block';
+                return;
+            }
 
             if (!code) {
                 errEl.textContent = 'Please enter the attendance code';
@@ -4048,6 +4086,17 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
 
             // — Fraud Signals —
             const pasteDetected = codeEl.dataset.pasted === 'true';
+
+            // — Biometric Data —
+            const deviceId = window._attBiometricData?.deviceId;
+            const signature = window._attBiometricData?.signature;
+
+            if (!deviceId || !signature) {
+                errEl.textContent = 'Biometric security tokens missing. Please try again.';
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                return;
+            }
 
             // — GPS (STRICT — no IP/network fallback!) —
             let studentLat = null;
@@ -4159,7 +4208,9 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                     code,
                     sessionToken,
                     pasteDetected,
-                    deviceFingerprint: await generateDeviceFingerprint()
+                    deviceFingerprint: await generateDeviceFingerprint(),
+                    deviceId,
+                    signature
                 };
                 if (studentLat) payload.studentLat = studentLat;
                 if (studentLng) payload.studentLng = studentLng;

@@ -1175,6 +1175,7 @@ export const getCurrentUser = async (req, res) => {
             organization: orgData,
             mustResetPassword: req.user.mustResetPassword || false,
             registeredDevice: req.user.registeredDevice || null,
+            registeredDevice: req.user.registeredDevice || null,
             // Impersonation state
             isImpersonating: req.isImpersonating || false,
             realUser: req.realUser ? {

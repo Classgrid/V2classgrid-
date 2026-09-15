@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Device Setup | Classgrid AI Classroom Platform</title>
   <meta name="theme-color" content="#0d1117" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
   <style>
     :root {
       --primary-black: #111111;
@@ -47,7 +51,7 @@
       max-width: 450px;
       padding: 2.5rem;
       border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -107,9 +111,17 @@
     }
 
     @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.4); }
-      70% { box-shadow: 0 0 0 15px rgba(46, 125, 50, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 15px rgba(46, 125, 50, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(46, 125, 50, 0);
+      }
     }
 
     .form-input {
@@ -151,7 +163,7 @@
     .btn:hover {
       background: #333333;
       transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     }
 
     .btn:disabled {
@@ -171,8 +183,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .error-msg {
@@ -183,7 +202,7 @@
     }
 
     .loader {
-      border: 3px solid rgba(255,255,255,0.3);
+      border: 3px solid rgba(255, 255, 255, 0.3);
       border-top: 3px solid white;
       border-radius: 50%;
       width: 20px;
@@ -192,7 +211,15 @@
       display: none;
     }
 
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
 
     /* Checkmark Animation Styles */
     .checkmark-wrapper {
@@ -207,7 +234,10 @@
 
     .spinner-ring {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       box-sizing: border-box;
       border-radius: 50%;
       border-style: solid;
@@ -221,7 +251,10 @@
 
     .checkmark-pop {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -252,14 +285,17 @@
         width: 96px;
         height: 96px;
       }
+
       .spinner-ring {
         border-width: 3px;
       }
+
       .checkmark-circle {
         width: 56px;
         height: 56px;
         box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);
       }
+
       .checkmark-svg {
         width: 28px;
         height: 28px;
@@ -267,15 +303,39 @@
     }
 
     @keyframes spinOnce {
-      0% { transform: rotate(0deg); opacity: 1; border-width: 3px; }
-      70% { transform: rotate(720deg); border-width: 3px; opacity: 1; }
-      100% { transform: rotate(900deg); opacity: 0; border-width: 0px; }
+      0% {
+        transform: rotate(0deg);
+        opacity: 1;
+        border-width: 3px;
+      }
+
+      70% {
+        transform: rotate(720deg);
+        border-width: 3px;
+        opacity: 1;
+      }
+
+      100% {
+        transform: rotate(900deg);
+        opacity: 0;
+        border-width: 0px;
+      }
     }
 
     @keyframes popIn {
-      0% { transform: scale(0); opacity: 0; }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); opacity: 1; }
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
 
     /* --- POLICIES MODAL --- */
@@ -300,7 +360,7 @@
         border: 1px solid #2a2a2a;
         border-radius: 12px;
         width: 100%;
-        max-width: 600px;
+        max-width: 650px;
         padding: 32px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
         display: flex;
@@ -416,6 +476,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="setup-container">
@@ -435,7 +496,9 @@
         <div class="loader" id="loader1"></div>
       </button>
       <div style="text-align: center; margin-top: 15px;">
-        <a href="#" onclick="logoutUser(event)" style="color: var(--medium-gray); text-decoration: none; font-weight: 500; font-size: 0.9rem;">Wrong account? Log out</a>
+        <a href="#" onclick="logoutUser(event)"
+          style="color: var(--medium-gray); text-decoration: none; font-weight: 500; font-size: 0.9rem;">Wrong account?
+          Log out</a>
       </div>
     </div>
 
@@ -450,11 +513,13 @@
         <span class="btn-text">Verify Code</span>
         <div class="loader" id="loader2"></div>
       </button>
-      
+
       <div style="text-align: center; margin-top: 15px;">
         <p class="subtitle" style="font-size: 0.9rem;">Didn't receive the code? <br>
-          <a href="#" id="resendLink" onclick="resendOtp(event)" style="color: var(--primary); text-decoration: none; font-weight: 600; display: none;">Resend Code</a>
-          <span id="resendTimer" style="color: var(--text-muted); font-weight: 500;">Resend in <span id="timeRemaining">60</span>s</span>
+          <a href="#" id="resendLink" onclick="resendOtp(event)"
+            style="color: var(--primary); text-decoration: none; font-weight: 600; display: none;">Resend Code</a>
+          <span id="resendTimer" style="color: var(--text-muted); font-weight: 500;">Resend in <span
+              id="timeRemaining">60</span>s</span>
         </p>
       </div>
     </div>
@@ -477,16 +542,19 @@
         <div class="spinner-ring"></div>
         <div class="checkmark-pop">
           <div class="checkmark-circle">
-            <svg class="checkmark-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="checkmark-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </div>
         </div>
       </div>
       <h2>Device Bound!</h2>
-      <p class="subtitle">Your physical device has been permanently locked to your account. You can now securely access your classrooms and mark attendance.</p>
+      <p class="subtitle">Your physical device has been permanently locked to your account. You can now securely access
+        your classrooms and mark attendance.</p>
       <div style="margin-top: 20px;">
-        <div class="loader" style="display: inline-block; border-color: rgba(46, 125, 50, 0.3); border-top-color: var(--success);"></div>
+        <div class="loader"
+          style="display: inline-block; border-color: rgba(46, 125, 50, 0.3); border-top-color: var(--success);"></div>
         <p style="color: var(--success); font-weight: 600; margin-top: 10px;">Redirecting...</p>
       </div>
     </div>
@@ -500,13 +568,19 @@
             </div>
 
             <div class="policies-modal-body">
-                <p style="margin-top: 0;">By proceeding to bind your fingerprint, you agree to our strict device lock model:</p>
+                <p style="margin-top: 0;">By proceeding to bind your fingerprint, you agree to our strict device lock model and our general platform policies:</p>
                 
-                <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 0; margin-top: 15px;">
+                <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; margin-top: 15px;">
                     <li><strong>Permanent Device Lock:</strong> Your account will be permanently locked to this specific physical device motherboard.</li>
                     <li><strong>No Multiple Accounts:</strong> You cannot log into any other student's account on this phone. Doing so will permanently block that account.</li>
                     <li><strong>No Account Sharing:</strong> You cannot log into your account on a friend's phone or a web browser. You must always use this exact physical device.</li>
                 </ul>
+
+                <p style="margin-bottom: 0;">Please review our full terms before proceeding:</p>
+                <div style="display: flex; gap: 15px; margin-top: 10px;">
+                    <a href="https://classgrid.in/privacy" target="_blank" style="color: #f59e0b; text-decoration: none; font-weight: 600;">Privacy Policy <i class="fas fa-external-link-alt" style="font-size: 12px;"></i></a>
+                    <a href="https://classgrid.in/terms" target="_blank" style="color: #f59e0b; text-decoration: none; font-weight: 600;">Terms of Service <i class="fas fa-external-link-alt" style="font-size: 12px;"></i></a>
+                </div>
             </div>
 
             <div class="policies-modal-footer">
@@ -524,7 +598,7 @@
 
     async function logoutUser(e) {
       if (e) e.preventDefault();
-      try { await fetch('/api/auth/logout', { method: 'POST' }); } catch(err) {}
+      try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (err) { }
       localStorage.removeItem('token');
       localStorage.removeItem('jwt_token');
       document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -534,7 +608,7 @@
     function showStep(step) {
       document.querySelectorAll('.step-section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.step-dot').forEach((el, index) => {
-        if(index < step) el.classList.add('active');
+        if (index < step) el.classList.add('active');
         else el.classList.remove('active');
       });
       document.getElementById('step' + step).classList.add('active');
@@ -572,13 +646,13 @@
       const resendLink = document.getElementById('resendLink');
       const resendTimer = document.getElementById('resendTimer');
       const timeRemaining = document.getElementById('timeRemaining');
-      
+
       resendLink.style.display = 'none';
       resendTimer.style.display = 'inline';
-      
+
       let timeLeft = 60;
       timeRemaining.innerText = timeLeft;
-      
+
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timeLeft--;
@@ -596,7 +670,7 @@
       const resendLink = document.getElementById('resendLink');
       resendLink.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
       resendLink.style.pointerEvents = 'none';
-      
+
       try {
         const token = localStorage.getItem('token') || localStorage.getItem('jwt_token');
         const res = await fetch('/api/auth/send-setup-otp', {
@@ -604,9 +678,9 @@
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
-           startResendTimer();
+          startResendTimer();
         } else {
-           alert('Failed to resend code.');
+          alert('Failed to resend code.');
         }
       } catch (e) {
         console.error(e);
@@ -618,12 +692,12 @@
 
     async function verifyOtp() {
       const otp = document.getElementById('otpInput').value;
-      if(otp.length !== 6) return;
+      if (otp.length !== 6) return;
 
       const btn = document.getElementById('btnVerifyOtp');
       const loader = document.getElementById('loader2');
       const errorEl = document.getElementById('otpError');
-      
+
       btn.disabled = true;
       loader.style.display = 'block';
       errorEl.style.display = 'none';
@@ -681,12 +755,12 @@
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ deviceId, publicKey, setupToken })
           });
-          
+
           if (res.ok) {
             // Show Success Screen
             showStep(4);
             setTimeout(() => {
-              window.location.href = "/classroom.html"; 
+              window.location.href = "/classroom.html";
             }, 2500);
           } else {
             const data = await res.json();
@@ -708,11 +782,12 @@
         } else if (message.includes("Hardware Error")) {
           displayMessage = "Device error: " + message.split(':').slice(1).join(':').trim();
         }
-        
+
         document.getElementById('bioError').innerText = displayMessage;
         document.getElementById('bioError').style.display = 'block';
       }
     }
   </script>
 </body>
+
 </html>
