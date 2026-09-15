@@ -154,6 +154,12 @@ class MainActivity : AppCompatActivity() {
     // --- JAVASCRIPT INTERFACE ---
     inner class WebAppInterface(private val context: Context) {
         
+        // Expose to JS: window.AndroidApp.getHardwareDeviceId()
+        @JavascriptInterface
+        fun getHardwareDeviceId(): String {
+            return this@MainActivity.getHardwareDeviceId()
+        }
+
         // Expose to JS: window.AndroidApp.registerDevice()
         @JavascriptInterface
         fun registerDevice(setupToken: String) {

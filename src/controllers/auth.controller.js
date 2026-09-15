@@ -1531,8 +1531,16 @@ export const registerDevice = async (req, res) => {
             });
         }
 
-        // Save the new binding to the current user
         const user = await User.findById(req.user.id);
+
+        // STRICT ACCOUNT CHECK: Has this user already registered a different device?
+        if (user.registeredDevice && user.registeredDevice.deviceId && user.registeredDevice.deviceId !== deviceId) {
+            return res.status(403).json({ 
+                message: "Your account is already permanently bound to another device. You cannot register a new device. Please contact administration." 
+            });
+        }
+
+        // Save the new binding to the current user
         user.registeredDevice = {
             deviceId,
             publicKey,

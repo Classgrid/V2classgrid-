@@ -263,7 +263,7 @@
       loader.style.display = 'block';
 
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || localStorage.getItem('jwt_token');
         const res = await fetch('/api/auth/send-setup-otp', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
@@ -295,7 +295,7 @@
       errorEl.style.display = 'none';
 
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || localStorage.getItem('jwt_token');
         const res = await fetch('/api/auth/verify-setup-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -331,7 +331,7 @@
     async function onDeviceRegistered(success, message, deviceId, publicKey) {
       if (success) {
         try {
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem('token') || localStorage.getItem('jwt_token');
           const res = await fetch('/api/auth/register-device', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -340,7 +340,7 @@
           
           if (res.ok) {
             // Redirect to dashboard
-            window.location.href = "/student.html"; // Adjust to correct dashboard
+            window.location.href = "/classroom"; 
           } else {
             const data = await res.json();
             document.getElementById('bioError').innerText = data.message || "Device binding failed";

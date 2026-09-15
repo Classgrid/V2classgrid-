@@ -35,6 +35,11 @@ router.get("/profile", isAuthenticated, async (req, res) => {
         authProvider: user.authProvider,
         lastLoginAt: user.lastLoginAt,
         createdAt: user.createdAt,
+        registeredDevice: user.registeredDevice ? {
+          deviceId: user.registeredDevice.deviceId,
+          registeredAt: user.registeredDevice.registeredAt,
+          lastOtpVerifiedAt: user.registeredDevice.lastOtpVerifiedAt
+        } : null,
         organization_id: user.organization_id ? {
           id: user.organization_id._id,
           name: user.organization_id.name,
