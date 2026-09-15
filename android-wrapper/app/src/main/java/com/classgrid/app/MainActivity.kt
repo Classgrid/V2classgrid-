@@ -124,6 +124,13 @@ class MainActivity : AppCompatActivity() {
                     return true
                 }
                 
+                // Open all other external links (like Privacy Policy) in Custom Chrome Tab instead of inside WebView
+                if (!url.contains("v2.classgrid.in") && (url.startsWith("http://") || url.startsWith("https://"))) {
+                    val customTabsIntent = CustomTabsIntent.Builder().build()
+                    customTabsIntent.launchUrl(this@MainActivity, Uri.parse(url))
+                    return true
+                }
+                
                 return false
             }
         }

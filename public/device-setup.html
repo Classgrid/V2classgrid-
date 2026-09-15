@@ -583,9 +583,16 @@
                 </div>
             </div>
 
-            <div class="policies-modal-footer">
-                <button class="policies-btn policies-btn-cancel" onclick="closePoliciesModal()">Cancel</button>
-                <button class="policies-btn policies-btn-primary" onclick="acceptPoliciesAndProceed()">I Understand &mdash; Proceed</button>
+            <div style="margin-top: 24px; padding-top: 15px; border-top: 1px solid #333;">
+                <label style="display: flex; align-items: flex-start; gap: 10px; color: #fff; cursor: pointer; font-size: 14px; margin-bottom: 20px;">
+                    <input type="checkbox" id="agreePoliciesCheck" onchange="document.getElementById('proceedPoliciesBtn').disabled = !this.checked; document.getElementById('proceedPoliciesBtn').style.opacity = this.checked ? '1' : '0.5';" style="width: 18px; height: 18px; accent-color: #f59e0b; margin-top: 2px; flex-shrink: 0;">
+                    <span style="line-height: 1.4;">I have read and agree to all the Terms of Service and Privacy Policy</span>
+                </label>
+                
+                <div style="display: flex; gap: 15px; align-items: center; justify-content: flex-end;">
+                    <button class="policies-btn policies-btn-cancel" style="background: transparent; border: none; color: #9ca3af; padding: 12px; margin: 0; font-weight: 500;" onclick="closePoliciesModal()">Cancel</button>
+                    <button id="proceedPoliciesBtn" class="policies-btn policies-btn-primary" style="margin: 0; flex: 1; opacity: 0.5;" onclick="acceptPoliciesAndProceed()" disabled>I Understand &mdash; Proceed</button>
+                </div>
             </div>
         </div>
     </div>
