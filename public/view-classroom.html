@@ -4114,6 +4114,24 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                 return;
             }
 
+            // — VERIFY CODE FIRST —
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying Code...';
+            try {
+                const rCode = await api(`/api/attendance/${CID}/verify-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, sessionToken })
+                });
+                const dCode = await rCode.json();
+                if (!rCode.ok) throw new Error(dCode.message || "Incorrect attendance code");
+            } catch (e) {
+                errEl.textContent = e.message;
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Mark Attendance';
+                return;
+            }
+
             // — GPS (STRICT — no IP/network fallback!) —
             let studentLat = null;
             let studentLng = null;

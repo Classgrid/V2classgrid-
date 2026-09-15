@@ -466,6 +466,59 @@ router.post(
 );
 
 // ─────────────────────────────────────────────
+// POST /:classroomId/verify-code — Student verifies code before GPS
+// ─────────────────────────────────────────────
+const failedAttemptsMap = new Map();
+
+router.post(
+    "/:classroomId/verify-code",
+    isAuthenticated,
+    requireClassroomMember,
+    async (req, res) => {
+        try {
+            await connectDB();
+            const { code, sessionToken } = req.body;
+            const classroomId = req.params.classroomId;
+
+            if (!code) return res.status(400).json({ message: "Attendance code is required" });
+            if (!sessionToken) return res.status(400).json({ message: "Session token is required" });
+
+            const session = await AttendanceSession.findOne({
+                classroom: classroomId,
+                status: "active",
+                sessionToken,
+            });
+
+            if (!session) {
+                return res.status(404).json({ message: "No active attendance session found. It may have expired." });
+            }
+
+            const attemptKey = `${session._id}_${req.user._id}`;
+            const attempts = failedAttemptsMap.get(attemptKey) || 0;
+
+            if (attempts >= 3) {
+                return res.status(403).json({ message: "You entered wrong more than 2 times. You have been marked absent by the system." });
+            }
+
+            const isMatch = await bcrypt.compare(code.toLowerCase().trim(), session.codeHash);
+            if (!isMatch) {
+                const newAttempts = attempts + 1;
+                failedAttemptsMap.set(attemptKey, newAttempts);
+                if (newAttempts >= 3) {
+                    return res.status(403).json({ message: "You entered wrong more than 2 times. You have been marked absent by the system." });
+                }
+                return res.status(401).json({ message: "Incorrect attendance code" });
+            }
+
+            res.json({ success: true });
+        } catch (err) {
+            console.error("[Attendance] Verify code error:", err);
+            res.status(500).json({ message: "Server error verifying code" });
+        }
+    }
+);
+
+// ─────────────────────────────────────────────
 // POST /:classroomId/mark — Student marks attendance
 // NEW: GPS validation, sessionToken check, paste/typing detection
 // ─────────────────────────────────────────────
@@ -519,8 +572,19 @@ router.post(
             }
 
             // Verify code
+            const attemptKey = `${session._id}_${req.user._id}`;
+            const attempts = failedAttemptsMap.get(attemptKey) || 0;
+            if (attempts >= 3) {
+                return res.status(403).json({ message: "You entered wrong more than 2 times. You have been marked absent by the system." });
+            }
+
             const isMatch = await bcrypt.compare(code.toLowerCase().trim(), session.codeHash);
             if (!isMatch) {
+                const newAttempts = attempts + 1;
+                failedAttemptsMap.set(attemptKey, newAttempts);
+                if (newAttempts >= 3) {
+                    return res.status(403).json({ message: "You entered wrong more than 2 times. You have been marked absent by the system." });
+                }
                 return res.status(401).json({ message: "Incorrect attendance code" });
             }
 
