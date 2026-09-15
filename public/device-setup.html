@@ -408,7 +408,14 @@
           document.getElementById('bioError').style.display = 'block';
         }
       } else {
-        document.getElementById('bioError').innerText = message;
+        let displayMessage = message;
+        if (message.includes("At least one biometric must be enrolled")) {
+          displayMessage = "No fingerprint found! Please go to your phone's Settings > Security and add a fingerprint to continue.";
+        } else if (message.includes("Hardware Error")) {
+          displayMessage = "Device error: " + message.split(':').slice(1).join(':').trim();
+        }
+        
+        document.getElementById('bioError').innerText = displayMessage;
         document.getElementById('bioError').style.display = 'block';
       }
     }

@@ -182,8 +182,9 @@ class MainActivity : AppCompatActivity() {
                         
                         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                             super.onAuthenticationError(errorCode, errString)
+                            val safeErr = errString.toString().replace("'", "\\'").replace("\n", " ")
                             runOnUiThread {
-                                webView.evaluateJavascript("javascript:onDeviceRegistered(false, '$errString', null, null);", null)
+                                webView.evaluateJavascript("javascript:onDeviceRegistered(false, '$safeErr', null, null);", null)
                             }
                         }
                     })
@@ -194,11 +195,18 @@ class MainActivity : AppCompatActivity() {
                 .setNegativeButtonText("Cancel")
                 .build()
 
-            runOnUiThread {
-                biometricPrompt.authenticate(promptInfo)
+                runOnUiThread {
+                    biometricPrompt.authenticate(promptInfo)
+                }
+            } catch (e: Exception) {
+                val errorMsg = e.message ?: "Unknown biometric hardware error"
+                val safeErr = errorMsg.replace("'", "\\'").replace("\n", " ")
+                runOnUiThread {
+                    webView.evaluateJavascript("javascript:onDeviceRegistered(false, 'Hardware Error: $safeErr', null, null);", null)
+                }
             }
         }
-
+        
         // Expose to JS: window.AndroidApp.signChallenge()
         @JavascriptInterface
         fun signChallenge(challenge: String, callbackName: String) {
@@ -233,8 +241,9 @@ class MainActivity : AppCompatActivity() {
                         
                         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                             super.onAuthenticationError(errorCode, errString)
+                            val safeErr = errString.toString().replace("'", "\\'").replace("\n", " ")
                             runOnUiThread {
-                                webView.evaluateJavascript("javascript:$callbackName(false, '$errString', null, null);", null)
+                                webView.evaluateJavascript("javascript:$callbackName(false, '$safeErr', null, null);", null)
                             }
                         }
                     })
@@ -249,8 +258,10 @@ class MainActivity : AppCompatActivity() {
                     biometricPrompt.authenticate(promptInfo, cryptoObject)
                 }
             } catch (e: Exception) {
+                val errorMsg = e.message ?: "Unknown biometric hardware error"
+                val safeErr = errorMsg.replace("'", "\\'").replace("\n", " ")
                 runOnUiThread {
-                    webView.evaluateJavascript("javascript:$callbackName(false, 'Biometric setup missing or invalid', null, null);", null)
+                    webView.evaluateJavascript("javascript:$callbackName(false, 'Biometric Error: $safeErr', null, null);", null)
                 }
             }
         }

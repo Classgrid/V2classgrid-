@@ -42,7 +42,7 @@ async function main() {
     // await uploadFile(faviconPath, 'favicon-16x16.png', 'image/png');
 
     const apkPath = 'c:\\V2classgrid-\\android-wrapper\\app\\build\\outputs\\apk\\debug\\app-debug.apk';
-    await uploadFile(apkPath, 'v2classgrid-release-2.apk', 'application/vnd.android.package-archive');
+    await uploadFile(apkPath, 'v2classgrid-release-4.apk', 'application/vnd.android.package-archive');
 }
 
 main();
