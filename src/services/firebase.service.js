@@ -1,6 +1,8 @@
-import admin from 'firebase-admin';
+import { initializeApp, cert } from 'firebase-admin/app';
+import { getMessaging } from 'firebase-admin/messaging';
 
 let isInitialized = false;
+let messagingApp;
 
 export const initFirebase = () => {
     if (isInitialized) return;
@@ -15,19 +17,20 @@ export const initFirebase = () => {
         const serviceAccountJson = Buffer.from(base64ServiceAccount, 'base64').toString('utf8');
         const serviceAccount = JSON.parse(serviceAccountJson);
 
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
+        const app = initializeApp({
+            credential: cert(serviceAccount)
         });
         
+        messagingApp = getMessaging(app);
         isInitialized = true;
-        console.log("🔥 Firebase Admin SDK initialized successfully.");
+        console.log("Firebase Admin SDK initialized successfully.");
     } catch (error) {
         console.error("Failed to initialize Firebase Admin SDK:", error);
     }
 };
 
 export const sendPushNotification = async ({ fcmToken, title, body, data }) => {
-    if (!isInitialized || !fcmToken) return false;
+    if (!isInitialized || !fcmToken || !messagingApp) return false;
 
     try {
         const message = {
@@ -39,7 +42,7 @@ export const sendPushNotification = async ({ fcmToken, title, body, data }) => {
             token: fcmToken
         };
 
-        const response = await admin.messaging().send(message);
+        const response = await messagingApp.send(message);
         console.log("Successfully sent push message:", response);
         return true;
     } catch (error) {
