@@ -4033,6 +4033,18 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
         window.onAttendanceBiometricResult = function (success, errorMsg, deviceId, signature) {
             const errEl = g('attError');
             if (!success) {
+                if (errorMsg && errorMsg.includes('PrivateKey')) {
+                    errEl.innerHTML = '<div style="text-align:left;padding:4px 0">' +
+                        '<b style="font-size:1.05em">⚠️ Fingerprint Key Missing</b><br><br>' +
+                        'Your fingerprint security key was automatically deleted by Android when the app was uninstalled or your lock screen was changed.<br><br>' +
+                        '<b>What does this mean?</b> When you first set up your fingerprint, your phone created a secret digital key locked inside your device\'s security chip. ' +
+                        'That key has now been erased, so your phone can no longer verify your identity for attendance.<br><br>' +
+                        '<b>How to fix it:</b> Simply click the button below to securely re-register your fingerprint. This will generate a new key locked to your account only.<br><br>' +
+                        '<a href="/device-setup.html?force=true" style="color:#fff;text-decoration:none;font-weight:bold;background:#b71c1c;padding:10px 20px;border-radius:8px;display:inline-block;border:1px solid #fff;font-size:1em">🔄 Reset Fingerprint</a>' +
+                        '</div>';
+                    errEl.style.display = 'block';
+                    return;
+                }
                 errEl.textContent = errorMsg || "Biometric authentication failed";
                 errEl.style.display = 'block';
                 return;
