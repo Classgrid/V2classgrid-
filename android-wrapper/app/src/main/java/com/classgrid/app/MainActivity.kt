@@ -262,7 +262,7 @@ class MainActivity : AppCompatActivity() {
             return try {
                 val keyStore = KeyStore.getInstance("AndroidKeyStore")
                 keyStore.load(null)
-                keyStore.containsAlias(KEY_NAME)
+                keyStore.containsAlias(KEY_NAME) && keyStore.getKey(KEY_NAME, null) != null
             } catch (e: Exception) {
                 false
             }
