@@ -1630,7 +1630,8 @@
         if (window.grecaptcha && window.RECAPTCHA_SITE_KEY) {
           try { reCaptchaToken = await grecaptcha.execute(window.RECAPTCHA_SITE_KEY, { action: 'check_email' }); } catch (e) { console.warn('reCAPTCHA skipped:', e); }
         }
-        const payload = JSON.stringify({ email: email, existsCheck: true, recaptchaToken: reCaptchaToken || '' });
+        const isInsideApp = (typeof window.AndroidApp !== 'undefined');
+        const payload = JSON.stringify({ email: email, existsCheck: true, recaptchaToken: reCaptchaToken || '', isInsideApp });
         const r = await fetch(EP.checkEmail, {
           method: 'POST',
           headers: {
@@ -1641,6 +1642,7 @@
           body: payload
         });
         const d = await r.json();
+        if (d.mobileBlocked) { showMessage('Please check your email for app download instructions.', 'info'); return; }
         if (!r.ok) { showMessage(d.message || 'Unable to check email.', 'error'); return; }
         checkedEmail = email;
         if (d.exists) {

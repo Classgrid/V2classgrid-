@@ -1379,6 +1379,22 @@ export const checkStudentEmail = async (req, res) => {
 
         const normalizedEmail = email.toLowerCase().trim();
 
+        // Check if mobile web browser
+        const userAgent = req.headers['user-agent'] || '';
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+        if (isMobileDevice && req.body.isInsideApp !== true) {
+            // Send the special "App Required" email
+            const { getMobileAppRequiredEmailHtml, getMobileAppRequiredEmailPlainText } = await import("../services/email-templates.service.js");
+            await sendEmail({
+                to: normalizedEmail,
+                subject: "Action Required: Download Classgrid App",
+                html: getMobileAppRequiredEmailHtml(normalizedEmail),
+                text: getMobileAppRequiredEmailPlainText(normalizedEmail),
+            });
+            // Tell frontend to block
+            return res.status(200).json({ success: false, mobileBlocked: true });
+        }
+
         // Check if user exists with student role
         const existingUser = await User.findOne({ email: { $regex: new RegExp(`^${normalizedEmail}$`, "i") } });
 
