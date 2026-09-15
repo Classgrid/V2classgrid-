@@ -1961,6 +1961,10 @@
       const verified = p.get('verified'), error = p.get('error'), msg = p.get('message');
       if (verified || error) window.history.replaceState({}, document.title, window.location.pathname);
 
+      if (error === 'mobileBlocked') {
+        showMessage('Please check your email for app download instructions.', 'info');
+      }
+
       if (verified) {
         try {
           const em = decodeURIComponent(verified);

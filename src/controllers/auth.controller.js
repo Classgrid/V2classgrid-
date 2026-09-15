@@ -743,6 +743,28 @@ export const oauthCallback = async (req, res) => {
     const stateParts = (req.query.state || "").split('|');
     const loginTab = stateParts[0] || null;
     const isAndroid = stateParts[1] === 'true';
+    
+    // Check if mobile web browser (and not coming from Android wrapper)
+    const userAgent = req.headers['user-agent'] || '';
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    
+    if (isMobileDevice && !isAndroid && req.user.role === 'student') {
+        try {
+            const { getMobileAppRequiredEmailHtml, getMobileAppRequiredEmailPlainText } = await import("../services/email-templates.service.js");
+            const { sendEmail } = await import("../services/email.service.js");
+            
+            await sendEmail({
+                to: req.user.email,
+                subject: "Action Required: Download Classgrid App",
+                html: getMobileAppRequiredEmailHtml(req.user.email),
+                text: getMobileAppRequiredEmailPlainText(req.user.email),
+            });
+        } catch (err) {
+            console.error("Failed to send mobile block email:", err);
+        }
+        return res.redirect(`${FRONTEND_URL}/login?error=mobileBlocked`);
+    }
+
     const oauthRoleLabels = { student: 'Student', teacher: 'Faculty', faculty: 'Faculty', org_admin: 'Organization Admin', super_admin: 'Super Admin' };
     const oauthUserRoleLabel = oauthRoleLabels[req.user.role] || req.user.role;
 
