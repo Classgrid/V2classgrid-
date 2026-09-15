@@ -1123,7 +1123,20 @@
         font-size: 0.85rem;
       }
     }
-  </style>
+  
+    /* Native App / Mobile Tweaks */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    @media (max-width: 992px) {
+      .brand-panel {
+        display: none !important;
+      }
+      .grecaptcha-badge {
+        display: none !important;
+      }
+    }
+</style>
 </head>
 
 <body>

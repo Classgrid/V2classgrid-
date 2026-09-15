@@ -1182,7 +1182,20 @@
         font-size: 0.85rem;
       }
     }
-  </style>
+  
+    /* Native App / Mobile Tweaks */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    @media (max-width: 992px) {
+      .brand-panel {
+        display: none !important;
+      }
+      .grecaptcha-badge {
+        display: none !important;
+      }
+    }
+</style>
 </head>
 
 <body>
@@ -1277,8 +1290,7 @@
       <div class="social-links">
         <a href="https://www.instagram.com/classgrid_cg/?hl=" class="social-link" target="_blank" aria-label="Instagram"><i
             class="fab fa-instagram"></i></a>
-        <a href="https://x.com/classgrid_cg" class="social-link" target="_blank" aria-label="X"><i
-            class="fab fa-x-twitter"></i></a>
+        <a href="https://www.linkedin.com/company/classgrid/?viewAsMember=true" class="social-link" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
         <a href="https://www.facebook.com/profile.php?id=61588646851017" class="social-link" target="_blank"
           aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
       </div>
