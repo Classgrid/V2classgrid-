@@ -58,6 +58,9 @@ class MainActivity : AppCompatActivity() {
         val webSettings: WebSettings = webView.settings
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
+        webSettings.mediaPlaybackRequiresUserGesture = false
+        webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
+        webView.clearCache(true) // Aggressively clear cache on every startup
         webSettings.useWideViewPort = true
         webSettings.loadWithOverviewMode = true
         webSettings.setGeolocationEnabled(true)

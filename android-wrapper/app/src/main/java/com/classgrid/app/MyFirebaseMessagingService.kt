@@ -15,8 +15,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Handle FCM messages here.
-        remoteMessage.notification?.let {
-            sendNotification(it.title ?: "Classgrid", it.body ?: "")
+        // We read from data payload to support background notifications natively
+        val title = remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: "Classgrid"
+        val body = remoteMessage.data["body"] ?: remoteMessage.notification?.body ?: ""
+
+        if (title.isNotEmpty() || body.isNotEmpty()) {
+            sendNotification(title, body)
         }
     }
 

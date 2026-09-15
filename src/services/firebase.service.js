@@ -33,12 +33,23 @@ export const sendPushNotification = async ({ fcmToken, title, body, data }) => {
     if (!isInitialized || !fcmToken || !messagingApp) return false;
 
     try {
+        // We only send a 'data' payload (no 'notification' payload) to ensure
+        // Android's onMessageReceived is triggered even when the app is in the background.
+        // FCM data payload values must be strings.
+        const stringifiedData = {};
+        if (data) {
+            for (const key in data) {
+                stringifiedData[key] = String(data[key]);
+            }
+        }
+        stringifiedData.title = String(title || "");
+        stringifiedData.body = String(body || "");
+
         const message = {
-            notification: {
-                title,
-                body
+            data: stringifiedData,
+            android: {
+                priority: "high"
             },
-            data: data || {},
             token: fcmToken
         };
 
