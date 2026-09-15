@@ -21,7 +21,19 @@
             var _cb = location.origin.includes('localhost') ? 'http://localhost:3000' : '';
             var _tok = localStorage.getItem('jwt_token'); var _hdrs = { 'Cache-Control': 'no-store' }; if (_tok && _tok !== 'null' && _tok !== 'undefined') { _hdrs['Authorization'] = 'Bearer ' + _tok; }
             fetch(_cb + '/api/auth/me', { credentials: 'include', cache: 'no-store', headers: _hdrs })
-                .then(function (r) { if (r.ok) return r.json().then(function (u) { window._cookieAuthUser = u; if (u.token && !_tok) localStorage.setItem('jwt_token', u.token); var e = document.getElementById('_ag'); if (e) e.remove(); document.body.style.visibility = 'visible'; }); throw 0; })
+                .then(function (r) { 
+                    if (r.ok) return r.json().then(function (u) { 
+                        window._cookieAuthUser = u; 
+                        if (u.token && !_tok) localStorage.setItem('jwt_token', u.token); 
+                        if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId) {
+                            var hwId = window.AndroidApp.getHardwareDeviceId();
+                            var isBound = u.registeredDevice && u.registeredDevice.deviceId === hwId;
+                            if (!isBound) { window.location.replace('/device-setup.html'); return; }
+                        }
+                        var e = document.getElementById('_ag'); if (e) e.remove(); document.body.style.visibility = 'visible'; 
+                    }); 
+                    throw 0; 
+                })
                 .catch(function () { window.location.replace('/login.html'); });
             window.addEventListener('storage', function (e) { if (e.key === 'jwt_token' && !e.newValue) window.location.replace('/login.html'); });
         })();

@@ -1174,6 +1174,7 @@ export const getCurrentUser = async (req, res) => {
             prn: req.user.prn || null,
             organization: orgData,
             mustResetPassword: req.user.mustResetPassword || false,
+            registeredDevice: req.user.registeredDevice || null,
             // Impersonation state
             isImpersonating: req.isImpersonating || false,
             realUser: req.realUser ? {
