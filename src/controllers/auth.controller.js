@@ -1461,7 +1461,7 @@ export const sendSetupOtp = async (req, res) => {
                     isUsed: false,
                     failedAttempts: 0,
                     lastResentAt: new Date(),
-                    expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 mins
+                    expiresAt: new Date(Date.now() + 60 * 1000) // 60 seconds
                 }
             },
             { upsert: true, sort: { createdAt: -1 } }
