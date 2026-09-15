@@ -386,6 +386,17 @@ class MainActivity : AppCompatActivity() {
         
         // Expose to JS: window.AndroidApp.getFcmToken()
         @JavascriptInterface
+        fun openBrowser(url: String) {
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(context, "Could not open browser", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        @JavascriptInterface
         fun getFcmToken() {
             FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
