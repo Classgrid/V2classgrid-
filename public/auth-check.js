@@ -145,6 +145,26 @@
                 window.Auth.user = user;
                 window.Auth.isAuthenticated = true;
 
+                // Sync FCM Token
+                if (window.AndroidApp && window.AndroidApp.getFcmToken && !sessionStorage.getItem('fcmSynced')) {
+                    window.onFcmTokenReady = async (fcmToken) => {
+                        try {
+                            await fetch(`${API_BASE_URL}/api/auth/fcm-token`, {
+                                method: 'POST',
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}` 
+                                },
+                                body: JSON.stringify({ fcmToken })
+                            });
+                            sessionStorage.setItem('fcmSynced', 'true');
+                        } catch (e) {
+                            console.error("Failed to sync FCM token", e);
+                        }
+                    };
+                    window.AndroidApp.getFcmToken();
+                }
+
                 // --- STRICT ANDROID DEVICE BINDING INTERCEPTOR ---
                 if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId) {
                     const hwId = window.AndroidApp.getHardwareDeviceId();

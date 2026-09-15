@@ -1,0 +1,11 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.classgrid.app",
+    "sha256_cert_fingerprints": [
+      "PUT_YOUR_RELEASE_KEYSTORE_SHA256_HERE",
+      "PUT_YOUR_DEBUG_KEYSTORE_SHA256_HERE"
+    ]
+  }
+}]
