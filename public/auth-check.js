@@ -1,4 +1,12 @@
 (function () {
+    // Check if on a mobile device but NOT inside the Android App Wrapper
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isInsideApp = (typeof window.AndroidApp !== 'undefined');
+    if (isMobile && !isInsideApp && !window.location.pathname.includes('mobile-blocked.html')) {
+        window.location.href = '/mobile-blocked.html';
+        return; // Stop execution
+    }
+
     // Configuration
     const API_BASE_URL = window.location.origin.includes('localhost')
         ? 'http://localhost:3000'
