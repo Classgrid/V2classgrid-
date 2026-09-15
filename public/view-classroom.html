@@ -4029,6 +4029,14 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
         window.onAttendanceBiometricResult = function(success, errorMsg, deviceId, signature) {
             const errEl = g('attError');
             if (!success) {
+                if (errorMsg && errorMsg.includes('java.security.PrivateKey')) {
+                    errEl.textContent = "Your fingerprint key was deleted by Android during uninstall. Redirecting to setup to create a new secure key...";
+                    errEl.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = '/device-setup.html?force=true';
+                    }, 2500);
+                    return;
+                }
                 errEl.textContent = errorMsg || "Biometric authentication failed";
                 errEl.style.display = 'block';
                 return;
