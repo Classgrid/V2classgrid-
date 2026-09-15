@@ -3735,6 +3735,15 @@ ${groups.length ? html : `<div class="mat-empty" style="padding:44px 20px"><div 
                             <p style="font-size:13px;color:var(--mt)">Your attendance for this session has been recorded.</p>
                         </div>`;
                     }
+                } else if (s.isBlocked) {
+                    el.innerHTML = `
+                    <div style="padding:40px 20px;text-align:center">
+                        <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,71,87,.12);display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px">
+                            <i class="fas fa-times-circle" style="font-size:30px;color:var(--rd)"></i>
+                        </div>
+                        <h3 style="font-size:18px;font-weight:700;color:var(--rd);margin-bottom:6px">Marked Absent</h3>
+                        <p style="font-size:13px;color:var(--mt)">You entered the wrong code more than 2 times. You have been marked absent by the system.</p>
+                    </div>`;
                 } else {
                     el.innerHTML = `
                     <div style="padding:20px">

@@ -849,6 +849,9 @@ router.get(
                 }
             }
 
+            const attemptKey = `${session._id}_${req.user._id}`;
+            const isBlocked = (failedAttemptsMap.get(attemptKey) || 0) >= 3;
+
             res.json({
                 active: true,
                 session: {
@@ -868,6 +871,7 @@ router.get(
                     teacherLocationName: session.locationName,
                     radiusMeters: session.radiusMeters || 25,
                     teacherMetadata: session.teacherMetadata || {},
+                    isBlocked,
                 },
             });
         } catch (err) {
