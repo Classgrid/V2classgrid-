@@ -256,6 +256,18 @@ class MainActivity : AppCompatActivity() {
             return this@MainActivity.getHardwareDeviceId()
         }
 
+        // Expose to JS: window.AndroidApp.hasBiometricKey()
+        @JavascriptInterface
+        fun hasBiometricKey(): Boolean {
+            return try {
+                val keyStore = KeyStore.getInstance("AndroidKeyStore")
+                keyStore.load(null)
+                keyStore.containsAlias(KEY_NAME)
+            } catch (e: Exception) {
+                false
+            }
+        }
+
         @JavascriptInterface
         fun registerDevice(setupToken: String) {
             try {

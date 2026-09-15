@@ -2,6 +2,13 @@
 <html lang="en">
 
 <head>
+    <script>
+        // INSTANT LOGIN CHECK: Prevent login screen flicker
+        if (localStorage.getItem('jwt_token')) {
+            document.documentElement.style.display = 'none';
+            window.location.replace('/dashboard.html');
+        }
+    </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4222089495408727"
         crossorigin="anonymous"></script>
     <meta charset="UTF-8">

@@ -82,7 +82,7 @@
                     if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId) {
                         const hwId = window.AndroidApp.getHardwareDeviceId();
                         const currentPath = window.location.pathname;
-                        const isBound = user.registeredDevice && user.registeredDevice.deviceId === hwId;
+                        const isBound = user.registeredDevice && user.registeredDevice.deviceId === hwId && (typeof window.AndroidApp.hasBiometricKey !== 'function' || window.AndroidApp.hasBiometricKey());
                         if (!isBound && currentPath !== '/device-setup.html') {
                             window.location.href = '/device-setup.html';
                             return; // Stop execution
@@ -114,7 +114,7 @@
                 if (window.AndroidApp && window.AndroidApp.getHardwareDeviceId) {
                     const hwId = window.AndroidApp.getHardwareDeviceId();
                     const currentPath = window.location.pathname;
-                    const isBound = user.registeredDevice && user.registeredDevice.deviceId === hwId;
+                    const isBound = user.registeredDevice && user.registeredDevice.deviceId === hwId && (typeof window.AndroidApp.hasBiometricKey !== 'function' || window.AndroidApp.hasBiometricKey());
                     if (!isBound && currentPath !== '/device-setup.html') {
                         window.location.href = '/device-setup.html';
                         return; // Stop execution
@@ -171,7 +171,7 @@
                     const currentPath = window.location.pathname;
                     
                     // Check if device is bound
-                    const isBound = user.registeredDevice && user.registeredDevice.deviceId === hwId;
+                    const isBound = user.registeredDevice && user.registeredDevice.deviceId === hwId && (typeof window.AndroidApp.hasBiometricKey !== 'function' || window.AndroidApp.hasBiometricKey());
                     
                     if (!isBound && currentPath !== '/device-setup.html') {
                         // Force redirect to setup!
