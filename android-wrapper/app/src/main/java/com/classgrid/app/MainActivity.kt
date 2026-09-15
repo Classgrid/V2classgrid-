@@ -160,35 +160,35 @@ class MainActivity : AppCompatActivity() {
             return this@MainActivity.getHardwareDeviceId()
         }
 
-        // Expose to JS: window.AndroidApp.registerDevice()
         @JavascriptInterface
         fun registerDevice(setupToken: String) {
-            generateSecretKey()
-            
-            val executor = ContextCompat.getMainExecutor(context)
-            val biometricPrompt = BiometricPrompt(this@MainActivity, executor,
-                object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                        super.onAuthenticationSucceeded(result)
-                        val deviceId = getHardwareDeviceId()
-                        val publicKey = getPublicKeyString()
+            try {
+                generateSecretKey()
+                
+                val executor = ContextCompat.getMainExecutor(context)
+                val biometricPrompt = BiometricPrompt(this@MainActivity, executor,
+                    object : BiometricPrompt.AuthenticationCallback() {
+                        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                            super.onAuthenticationSucceeded(result)
+                            val deviceId = getHardwareDeviceId()
+                            val publicKey = getPublicKeyString()
+                            
+                            // Send data back to Web JS
+                            runOnUiThread {
+                                val script = "javascript:onDeviceRegistered(true, null, '$deviceId', '$publicKey');"
+                                webView.evaluateJavascript(script, null)
+                            }
+                        }
                         
-                        // Send data back to Web JS
-                        runOnUiThread {
-                            val script = "javascript:onDeviceRegistered(true, null, '$deviceId', '$publicKey');"
-                            webView.evaluateJavascript(script, null)
+                        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                            super.onAuthenticationError(errorCode, errString)
+                            runOnUiThread {
+                                webView.evaluateJavascript("javascript:onDeviceRegistered(false, '$errString', null, null);", null)
+                            }
                         }
-                    }
-                    
-                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                        super.onAuthenticationError(errorCode, errString)
-                        runOnUiThread {
-                            webView.evaluateJavascript("javascript:onDeviceRegistered(false, '$errString', null, null);", null)
-                        }
-                    }
-                })
+                    })
 
-            val promptInfo = BiometricPrompt.PromptInfo.Builder()
+                val promptInfo = BiometricPrompt.PromptInfo.Builder()
                 .setTitle("Secure Device Registration")
                 .setSubtitle("Link this device to your Classgrid account")
                 .setNegativeButtonText("Cancel")
