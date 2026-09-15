@@ -277,6 +277,143 @@
       50% { transform: scale(1.1); }
       100% { transform: scale(1); opacity: 1; }
     }
+
+    /* --- POLICIES MODAL --- */
+    .policies-modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        display: none; /* hidden by default */
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        z-index: 9999;
+    }
+
+    .policies-modal-overlay.open {
+        display: flex;
+    }
+
+    .policies-modal-content {
+        background-color: #161616;
+        border: 1px solid #2a2a2a;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 600px;
+        padding: 32px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        max-height: 90vh; 
+        overflow-y: auto;
+    }
+
+    .policies-modal-header {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .policies-modal-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        color: #ffffff;
+        line-height: 1.3;
+    }
+
+    .policies-modal-subtitle {
+        margin: 0;
+        font-size: 14px;
+        color: #a1a1aa;
+        line-height: 1.4;
+    }
+
+    .policies-modal-body {
+        background-color: #1a1a1a;
+        border-radius: 8px;
+        padding: 24px;
+        min-height: 150px;
+        border: 1px solid #242424;
+        color: #d4d4d8;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    .policies-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 16px;
+        margin-top: 8px;
+    }
+
+    .policies-btn {
+        border: none;
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .policies-btn-cancel {
+        background: transparent;
+        color: #ffffff;
+    }
+
+    .policies-btn-cancel:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .policies-btn-primary {
+        background-color: #f59e0b;
+        color: #000000;
+    }
+
+    .policies-btn-primary:hover {
+        background-color: #d97706;
+        transform: translateY(-1px);
+    }
+    
+    .policies-btn-primary:active {
+        transform: translateY(0);
+    }
+
+    @media (max-width: 600px) {
+        .policies-modal-overlay {
+            padding: 12px;
+        }
+        .policies-modal-content {
+            padding: 20px;
+            gap: 20px;
+        }
+        .policies-modal-title {
+            font-size: 18px;
+        }
+        .policies-modal-body {
+            padding: 16px;
+            font-size: 14px;
+        }
+        .policies-modal-footer {
+            flex-direction: column-reverse;
+            gap: 12px;
+            width: 100%;
+        }
+        .policies-btn {
+            width: 100%;
+            padding: 14px 20px;
+        }
+    }
   </style>
 </head>
 <body>
@@ -352,6 +489,31 @@
         <div class="loader" style="display: inline-block; border-color: rgba(46, 125, 50, 0.3); border-top-color: var(--success);"></div>
         <p style="color: var(--success); font-weight: 600; margin-top: 10px;">Redirecting...</p>
       </div>
+    </div>
+
+    <!-- POLICIES MODAL -->
+    <div class="policies-modal-overlay" id="policiesModal">
+        <div class="policies-modal-content">
+            <div class="policies-modal-header">
+                <h2 class="policies-modal-title">Device Security Policy</h2>
+                <p class="policies-modal-subtitle">Please review our security flow before proceeding.</p>
+            </div>
+
+            <div class="policies-modal-body">
+                <p style="margin-top: 0;">By proceeding to bind your fingerprint, you agree to our strict device lock model:</p>
+                
+                <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 0; margin-top: 15px;">
+                    <li><strong>Permanent Device Lock:</strong> Your account will be permanently locked to this specific physical device motherboard.</li>
+                    <li><strong>No Multiple Accounts:</strong> You cannot log into any other student's account on this phone. Doing so will permanently block that account.</li>
+                    <li><strong>No Account Sharing:</strong> You cannot log into your account on a friend's phone or a web browser. You must always use this exact physical device.</li>
+                </ul>
+            </div>
+
+            <div class="policies-modal-footer">
+                <button class="policies-btn policies-btn-cancel" onclick="closePoliciesModal()">Cancel</button>
+                <button class="policies-btn policies-btn-primary" onclick="acceptPoliciesAndProceed()">I Understand &mdash; Proceed</button>
+            </div>
+        </div>
     </div>
 
   </div>
@@ -491,6 +653,16 @@
     }
 
     function triggerBiometric() {
+      // Show Policies Modal first
+      document.getElementById('policiesModal').classList.add('open');
+    }
+
+    function closePoliciesModal() {
+      document.getElementById('policiesModal').classList.remove('open');
+    }
+
+    function acceptPoliciesAndProceed() {
+      closePoliciesModal();
       // Tell Android app to trigger biometric prompt and generate key
       if (window.AndroidApp && window.AndroidApp.registerDevice) {
         window.AndroidApp.registerDevice(setupToken);
