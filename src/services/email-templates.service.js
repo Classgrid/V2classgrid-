@@ -2063,16 +2063,23 @@ If you did not attempt to log in, please reset your password immediately.
 // APP REQUIRED EMAIL (Sent when blocking mobile browser login)
 // -------------------------------------------------------------
 export const getMobileAppRequiredEmailHtml = (email) => {
-  return `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-      <h2 style="color: #b71c1c;">Action Required: Download Classgrid App</h2>
-      <p>Hi there,</p>
-      <p>We noticed you tried to log into Classgrid from a mobile web browser. For security, GPS location tracking, and attendance verification, <strong>mobile web access is strictly disabled</strong>.</p>
-      <p>You must download the official Classgrid Android App to mark your attendance and access your classroom.</p>
-      <a href="https://cdn.classgrid.in/classgridv2.apk" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px;">Download Classgrid App</a>
-      <p style="margin-top: 25px; font-size: 13px; color: #666;"><em>Note: If you are using a laptop or desktop computer, you may ignore this message and log in normally.</em></p>
+  const content = `
+    <h1 style="color: #ef4444;">Action Required</h1>
+    <p>Hi there,</p>
+    <p>We noticed you tried to log into Classgrid from a mobile web browser. For security, GPS location tracking, and attendance verification, <strong>mobile web access is strictly disabled for students</strong>.</p>
+    
+    <div class="box" style="text-align:center; margin: 24px 0;">
+      <div class="meta" style="margin-bottom: 15px;">Download the official Classgrid app to mark your attendance and access your classroom.</div>
+      <a href="https://cdn.classgrid.in/classgrid.apk" class="button" style="display:inline-block; padding:12px 24px; background-color:#3b82f6; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:600;">Download Classgrid App</a>
     </div>
+
+    <p style="margin-top: 25px; font-size: 13px; color: #9ca3af;"><em>Note: If you are using a laptop or desktop computer, you may ignore this message and log in normally.</em></p>
   `;
+  return baseTemplate({
+    content,
+    title: 'Action Required: Download Classgrid App',
+    ignoreText: 'If you are not a student, or if you received this in error, you may safely ignore this email.'
+  });
 };
 
 export const getMobileAppRequiredEmailPlainText = (email) => {
@@ -2084,7 +2091,7 @@ We noticed you tried to log into Classgrid from a mobile web browser. For securi
 
 You must download the official Classgrid Android App to mark your attendance and access your classroom.
 
-Download Link: https://cdn.classgrid.in/classgridv2.apk
+Download Link: https://cdn.classgrid.in/classgrid.apk
 
 Note: If you are using a laptop or desktop computer, you may ignore this message and log in normally.`;
 };
