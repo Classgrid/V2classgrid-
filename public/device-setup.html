@@ -365,15 +365,17 @@
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 0; /* Changed from 24px so we can manage spacing precisely */
         max-height: 90vh; 
-        overflow-y: auto;
+        overflow: hidden;
     }
 
     .policies-modal-header {
         display: flex;
         flex-direction: column;
         gap: 8px;
+        flex-shrink: 0;
+        margin-bottom: 24px;
     }
 
     .policies-modal-title {
@@ -396,11 +398,20 @@
         background-color: #1a1a1a;
         border-radius: 8px;
         padding: 24px;
-        min-height: 150px;
         border: 1px solid #242424;
         color: #d4d4d8;
         font-size: 15px;
         line-height: 1.6;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+    }
+    
+    .policies-modal-footer {
+        flex-shrink: 0;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #333;
     }
 
     .policies-modal-footer {
@@ -455,7 +466,7 @@
         }
         .policies-modal-content {
             padding: 20px;
-            gap: 20px;
+            gap: 0;
         }
         .policies-modal-title {
             font-size: 18px;
@@ -465,8 +476,14 @@
             font-size: 14px;
         }
         .policies-modal-footer {
-            flex-direction: column-reverse;
+            flex-direction: column;
             gap: 12px;
+            width: 100%;
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+        .policies-modal-footer > div {
+            flex-direction: column-reverse;
             width: 100%;
         }
         .policies-btn {
@@ -583,7 +600,7 @@
                 </div>
             </div>
 
-            <div style="margin-top: 24px; padding-top: 15px; border-top: 1px solid #333;">
+            <div class="policies-modal-footer">
                 <label style="display: flex; align-items: flex-start; gap: 10px; color: #fff; cursor: pointer; font-size: 14px; margin-bottom: 20px;">
                     <input type="checkbox" id="agreePoliciesCheck" onchange="document.getElementById('proceedPoliciesBtn').disabled = !this.checked; document.getElementById('proceedPoliciesBtn').style.opacity = this.checked ? '1' : '0.5';" style="width: 18px; height: 18px; accent-color: #f59e0b; margin-top: 2px; flex-shrink: 0;">
                     <span style="line-height: 1.4;">I have read and agree to all the Terms of Service and Privacy Policy</span>
