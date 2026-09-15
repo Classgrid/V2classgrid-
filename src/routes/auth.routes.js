@@ -29,6 +29,12 @@ router.post("/resend-activation", authController.resendActivation);
 
 router.post("/login", loginLimiter, authController.login);
 router.post("/verify-device", authController.verifyDeviceOtp);
+
+// 📱 Native Device Binding & Biometric Setup
+router.post("/send-setup-otp", isAuthenticated, authController.sendSetupOtp);
+router.post("/verify-setup-otp", isAuthenticated, authController.verifySetupOtp);
+router.post("/register-device", isAuthenticated, authController.registerDevice);
+
 router.post("/setup-org-admin", authController.setupOrgAdmin); // kept for backward compat
 router.post("/logout", authController.logout);
 
@@ -44,9 +50,11 @@ router.get(
     "/google",
     (req, res, next) => {
         const loginTab = req.query.loginTab || 'student';
+        const isAndroid = req.query.android === 'true' ? 'true' : 'false';
+        const state = `${loginTab}|${isAndroid}`; // Pass both through OAuth state
         passport.authenticate("google", {
             scope: ["profile", "email"],
-            state: loginTab  // survives the round-trip through Google OAuth
+            state: state
         })(req, res, next);
     }
 );

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Device Setup | Classgrid AI Classroom Platform</title>
+  <meta name="theme-color" content="#0d1117" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-black: #111111;
+      --accent-black: #000000;
+      --dark-bg: #0d1117;
+      --white: #ffffff;
+      --light-gray: #f5f5f5;
+      --medium-gray: #9e9e9e;
+      --dark-gray: #424242;
+      --success: #2e7d32;
+      --error: #c62828;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--dark-bg);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image:
+        linear-gradient(135deg, rgba(26, 35, 126, 0.1) 0%, transparent 100%),
+        linear-gradient(45deg, rgba(40, 53, 147, 0.05) 0%, transparent 100%);
+    }
+
+    .setup-container {
+      background: var(--white);
+      color: var(--primary-black);
+      width: 90%;
+      max-width: 450px;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .step-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      transition: all 0.3s ease;
+    }
+
+    .step-dot.active {
+      background: var(--primary-black);
+      transform: scale(1.2);
+    }
+
+    h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: var(--dark-gray);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .icon-container {
+      width: 80px;
+      height: 80px;
+      background: var(--light-gray);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 1.5rem auto;
+      font-size: 2rem;
+      color: var(--primary-black);
+    }
+
+    .icon-container.fingerprint {
+      background: rgba(46, 125, 50, 0.1);
+      color: var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(46, 125, 50, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      text-align: center;
+      letter-spacing: 5px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-black);
+      box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--primary-black);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn:hover {
+      background: #333333;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    .btn:disabled {
+      background: var(--medium-gray);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .step-section {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .step-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .error-msg {
+      color: var(--error);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .loader {
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  </style>
+</head>
+<body>
+
+  <div class="setup-container">
+    <div class="step-indicator">
+      <div class="step-dot active" id="dot1"></div>
+      <div class="step-dot" id="dot2"></div>
+      <div class="step-dot" id="dot3"></div>
+    </div>
+
+    <!-- Step 1: Request OTP -->
+    <div class="step-section active" id="step1">
+      <div class="icon-container"><i class="fa-solid fa-mobile-screen-button"></i></div>
+      <h2>Device Security</h2>
+      <p class="subtitle">To ensure secure attendance, we need to bind this physical device to your account.</p>
+      <button class="btn" onclick="sendOtp()" id="btnSendOtp">
+        <span class="btn-text">Send Verification Code</span>
+        <div class="loader" id="loader1"></div>
+      </button>
+    </div>
+
+    <!-- Step 2: Verify OTP -->
+    <div class="step-section" id="step2">
+      <div class="icon-container"><i class="fa-solid fa-envelope-open-text"></i></div>
+      <h2>Enter Code</h2>
+      <p class="subtitle">We sent a 6-digit verification code to your email.</p>
+      <div class="error-msg" id="otpError">Invalid code. Please try again.</div>
+      <input type="text" id="otpInput" class="form-input" placeholder="000000" maxlength="6" inputmode="numeric">
+      <button class="btn" onclick="verifyOtp()" id="btnVerifyOtp">
+        <span class="btn-text">Verify Code</span>
+        <div class="loader" id="loader2"></div>
+      </button>
+    </div>
+
+    <!-- Step 3: Biometric Scan -->
+    <div class="step-section" id="step3">
+      <div class="icon-container fingerprint"><i class="fa-solid fa-fingerprint"></i></div>
+      <h2>Biometric Lock</h2>
+      <p class="subtitle">Please authenticate using your device fingerprint or face lock to securely bind this device.</p>
+      <div class="error-msg" id="bioError">Biometric scan failed.</div>
+      <button class="btn" onclick="triggerBiometric()" id="btnBio">
+        <span class="btn-text">Scan Fingerprint</span>
+        <div class="loader" id="loader3"></div>
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    // These will be securely returned by the backend
+    let setupToken = "";
+
+    function showStep(step) {
+      document.querySelectorAll('.step-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.step-dot').forEach((el, index) => {
+        if(index < step) el.classList.add('active');
+        else el.classList.remove('active');
+      });
+      document.getElementById('step' + step).classList.add('active');
+    }
+
+    async function sendOtp() {
+      const btn = document.getElementById('btnSendOtp');
+      const loader = document.getElementById('loader1');
+      btn.disabled = true;
+      loader.style.display = 'block';
+
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/auth/send-setup-otp', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+          showStep(2);
+        } else {
+          alert("Failed to send OTP. Please try again.");
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        btn.disabled = false;
+        loader.style.display = 'none';
+      }
+    }
+
+    async function verifyOtp() {
+      const otp = document.getElementById('otpInput').value;
+      if(otp.length !== 6) return;
+
+      const btn = document.getElementById('btnVerifyOtp');
+      const loader = document.getElementById('loader2');
+      const errorEl = document.getElementById('otpError');
+      
+      btn.disabled = true;
+      loader.style.display = 'block';
+      errorEl.style.display = 'none';
+
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/auth/verify-setup-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ otp })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setupToken = data.setupToken;
+          showStep(3);
+        } else {
+          errorEl.style.display = 'block';
+        }
+      } catch (e) {
+        console.error(e);
+        errorEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        loader.style.display = 'none';
+      }
+    }
+
+    function triggerBiometric() {
+      // Tell Android app to trigger biometric prompt and generate key
+      if (window.AndroidApp && window.AndroidApp.registerDevice) {
+        window.AndroidApp.registerDevice(setupToken);
+      } else {
+        alert("This feature is only available inside the Classgrid Android App.");
+      }
+    }
+
+    // Called automatically by the Android app when biometric is successful
+    async function onDeviceRegistered(success, message, deviceId, publicKey) {
+      if (success) {
+        try {
+          const token = localStorage.getItem('token');
+          const res = await fetch('/api/auth/register-device', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ deviceId, publicKey, setupToken })
+          });
+          
+          if (res.ok) {
+            // Redirect to dashboard
+            window.location.href = "/student.html"; // Adjust to correct dashboard
+          } else {
+            const data = await res.json();
+            document.getElementById('bioError').innerText = data.message || "Device binding failed";
+            document.getElementById('bioError').style.display = 'block';
+          }
+        } catch (e) {
+          document.getElementById('bioError').innerText = "Network error while binding device";
+          document.getElementById('bioError').style.display = 'block';
+        }
+      } else {
+        document.getElementById('bioError').innerText = message;
+        document.getElementById('bioError').style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

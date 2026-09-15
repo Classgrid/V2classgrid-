@@ -739,8 +739,10 @@ export const oauthCallback = async (req, res) => {
         return res.redirect(`${FRONTEND_URL}/login?error=account_suspended`);
     }
 
-    // Tab enforcement for Google OAuth (state param carries loginTab)
-    const loginTab = req.query.state || null;
+    // Tab enforcement for Google OAuth (state param carries loginTab and isAndroid)
+    const stateParts = (req.query.state || "").split('|');
+    const loginTab = stateParts[0] || null;
+    const isAndroid = stateParts[1] === 'true';
     const oauthRoleLabels = { student: 'Student', teacher: 'Faculty', faculty: 'Faculty', org_admin: 'Organization Admin', super_admin: 'Super Admin' };
     const oauthUserRoleLabel = oauthRoleLabels[req.user.role] || req.user.role;
 
@@ -844,6 +846,12 @@ export const oauthCallback = async (req, res) => {
     await req.user.save();
 
     const token = generateToken(req.user);
+    
+    // If logging in via Android Custom Tab, redirect to deep link instead of setting cookie
+    if (isAndroid) {
+        return res.redirect(`classgridapp://auth?token=${token}`);
+    }
+    
     setTokenCookie(res, token);
 
     // Send welcome email on first login only
@@ -1428,6 +1436,115 @@ export const checkStudentEmail = async (req, res) => {
     } catch (err) {
         console.error("checkStudentEmail Error:", err);
         return res.status(500).json({ success: false, message: "Server error. Please try again." });
+    }
+};
+
+/* ==================== DEVICE BINDING (NATIVE APP) ==================== */
+
+// POST /api/auth/send-setup-otp
+export const sendSetupOtp = async (req, res) => {
+    try {
+        await connectDB();
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        await DeviceVerification.findOneAndUpdate(
+            { email: user.email },
+            {
+                otp,
+                isUsed: false,
+                failedAttempts: 0,
+                lastResentAt: new Date(),
+                expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 mins
+            },
+            { upsert: true }
+        );
+
+        const { getNewDeviceOtpHtml, getNewDeviceOtpPlainText } = await import("../services/email-templates.service.js");
+
+        await sendEmail({
+            to: user.email,
+            subject: "Device Setup Verification Code",
+            html: getNewDeviceOtpHtml ? getNewDeviceOtpHtml(user.name, otp) : `<p>Your device setup code is: <strong>${otp}</strong></p>`,
+            text: getNewDeviceOtpPlainText ? getNewDeviceOtpPlainText(user.name, otp) : `Your device setup code is: ${otp}`,
+        });
+
+        res.json({ success: true, message: "Setup OTP sent to email" });
+    } catch (err) {
+        console.error("Send Setup OTP Error:", err);
+        res.status(500).json({ message: "Failed to send OTP" });
+    }
+};
+
+// POST /api/auth/verify-setup-otp
+export const verifySetupOtp = async (req, res) => {
+    try {
+        await connectDB();
+        const { otp } = req.body;
+        const user = await User.findById(req.user.id);
+
+        const record = await DeviceVerification.findOne({ email: user.email });
+        if (!record || record.otp !== otp || record.isUsed || record.expiresAt < new Date()) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        record.isUsed = true;
+        await record.save();
+
+        // Generate a short-lived token to authorize the device registration step
+        const setupToken = jwt.sign({ id: user._id, intent: 'device_binding' }, JWT_SECRET, { expiresIn: '15m' });
+
+        res.json({ success: true, setupToken });
+    } catch (err) {
+        console.error("Verify Setup OTP Error:", err);
+        res.status(500).json({ message: "Failed to verify OTP" });
+    }
+};
+
+// POST /api/auth/register-device
+export const registerDevice = async (req, res) => {
+    try {
+        await connectDB();
+        const { deviceId, publicKey, setupToken } = req.body;
+
+        if (!deviceId || !publicKey || !setupToken) {
+            return res.status(400).json({ message: "Missing device credentials" });
+        }
+
+        // Verify the short-lived setup token
+        try {
+            const decoded = jwt.verify(setupToken, JWT_SECRET);
+            if (decoded.id !== req.user.id || decoded.intent !== 'device_binding') {
+                return res.status(403).json({ message: "Invalid setup token" });
+            }
+        } catch (e) {
+            return res.status(403).json({ message: "Setup token expired or invalid" });
+        }
+
+        // STRICT DEVICE CHECK: Has this hardware ID been registered by ANY OTHER user?
+        const existingDeviceBinding = await User.findOne({ 'registeredDevice.deviceId': deviceId });
+        if (existingDeviceBinding && existingDeviceBinding._id.toString() !== req.user.id) {
+            return res.status(403).json({ 
+                message: "This physical device is already permanently bound to another student account. Multiple accounts on a single device are prohibited." 
+            });
+        }
+
+        // Save the new binding to the current user
+        const user = await User.findById(req.user.id);
+        user.registeredDevice = {
+            deviceId,
+            publicKey,
+            registeredAt: new Date(),
+            lastOtpVerifiedAt: new Date() // Pre-verify them for today
+        };
+        await user.save();
+
+        res.json({ success: true, message: "Device successfully bound to account" });
+    } catch (err) {
+        console.error("Register Device Error:", err);
+        res.status(500).json({ message: "Failed to register device" });
     }
 };
 
